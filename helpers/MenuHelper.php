@@ -37,7 +37,7 @@ class MenuHelper
 	                ['label' => 'Penempatan', 'url' => ['/penugasan/index']],
 		        ]
 	        ];
-
+	        $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
 		    $menuItems[] = [
 	    		'template' => '<a href="{url}">{label}</a>',
 		        'label' => '<i class="lnr lnr-book"></i><span>Catatan Harian</span><i class="icon-submenu lnr lnr-chevron-left"></i>', 
@@ -46,6 +46,7 @@ class MenuHelper
 		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_notes">{label}</a>',
 		        'items'=>[
 		           	['label' => 'Daily', 'url' => ['/catatan-harian/index']],
+		           	['label' => 'Manage', 'url' => ['/catatan-harian/list'],'visible'=>in_array(Yii::$app->user->identity->access_role, $roles)],
 	                ['label' => 'Reports', 'url' => ['/catatan-harian/reports']],
 		        ]
 	        ];

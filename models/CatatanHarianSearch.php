@@ -70,6 +70,12 @@ class CatatanHarianSearch extends CatatanHarian
             ]);
         }
 
+        // $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
+        // if(in_array(Yii::$app->user->identity->access_role, $roles))
+        // {
+            
+        // }
+
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,

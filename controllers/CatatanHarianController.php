@@ -340,22 +340,22 @@ class CatatanHarianController extends Controller
      */
     public function actionIndex()
     {
-        $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
+        // $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
         
-        if(in_array(Yii::$app->user->identity->access_role, $roles))
-        {
-            return $this->redirect(['list']);
-        }
+        // if(in_array(Yii::$app->user->identity->access_role, $roles))
+        // {
+        //     return $this->redirect(['list']);
+        // }
 
-        else{
-            $searchModel = new CatatanHarianSearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        // else{
+        $searchModel = new CatatanHarianSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-            return $this->render('index', [
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
-        }
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+        // }
     }
 
     /**
