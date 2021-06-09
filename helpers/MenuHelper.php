@@ -225,8 +225,15 @@ class MenuHelper
 		        
 		    }
         }
-    	if(!Yii::$app->user->isGuest){	
+    	if(!Yii::$app->user->isGuest)
+    	{	
 			
+			$menuItems[] = [
+		     	'template' => '<a href="{url}" >Logged in as {label}</a>',
+		        'label' => '<strong>'.Yii::$app->user->identity->access_role.'</strong>',
+		        'url' => '#'
+		        
+		    ];
     		$class = Yii::$app->user->identity->class ?: '';
     		$stars = Yii::$app->user->identity->stars ?: '';
     		$label_stars = '';
@@ -249,7 +256,7 @@ class MenuHelper
 
 		    $menuItems[] = [
 		     	'template' => '<a href="{url}" class="dropdown-toggle" data-toggle="dropdown"><i class="lnr lnr-user"></i> <span>{label}</span> <i class="icon-submenu lnr lnr-chevron-down"></i></a>',
-		        'label' => Yii::$app->user->identity->email, 
+		        'label' => Yii::$app->user->identity->nama, 
 		        'submenuTemplate' => "\n<ul class='dropdown-menu'>\n{items}\n</ul>\n",
 	         	'items' => [
 	         		[
