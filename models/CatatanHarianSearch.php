@@ -47,6 +47,9 @@ class CatatanHarianSearch extends CatatanHarian
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => ['tanggal'=>SORT_DESC]
+            ]
         ]);
 
         $query->joinWith(['unsur as u']);
