@@ -62,13 +62,13 @@ class CatatanHarianSearch extends CatatanHarian
             return $dataProvider;
         }
 
-        if(Yii::$app->user->identity->access_role =='Dosen' || Yii::$app->user->identity->access_role =='Staf')
-        {
+        // if(Yii::$app->user->identity->access_role =='Dosen' || Yii::$app->user->identity->access_role =='Staf')
+        // {
             $query->andWhere([
                 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
                 'user_id' => Yii::$app->user->identity->id
             ]);
-        }
+        // }
 
         // $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
         // if(in_array(Yii::$app->user->identity->access_role, $roles))
