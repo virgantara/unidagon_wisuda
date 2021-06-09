@@ -78,7 +78,12 @@ class CatatanHarianController extends Controller
                 $query = CatatanHarian::find();
                 $sd = date('Y-m-d 00:00:00');
                 $ed = date('Y-m-d 23:59:59');
+                $query->joinWith(['unsur as u']);
                 $query->andWhere(['between','tanggal',$sd,$ed]);
+                $query->andWhere([
+                    'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
+                    'user_id' => Yii::$app->user->identity->id
+                ]);
                 $tmp = $query->all();
                 foreach($tmp as $r)
                 {
@@ -103,11 +108,13 @@ class CatatanHarianController extends Controller
                     foreach($induk->unsurKegiatans as $uk)
                     {
                         $query = CatatanHarian::find();
+                        $query->joinWith(['unsur as u']);
                         $sd = date('Y-m-d 00:00:00', strtotime("last Saturday"));
                         $ed = date('Y-m-d 23:59:59');
                         $query->andWhere(['between','tanggal',$sd,$ed]);
                         $query->andWhere([
                             'unsur_id'=>$uk->id,
+                            'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
                             'user_id' => Yii::$app->user->identity->id
                         ]);
                         $tmp = $query->sum('poin');
