@@ -167,22 +167,11 @@ class CatatanHarianController extends Controller
 
     public function actionReports()
     {
-        $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
         
-        if(in_array(Yii::$app->user->identity->access_role, $roles))
-        {
-            return $this->redirect(['list']);
-        }
-
-        else{
-            $searchModel = new CatatanHarianSearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-            return $this->render('reports', [
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
-        }
+          
+        return $this->render('reports', [
+        ]);
+        
     }
 
     public function actionAjaxTolak()
