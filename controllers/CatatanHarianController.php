@@ -108,6 +108,7 @@ class CatatanHarianController extends Controller
                     foreach($induk->unsurKegiatans as $uk)
                     {
                         $query = CatatanHarian::find();
+                        $query->alias('t');
                         $query->joinWith(['unsur as u']);
                         $sd = date('Y-m-d 00:00:00', strtotime("last Saturday"));
                         $ed = date('Y-m-d 23:59:59');
@@ -117,7 +118,7 @@ class CatatanHarianController extends Controller
                             'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
                             'user_id' => Yii::$app->user->identity->id
                         ]);
-                        $tmp = $query->sum('poin');
+                        $tmp = $query->sum('t.poin');
                         $total_poin += $tmp;
                     }
 
