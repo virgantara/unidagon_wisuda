@@ -40,8 +40,14 @@ class MenuHelper
 
 		    $menuItems[] = [
 	    		'template' => '<a href="{url}">{label}</a>',
-		        'label' => '<i class="lnr lnr-book"></i><span>Catatan Harian</span>', 
-		        'url' => ['catatan-harian/index'],
+		        'label' => '<i class="lnr lnr-book"></i><span>Catatan Harian</span><i class="icon-submenu lnr lnr-chevron-left"></i>', 
+		        'url' => '#',
+		        'submenuTemplate' => "\n<div id='pages_notes' class='collapse'><ul class='nav'>\n{items}\n</ul></div>\n",
+		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_notes">{label}</a>',
+		        'items'=>[
+		           	['label' => 'Daily', 'url' => ['/catatan-harian/index']],
+	                ['label' => 'Reports', 'url' => ['/catatan-harian/reports']],
+		        ]
 	        ];
 
 	        $menuItems[] = [

@@ -29,24 +29,24 @@ class CatatanHarianController extends Controller
                 'denyCallback' => function ($rule, $action) {
                     throw new \yii\web\ForbiddenHttpException('You are not allowed to access this page');
                 },
-                'only' => ['create','update','delete','index','list'],
+                'only' => ['create','update','delete','index','list','reports'],
                 'rules' => [
                     
                     [
-                        'actions' => ['create','update','delete','index'],
+                        'actions' => ['create','update','delete','index','reports'],
                         'allow' => true,
                         'roles' => ['Dosen','Staf'],
                     ],
                     [
                         'actions' => [
-                            'create','update','delete','index','list','ajax-setuju','ajax-tolak'
+                            'create','update','delete','index','list','ajax-setuju','ajax-tolak','reports'
                         ],
                         'allow' => true,
                         'roles' => ['Dekan','Kepala','Kaprodi'],
                     ],
                     [
                         'actions' => [
-                            'create','update','delete','index','list'
+                            'create','update','delete','index','list','reports'
                         ],
                         'allow' => true,
                         'roles' => ['theCreator'],
@@ -60,6 +60,129 @@ class CatatanHarianController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionAjaxList()
+    {
+        if(Yii::$app->request->isPost)
+        {
+            $dataPost = $_POST['dataPost'];
+            $params = $dataPost['params'];
+            $results = [];
+           
+            
+            
+            $tmp = [];
+            if($params == 'today')
+            {
+                $query = CatatanHarian::find();
+                $sd = date('Y-m-d 00:00:00');
+                $ed = date('Y-m-d 23:59:59');
+                $query->andWhere(['between','tanggal',$sd,$ed]);
+                $tmp = $query->all();
+                foreach($tmp as $r)
+                {
+                    $results[] = [
+                        'id' => $r->id,
+                        'nama' => $r->deskripsi,
+                        'tanggal' => $r->tanggal,
+                        'poin' => $r->poin,
+                        'is_selesai' => $r->is_selesai,
+                        'unsur' => $r->unsur->nama,
+                        'induk' => $r->unsur->induk->nama
+                    ];
+                }
+            }
+            
+            else if($params == 'week')
+            {
+                $list_induk = \app\models\IndukKegiatan::find()->all();
+                foreach($list_induk as $induk)
+                {
+                    $total_poin = 0;
+                    foreach($induk->unsurKegiatans as $uk)
+                    {
+                        $query = CatatanHarian::find();
+                        $sd = date('Y-m-d 00:00:00', strtotime("last Saturday"));
+                        $ed = date('Y-m-d 23:59:59');
+                        $query->andWhere(['between','tanggal',$sd,$ed]);
+                        $query->andWhere([
+                            'unsur_id'=>$uk->id,
+                            'user_id' => Yii::$app->user->identity->id
+                        ]);
+                        $tmp = $query->sum('poin');
+                        $total_poin += $tmp;
+                    }
+
+                    $results[] = [
+                        'id' => $induk->id,
+                        'nama' => $induk->nama,
+                        'tanggal' => null,
+                        'poin' => $total_poin,
+                        'is_selesai' => null,
+                        'unsur' => $induk->nama,
+                        'induk' => ''
+                    ];
+                }
+            }
+
+            else if($params == 'month')
+            {
+                $list_induk = \app\models\IndukKegiatan::find()->all();
+                foreach($list_induk as $induk)
+                {
+                    $total_poin = 0;
+                    foreach($induk->unsurKegiatans as $uk)
+                    {
+                        $query = CatatanHarian::find();
+                        $sd = date('Y-m-01 00:00:00');
+                        $ed = date('Y-m-t 23:59:59');
+                        $query->andWhere(['between','tanggal',$sd,$ed]);
+                        $query->andWhere([
+                            'unsur_id'=>$uk->id,
+                            'user_id' => Yii::$app->user->identity->id
+                        ]);
+                        $tmp = $query->sum('poin');
+                        $total_poin += $tmp;
+                    }
+
+                    $results[] = [
+                        'id' => $induk->id,
+                        'nama' => $induk->nama,
+                        'tanggal' => null,
+                        'poin' => $total_poin,
+                        'is_selesai' => null,
+                        'unsur' => $induk->nama,
+                        'induk' => ''
+                    ];
+                }
+            }
+            
+            echo json_encode($results);
+
+            die();
+
+        }
+    }
+
+    public function actionReports()
+    {
+        $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
+        
+        if(in_array(Yii::$app->user->identity->access_role, $roles))
+        {
+            return $this->redirect(['list']);
+        }
+
+        else{
+            $searchModel = new CatatanHarianSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+            return $this->render('reports', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
     }
 
     public function actionAjaxTolak()
