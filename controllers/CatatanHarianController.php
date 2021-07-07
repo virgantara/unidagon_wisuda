@@ -42,7 +42,7 @@ class CatatanHarianController extends Controller
                             'create','update','delete','index','list','ajax-setuju','ajax-tolak','reports'
                         ],
                         'allow' => true,
-                        'roles' => ['Dekan','Kepala','Kaprodi'],
+                        'roles' => ['Dekan','Kepala','Kaprodi','Kepala Bagian'],
                     ],
                     [
                         'actions' => [
