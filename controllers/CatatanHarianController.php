@@ -81,7 +81,7 @@ class CatatanHarianController extends Controller
                 $query->joinWith(['unsur as u']);
                 $query->andWhere(['between','tanggal',$sd,$ed]);
                 $query->andWhere([
-                    'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
+                    // 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
                     'user_id' => Yii::$app->user->identity->id
                 ]);
                 $tmp = $query->all();
@@ -94,7 +94,8 @@ class CatatanHarianController extends Controller
                         'poin' => $r->poin,
                         'is_selesai' => $r->is_selesai,
                         'unsur' => $r->unsur->nama,
-                        'induk' => $r->unsur->induk->nama
+                        'induk' => $r->unsur->induk->nama,
+                        'role' => $r->unsur->jenis_pegawai
                     ];
                 }
             }
