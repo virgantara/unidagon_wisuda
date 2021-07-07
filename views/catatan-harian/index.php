@@ -37,16 +37,23 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'unsur_id',
                 'value' => function($data){
-                    return $data->unsur->nama;
+                    return !empty($data->unsur) ? $data->unsur->nama : '-';
                 }
             ],
+            
             [
                 'attribute' => 'user_id',
                 'value' => function($data){
-                    return $data->user->dataDiri->nama;
+                    return !empty($data->unsur) && !empty($data->user->dataDiri) ? $data->user->dataDiri->nama : '-';
                 }
             ],
             'deskripsi:html',
+            [
+                'header' => 'Sebagai',
+                'value' => function($data){
+                    return !empty($data->unsur) ? $data->unsur->jenis_pegawai : '-';
+                }
+            ],
             'tanggal',
             'poin',
             //'updated_at',

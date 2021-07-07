@@ -65,7 +65,7 @@ class CatatanHarianSearch extends CatatanHarian
         // if(Yii::$app->user->identity->access_role =='Dosen' || Yii::$app->user->identity->access_role =='Staf')
         // {
             $query->andWhere([
-                'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
+                // 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
                 'user_id' => Yii::$app->user->identity->id
             ]);
         // }
