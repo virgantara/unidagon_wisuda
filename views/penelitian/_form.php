@@ -1,4 +1,5 @@
 <?php
+use app\helpers\MyHelper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -148,6 +149,12 @@ $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
         <label class="control-label col-md-3">Tahun Pelaksanaan Ke</label>
         <div class="col-md-9">
         <?= $form->field($model, 'tahun_pelaksanaan_ke',['options' => ['tag' => false]])->textInput()->label(false) ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-3">Jenis Sumber Dana</label>
+        <div class="col-md-9">
+        <?= $form->field($model, 'jenis_sumber_dana',['options' => ['tag' => false]])->dropDownList(MyHelper::listJenisSumberDana())->label(false) ?>
         </div>
     </div>
     <div class="form-group">

@@ -8,6 +8,9 @@ use Yii;
  */
 class MyHelper
 {	
+	public static function listJenisSumberDana(){
+		return ['mandiri'=>'Mandiri/PT','dalam' => 'Institusi Dalam Negeri','luar' => 'Institusi Luar Negeri'];
+	} 
 
 	public static function listSatker()
     {
