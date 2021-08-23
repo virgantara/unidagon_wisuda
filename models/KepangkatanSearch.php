@@ -73,6 +73,11 @@ class KepangkatanSearch extends Kepangkatan
             ->andFilterWhere(['like', 'nama_golongan', $this->nama_golongan])
             ->andFilterWhere(['like', 'no_sk_pangkat', $this->no_sk_pangkat]);
 
+        if(!Yii::$app->user->isGuest)
+        {
+            $query->andWhere(['NIY'=> Yii::$app->user->identity->NIY]);
+        }
+
         return $dataProvider;
     }
 }

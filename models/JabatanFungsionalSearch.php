@@ -75,6 +75,11 @@ class JabatanFungsionalSearch extends JabatanFungsional
             ->andFilterWhere(['like', 'kelebihan_pengabdian_masyarakat', $this->kelebihan_pengabdian_masyarakat])
             ->andFilterWhere(['like', 'kelebihan_kegiatan_penunjang', $this->kelebihan_kegiatan_penunjang]);
 
+        if(!Yii::$app->user->isGuest)
+        {
+            $query->andWhere(['NIY'=> Yii::$app->user->identity->NIY]);
+        }
+
         return $dataProvider;
     }
 }

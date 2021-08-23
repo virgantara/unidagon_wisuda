@@ -19,7 +19,7 @@ class PenelitianSearch extends Penelitian
     {
         return [
             [['ID', 'tahun_kegiatan', 'durasi_kegiatan', 'tahun_usulan', 'tahun_dilaksanakan', 'tahun_pelaksanaan_ke', 'komponen_kegiatan_id'], 'integer'],
-            [['NIY', 'judul_penelitian_pengabdian', 'status', 'dana_dikti', 'sister_id', 'nama_skim', 'tempat_kegiatan', 'no_sk_tugas', 'tgl_sk_tugas', 'kategori_kegiatan_id', 'skim_kegiatan_id', 'kelompok_bidang_id', 'updated_at', 'created_at'], 'safe'],
+            [['NIY', 'judul_penelitian_pengabdian', 'status', 'dana_dikti', 'sister_id', 'nama_skim', 'tempat_kegiatan', 'no_sk_tugas', 'tgl_sk_tugas', 'kategori_kegiatan_id', 'skim_kegiatan_id', 'kelompok_bidang_id', 'updated_at', 'created_at','jenis_sumber_dana'], 'safe'],
             [['dana_institusi_lain', 'nilai', 'dana_pt'], 'number'],
         ];
     }
@@ -43,9 +43,11 @@ class PenelitianSearch extends Penelitian
     public function search($params)
     {
         $query = Penelitian::find();
+        $query->alias('t');
         $query->joinWith(['penelitianAnggotas as pa']);
         
         $query->where(['pa.NIY' => Yii::$app->user->identity->NIY]);
+        $query->orWhere(['t.NIY'=>Yii::$app->user->identity->NIY]);
         // $query->alias('p');
         // $query->where(['p.NIY' => Yii::$app->user->identity->NIY]);
         // add conditions that should always apply here
@@ -82,6 +84,7 @@ class PenelitianSearch extends Penelitian
         $query->andFilterWhere(['like', 'judul_penelitian_pengabdian', $this->judul_penelitian_pengabdian])
             ->andFilterWhere(['like', 'status', $this->status])
             ->andFilterWhere(['like', 'dana_dikti', $this->dana_dikti])
+            ->andFilterWhere(['like', 'jenis_sumber_dana', $this->jenis_sumber_dana])
             ->andFilterWhere(['like', 'sister_id', $this->sister_id])
             ->andFilterWhere(['like', 'nama_skim', $this->nama_skim])
             ->andFilterWhere(['like', 'tempat_kegiatan', $this->tempat_kegiatan])

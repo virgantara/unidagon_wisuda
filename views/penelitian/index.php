@@ -9,6 +9,9 @@ use kartik\grid\GridView;
 
 $this->title = 'Penelitian';
 $this->params['breadcrumbs'][] = $this->title;
+
+$list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
+
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -55,6 +58,13 @@ $this->params['breadcrumbs'][] = $this->title;
             //'tahun_usulan',
             //'tahun_dilaksanakan',
             'tahun_pelaksanaan_ke',
+            [
+                'attribute' => 'jenis_sumber_dana',
+                'filter' => $list_jenis_sumber_dana,
+                'value' => function($data) use ($list_jenis_sumber_dana){
+                    return $list_jenis_sumber_dana[$data->jenis_sumber_dana];
+                }
+            ],
             //'no_sk_tugas',
             //'tgl_sk_tugas',
             //'kategori_kegiatan_id',

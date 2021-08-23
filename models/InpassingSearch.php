@@ -69,6 +69,11 @@ class InpassingSearch extends Inpassing
             ->andFilterWhere(['like', 'nomor_sk_inpassing', $this->nomor_sk_inpassing])
             ->andFilterWhere(['like', 'NIY', $this->NIY]);
 
+        if(!Yii::$app->user->isGuest)
+        {
+            $query->andWhere(['NIY'=> Yii::$app->user->identity->NIY]);
+        }
+
         return $dataProvider;
     }
 }

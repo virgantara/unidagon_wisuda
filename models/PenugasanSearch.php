@@ -43,7 +43,7 @@ class PenugasanSearch extends Penugasan
     {
         $query = Penugasan::find();
         $query->alias('p');
-        $query->where(['p.NIY' => Yii::$app->user->identity->NIY]);
+        
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -71,6 +71,11 @@ class PenugasanSearch extends Penugasan
             ->andFilterWhere(['like', 'nama_jenjang_pendidikan', $this->nama_jenjang_pendidikan])
             ->andFilterWhere(['like', 'unit_kerja', $this->unit_kerja])
             ->andFilterWhere(['like', 'perguruan_tinggi', $this->perguruan_tinggi]);
+
+        if(!Yii::$app->user->isGuest)
+        {
+            $query->andWhere(['NIY'=> Yii::$app->user->identity->NIY]);
+        }
 
         return $dataProvider;
     }

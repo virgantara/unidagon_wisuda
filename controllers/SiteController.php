@@ -264,6 +264,7 @@ class SiteController extends AppController
                     $response = json_decode($response->getBody());
                     if($response->error_code == 0){
                         $detail = $response->data;
+
                         $model->tautan_laman_jurnal = $detail->tautan_laman_jurnal;
                         $model->tautan = $detail->tautan;
                         $model->volume = $detail->volume;
@@ -278,7 +279,7 @@ class SiteController extends AppController
 
 
                         if(empty($kategoriKegiatan)){
-                            $errors .= 'KategoriKegiatan '.$item->nama_kategori_kegiatan.' belum ada di database';
+                            $errors .= 'KategoriKegiatan '.$detail->nama_kategori_kegiatan.' belum ada di database';
                             throw new \Exception;
                         }
 
