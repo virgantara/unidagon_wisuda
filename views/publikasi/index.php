@@ -65,6 +65,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'tanggal_terbit',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'jumlah_sitasi',
+                'refreshGrid' => true,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+            ],
             'sister_id',
             //'updated_at',
             //'created_at',

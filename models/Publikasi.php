@@ -53,7 +53,7 @@ class Publikasi extends \yii\db\ActiveRecord
     {
         return [
             [['jenis_publikasi_id', 'kegiatan_id'], 'integer'],
-            [['tanggal_terbit', 'updated_at', 'created_at'], 'safe'],
+            [['tanggal_terbit', 'updated_at', 'created_at','jumlah_sitasi'], 'safe'],
             [['sks_bkd'], 'number'],
             [['judul_publikasi_paten', 'nama_jenis_publikasi', 'nama_kategori_kegiatan', 'tautan_laman_jurnal', 'tautan', 'penerbit', 'doi', 'issn'], 'string', 'max' => 255],
             [['NIY'], 'string', 'max' => 15],
@@ -87,6 +87,7 @@ class Publikasi extends \yii\db\ActiveRecord
             'tautan' => 'Tautan',
             'volume' => 'Volume',
             'nomor' => 'Nomor',
+            'jumlah_sitasi' => 'Jumlah Sitasi',
             'halaman' => 'Halaman',
             'penerbit' => 'Penerbit',
             'doi' => 'Doi',

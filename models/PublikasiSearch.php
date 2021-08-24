@@ -19,7 +19,7 @@ class PublikasiSearch extends Publikasi
     {
         return [
             [['id', 'kegiatan_id'], 'integer'],
-            [['judul_publikasi_paten', 'nama_jenis_publikasi','nama_kategori_kegiatan', 'tanggal_terbit', 'sister_id', 'updated_at', 'created_at'], 'safe'],
+            [['judul_publikasi_paten', 'nama_jenis_publikasi','nama_kategori_kegiatan', 'tanggal_terbit', 'sister_id', 'updated_at', 'created_at','jumlah_sitasi'], 'safe'],
         ];
     }
 
@@ -67,6 +67,7 @@ class PublikasiSearch extends Publikasi
             'tanggal_terbit' => $this->tanggal_terbit,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
+            'jumlah_sitasi' => $this->jumlah_sitasi,
         ]);
 
         $query->andFilterWhere(['like', 'judul_publikasi_paten', $this->judul_publikasi_paten])

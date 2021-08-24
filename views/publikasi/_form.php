@@ -167,6 +167,12 @@ $listJenisPublikasi = ArrayHelper::map(\app\models\JenisPublikasi::find()->all()
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-md-3">Jumlah Sitasi</label>
+        <div class="col-md-9">
+        <?= $form->field($model, 'jumlah_sitasi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true])->label(false) ?>
+        </div>
+    </div>
+    <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 

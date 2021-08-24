@@ -38,7 +38,7 @@ class BimbinganMahasiswaController extends AppController
         {
             return $this->redirect(Yii::$app->params['sso_login']);
         }
-
+        $counter =0;
         $user = User::findOne(Yii::$app->user->identity->ID);
         $sisterToken = MyHelper::getSisterToken();
         if(!isset($sisterToken)){
