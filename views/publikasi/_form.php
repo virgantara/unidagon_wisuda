@@ -163,6 +163,12 @@ $listJenisPublikasi = ArrayHelper::map(\app\models\JenisPublikasi::find()->all()
     <div class="form-group">
         <label class="control-label col-md-3">Tautan Laman Jurnal</label>
         <div class="col-md-9">
+        <?= $form->field($model, 'tautan_laman_jurnal',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true])->label(false) ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-3">Tautan File</label>
+        <div class="col-md-9">
         <?= $form->field($model, 'tautan',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true])->label(false) ?>
         </div>
     </div>

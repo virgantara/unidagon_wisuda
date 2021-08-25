@@ -80,6 +80,7 @@ class MenuHelper
 		           	['label' => 'Pengajaran', 'url' => ['/pengajaran/index']],
 		           	['label' => 'Bimbingan Mahasiswa', 'url' => ['/bimbingan-mahasiswa/index']],
 		           	['label' => 'Pengujian Mahasiswa', 'url' => ['/pengajaran/index']],
+		           	['label' => 'Visiting Scientist', 'url' => '#'],
 		           	['label' => 'Bahan Ajar', 'url' => ['/produk-ajar/index']],
 		           	['label' => 'Orasi ilmiah', 'url' => ['/konferensi/index']],
 		           	['label' => 'Tugas Tambahan', 'url' => ['/jabatan/index']],
@@ -125,7 +126,7 @@ class MenuHelper
 		           	['label' => 'Anggota Profesi', 'url' => ['/organisasi/index']],
 		           	
 		           	['label' => 'Penghargaan', 'url' => '#'],
-		           	['label' => 'Visiting Scientist', 'url' => '#'],
+		           	
 		           	['label' => 'Penunjang lain', 'url' => ['penunjang-lain/index']],
 		        ]
 	        ];
