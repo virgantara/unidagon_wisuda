@@ -883,7 +883,8 @@ class SiteController extends AppController
                     if(empty($model))
                         $model = new \app\models\Pengabdian;
 
-                    // $model->NIY = Yii::$app->user->identity->NIY;
+
+                    $model->NIY = Yii::$app->user->identity->NIY;
                     $model->sister_id = $item->id_penelitian_pengabdian;
                     $model->judul_penelitian_pengabdian = $item->judul_penelitian_pengabdian;
                     $model->nama_skim = $item->nama_skim;
@@ -904,6 +905,7 @@ class SiteController extends AppController
                     if($resp->error_code == 0){
                         $res = $resp->data;
                         // print_r($res);exit;
+                        $model->tempat_kegiatan = !empty($res->tempat_kegiatan) ? $res->tempat_kegiatan : '-';
                         $model->tahun_usulan = $res->nama_tahun_anggaran;
                         $model->tahun_kegiatan = $res->nama_tahun_anggaran;
                         $model->tahun_dilaksanakan = $res->nama_tahun_anggaran;
