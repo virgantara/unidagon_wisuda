@@ -7,44 +7,64 @@ use Yii;
 /**
  * This is the model class for table "buku".
  *
- * @property integer $ID
+ * @property int $ID
  * @property string $NIY
- * @property integer $tahun
+ * @property int $tahun
  * @property string $judul
  * @property string $penerbit
- * @property string $f_karya
+ * @property string|null $f_karya
+ * @property string $ISBN
+ * @property string $vol
+ * @property string $link
+ * @property string $ver
+ * @property string|null $komentar
+ * @property int|null $jenis_luaran_id
+ * @property string|null $jenis_litab
+ * @property string|null $parent_id
+ * @property string|null $uuid
+ * @property int|null $halaman
+ * @property string|null $tanggal_terbit
+ * @property string|null $updated_at
+ * @property string|null $created_at
+ *
+ * @property JenisLuaran $jenisLuaran
+ * @property User $nIY
+ * @property BukuAuthor[] $bukuAuthors
  */
 class Buku extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public $namanya;
-    
     public static function tableName()
     {
         return 'buku';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['NIY', 'tahun', 'judul', 'penerbit', 'jenis_publikasi_id'], 'required'],
-            [['tahun'], 'integer'],
+            [['NIY', 'tahun', 'judul', 'penerbit'], 'required'],
+            [['tahun', 'jenis_luaran_id', 'halaman'], 'integer'],
+            [['ver', 'komentar'], 'string'],
+            [['tanggal_terbit', 'updated_at', 'created_at'], 'safe'],
             [['NIY'], 'string', 'max' => 15],
-            [['judul','namanya'], 'string', 'max' => 500],
-            [['penerbit','ISBN','ver','vol'], 'string', 'max' => 50],
-            [['f_karya','link'], 'string', 'max' => 200],
-            [['f_karya'], 'file', 'extensions' => 'pdf,jpg,jpeg,png','maxSize' => 1024 * 1024 * 1 ],
-            [['jenis_publikasi_id'], 'exist', 'skipOnError' => true, 'targetClass' => JenisPublikasi::className(), 'targetAttribute' => ['jenis_publikasi_id' => 'id']],
+            [['judul'], 'string', 'max' => 500],
+            [['penerbit'], 'string', 'max' => 255],
+            [['f_karya'], 'string', 'max' => 200],
+            [['ISBN', 'vol', 'parent_id', 'uuid'], 'string', 'max' => 50],
+            [['link'], 'string', 'max' => 250],
+            [['jenis_litab'], 'string', 'max' => 1],
+            [['jenis_luaran_id'], 'exist', 'skipOnError' => true, 'targetClass' => JenisLuaran::className(), 'targetAttribute' => ['jenis_luaran_id' => 'id']],
+            [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -53,36 +73,51 @@ class Buku extends \yii\db\ActiveRecord
             'NIY' => 'Niy',
             'tahun' => 'Tahun',
             'judul' => 'Judul',
-            'namanya' => 'Nama',
             'penerbit' => 'Penerbit',
-            'f_karya' => 'File Karya',
-            'ISBN' => 'Nomor ISBN',
-            'vol' => 'Volume & Number',
-            'link' => 'Shared Link Google Drive',
-            'ver' => 'Status Verifikasi',
-            'jenis_publikasi_id' => 'Jenis Publikasi'
+            'f_karya' => 'F Karya',
+            'ISBN' => 'Isbn',
+            'vol' => 'Vol',
+            'link' => 'Link',
+            'ver' => 'Ver',
+            'komentar' => 'Komentar',
+            'jenis_luaran_id' => 'Jenis Luaran ID',
+            'jenis_litab' => 'Jenis Litab',
+            'parent_id' => 'Parent ID',
+            'uuid' => 'Uuid',
+            'halaman' => 'Halaman',
+            'tanggal_terbit' => 'Tanggal Terbit',
+            'updated_at' => 'Updated At',
+            'created_at' => 'Created At',
         ];
     }
-    public function getBukuDosen(){
-        return $this->hasOne(Dosen::className(),['NIY'=>'NIY']);
-    }
-     public function getBukuData(){
-        return $this->hasOne(DataDiri::className(),['NIY'=>'NIY']);
-    }
 
-    public function getJenisPublikasi()
+    /**
+     * Gets query for [[JenisLuaran]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJenisLuaran()
     {
-        return $this->hasOne(JenisPublikasi::className(), ['id' => 'jenis_publikasi_id']);
+        return $this->hasOne(JenisLuaran::className(), ['id' => 'jenis_luaran_id']);
     }
 
-    public function getNamaJenisPublikasi(){
-        return $this->jenisPublikasi->nama;
+    /**
+     * Gets query for [[NIY]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNIY()
+    {
+        return $this->hasOne(User::className(), ['NIY' => 'NIY']);
     }
 
+    /**
+     * Gets query for [[BukuAuthors]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getBukuAuthors()
     {
         return $this->hasMany(BukuAuthor::className(), ['buku_id' => 'ID']);
     }
-
-
 }

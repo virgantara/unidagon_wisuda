@@ -7,7 +7,7 @@ use yii\web\JsExpression;
 use kartik\depdrop\DepDrop;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
-
+use kartik\date\DatePicker;
 use kartik\file\FileInput;
 /* @var $this yii\web\View */
 /* @var $model app\models\LitabHki */
@@ -30,9 +30,9 @@ use kartik\file\FileInput;
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
                 <div class="form-group">
-                    <label class="form-label">Jenis HKI</label>
+                    <label class="form-label">Jenis Luaran</label>
                     <div class="form-line">
-                    <?= $form->field($model, 'jenis_luaran_id',['options' => ['tag' => false]])->dropDownList(ArrayHelper::map(\common\models\JenisLuaran::find()->where(['kode'=>'LAIN'])->all(),'id','nama'),['class'=>'form-control show-tick','prompt'=>'- Pilih Jenis -'])->label(false) ?>
+                    <?= $form->field($model, 'jenis_luaran_id',['options' => ['tag' => false]])->dropDownList(ArrayHelper::map(\app\models\JenisLuaran::find()->where(['keyword'=>'produk'])->all(),'id','nama'),['class'=>'form-control show-tick','prompt'=>'- Pilih Jenis -'])->label(false) ?>
 
                     
                     </div>
@@ -71,6 +71,27 @@ use kartik\file\FileInput;
                     <div class="form-line">
                     <?= $form->field($model, 'tahun_pelaksanaan',['options' => ['tag' => false]])->textInput()->label(false) ?>
 
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12">
+                <div class="form-group">
+                    <label class="form-label">Tanggal Pelaksanaan</label>
+                    <div class="form-line">
+                    <?= $form->field($model, 'tanggal_pelaksanaan')->widget(
+                        DatePicker::className(),[
+                            'name' => 'tanggal', 
+                            'value' => date('d-m-Y', strtotime('0 days')),
+                            'options' => ['placeholder' => 'Pilih tanggal pelaksanaan ...'],
+                            'pluginOptions' => [
+                                'format' => 'yyyy-mm-dd',
+                                'todayHighlight' => true
+                            ]
+                        ]
+                    )->label(false) ?>
                     
                     </div>
                 </div>

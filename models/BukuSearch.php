@@ -49,6 +49,9 @@ class BukuSearch extends Buku
             'query' => $query,
         ]);
 
+        $query->alias('p');
+        $query->where(['p.NIY' => Yii::$app->user->identity->NIY]);
+
         $this->load($params);
 
         if (!$this->validate()) {

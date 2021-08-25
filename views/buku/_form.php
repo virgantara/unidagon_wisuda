@@ -5,20 +5,31 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 use kartik\file\FileInput;
+use kartik\date\DatePicker;
 /* @var $this yii\web\View */
 /* @var $model common\models\Buku */
 /* @var $form yii\widgets\ActiveForm */
 
-$listPublikasi = \common\models\JenisPublikasi::getListJenisPublikasi();
+$listPublikasi = ArrayHelper::map(\app\models\JenisLuaran::find()->where(['keyword' => 'buku'])->all(),'id','nama');
 ?>
 <?php $form = ActiveForm::begin(); ?>
 <div class="col-lg-6">
 
     <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>    
 
-    <?= $form->field($model, 'jenis_publikasi_id')->dropDownList($listPublikasi, ['prompt'=>'..Pilih Jenis Publikasi..']);?>
+    <?= $form->field($model, 'jenis_luaran_id')->dropDownList($listPublikasi, ['prompt'=>'..Pilih Jenis Luaran..']);?>
     <?= $form->field($model, 'tahun')->textInput() ?>
-
+    <?= $form->field($model, 'tanggal_terbit')->widget(
+        DatePicker::className(),[
+            'name' => 'tanggal', 
+            'value' => date('d-m-Y', strtotime('0 days')),
+            'options' => ['placeholder' => 'Pilih tanggal terbit ...'],
+            'pluginOptions' => [
+                'format' => 'yyyy-mm-dd',
+                'todayHighlight' => true
+            ]
+        ]
+    ) ?>
     <?= $form->field($model, 'judul')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'penerbit')->textInput(['maxlength' => true]) ?>

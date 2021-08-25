@@ -72,31 +72,35 @@ class LuaranLainController extends Controller
 
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
-       
+        
+        $s3config = Yii::$app->params['s3'];
+
+        $s3 = new \Aws\S3\S3Client($s3config);
+
         $errors = '';
         try 
         {
             if ($model->load(Yii::$app->request->post())) {
-                $tambah = new Verify();
-                $tambah->NIY = Yii::$app->user->identity->NIY;
-                $tambah->kategori = 17;
-                $tambah->ver = 'Belum Diverifikasi';
-                $tambah->ID_data = $model->id;
-                $tambah->save();
-
+                
+                $model->NIY = Yii::$app->user->identity->NIY;
                 $model->berkas = UploadedFile::getInstance($model,'berkas');
                 if($model->berkas){
-                    $file = $model->berkas->name;
+                    $berkas = $model->berkas->tempName;
+                    $mime_type = $model->berkas->type;
+                    $file = 'LUARAN_LAIN_'.$model->NIY.'_'.$model->tahun_pelaksanaan.'_'.date('YmdHis').'.'.$model->berkas->extension;
+                    $key = 'luaran_lain/'.$file;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/luaran_lain'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/luaran_lain');
+                    $insert = $s3->putObject([
+                        'Bucket' => 'dosen',
+                        'Key'    => $key,
+                        'Body'   => 'This is the Body',
+                        'SourceFile' => $berkas,
+                        'ContentType' => $mime_type
+                    ]);
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/luaran_lain/'.$model->id))
-                        mkdir(Yii::getAlias('@frontend').'/web/uploads/luaran_lain/'.$model->id);
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->berkas = $plainUrl;
 
-                    if ($model->berkas->saveAs(Yii::getAlias('@frontend').'/web/uploads/luaran_lain/'.$model->id.'/'.$file)){
-                        $model->berkas = $file;           
-                    }
                 }
                 $model->ver = 'Sudah Diverifikasi';
                 $model->save();
@@ -159,20 +163,12 @@ class LuaranLainController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $s3config = Yii::$app->params['s3'];
+
+        $s3 = new \Aws\S3\S3Client($s3config);
 
         $berkas = $model->berkas;
-        $very = Verify::findOne(['kategori'=>'17','ID_data'=>$id]);
-        if(!empty($very)){
-          $very->ver = 'Belum Diverifikasi';
-          $very->save();
-        }else{
-          $tambah = new Verify();
-          $tambah->NIY = Yii::$app->user->identity->NIY;
-          $tambah->kategori = 17;
-          $tambah->ver = 'Belum Diverifikasi';
-          $tambah->ID_data = $model->id;
-          $tambah->save();
-        }
+        
 
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
@@ -187,17 +183,24 @@ class LuaranLainController extends Controller
                
                 $model->berkas = UploadedFile::getInstance($model,'berkas');
                 if($model->berkas){
-                    $file = $model->berkas->name;
+                    $berkas = $model->berkas->tempName;
+                    $mime_type = $model->berkas->type;
+                    $file = 'Luaran_lain_'.$model->id.'_'.$model->tahun_pelaksanaan.'_'.date('YmdHis').'.'.$model->berkas->extension;
+                    
+                    $key = 'luaran_lain/'.$file;
+                    $errors = '';
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/luaran_lain'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/luaran_lain');
+                     
+                    $insert = $s3->putObject([
+                         'Bucket' => 'dosen',
+                         'Key'    => $key,
+                         'Body'   => 'This is the Body',
+                         'SourceFile' => $berkas,
+                         'ContentType' => $mime_type
+                    ]);
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/luaran_lain/'.$model->id))
-                        mkdir(Yii::getAlias('@frontend').'/web/uploads/luaran_lain/'.$model->id);
-
-                    if ($model->berkas->saveAs(Yii::getAlias('@frontend').'/web/uploads/luaran_lain/'.$model->id.'/'.$file)){
-                        $model->berkas = $file;           
-                    }
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->berkas = $plainUrl;
                 }
 
                 if (empty($model->berkas)){

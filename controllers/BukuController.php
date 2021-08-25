@@ -40,14 +40,14 @@ class BukuController extends Controller
     {
         if (Yii::$app->user->isGuest) {
             return $this->goBack();
-        }else{  
-        $searchModel = new BukuSearch();
-        $dataProvider = $searchModel->searchItemku(Yii::$app->request->queryParams);
+        }else{ 
+             $searchModel = new BukuSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
         }
     }
 
@@ -73,6 +73,9 @@ class BukuController extends Controller
         $model = new Buku();
         $model->NIY = Yii::$app->user->identity->NIY;
         
+        $s3config = Yii::$app->params['s3'];
+
+        $s3 = new \Aws\S3\S3Client($s3config);
 
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
@@ -88,16 +91,27 @@ class BukuController extends Controller
                 $tambah->ID_data = $model->ID;
                 $tambah->save();
                 $model->f_karya = UploadedFile::getInstance($model,'f_karya');
-                if($model->f_karya){
-                    $file = $model->f_karya->name.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_karya->extension;
+                
+                if($model->f_karya)
+                {
+                  $f_karya = $model->f_karya->tempName;
+                  $mime_type = $model->f_karya->type;
+                  $file = 'BUKU_'.$tambah->NIY.'_'.$model->tahun.'_'.date('YmdHis').'.'.$model->f_karya->extension;
+                  $key = 'buku/'.$file;
+                  $insert = $s3->putObject([
+                       'Bucket' => 'dosen',
+                       'Key'    => $key,
+                       'Body'   => 'This is the Body',
+                       'SourceFile' => $f_karya,
+                       'ContentType' => $mime_type
+                  ]);
+                  
+                  $plainUrl = $s3->getObjectUrl('dosen', $key);
+                  $model->f_karya = $plainUrl;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/buku'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/buku');
-
-                    if ($model->f_karya->saveAs(Yii::getAlias('@frontend').'/web/uploads/buku/'.$file)){
-                        $model->f_karya = $file;           
-                    }
                 }
+
+                
                 $model->ver = 'Sudah Diverifikasi';
                 if($model->save())
                 {
@@ -163,18 +177,11 @@ class BukuController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $very = Verify::findOne(['kategori'=>'2','ID_data'=>$id]);
-            if(!empty($very)){
-            $very->ver = 'Belum Diverifikasi';
-            $very->save();
-            }else{
-              $tambah = new Verify();
-              $tambah->NIY = Yii::$app->user->identity->NIY;
-              $tambah->kategori = 2;
-              $tambah->ver = 'Belum Diverifikasi';
-              $tambah->ID_data = $model->ID;
-              $tambah->save();
-        }
+       
+
+        $s3config = Yii::$app->params['s3'];
+
+        $s3 = new \Aws\S3\S3Client($s3config);
         
         $f_karya = $model->f_karya;
         $connection = \Yii::$app->db;
@@ -186,14 +193,25 @@ class BukuController extends Controller
 
                 $model->f_karya = UploadedFile::getInstance($model,'f_karya');
                 if($model->f_karya){
-                    $file = $model->f_karya->name.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_karya->extension;
+                    $f_penugasan = $model->f_karya->tempName;
+                    $mime_type = $model->f_karya->type;
+                    $file = 'BUKU_'.$model->NIY.'_'.$model->tahun.'_'.date('YmdHis').'.'.$model->f_karya->extension;
+                    
+                    $key = 'buku/'.$file;
+                    $errors = '';
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/buku'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/buku');
+                     
+                    $insert = $s3->putObject([
+                         'Bucket' => 'dosen',
+                         'Key'    => $key,
+                         'Body'   => 'This is the Body',
+                         'SourceFile' => $f_karya,
+                         'ContentType' => $mime_type
+                    ]);
 
-                    if ($model->f_karya->saveAs(Yii::getAlias('@frontend').'/web/uploads/buku/'.$file)){
-                        $model->f_karya = $file;           
-                    }
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->f_karya = $plainUrl;
+                    
                 }
 
                 if (empty($model->f_karya)){

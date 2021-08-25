@@ -28,9 +28,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'NIY',
+            [
+                'attribute' => 'jenis_luaran_id',
+                'value' => function($data){
+                    return $data->jenisLuaran->nama;
+                }
+            ],
             'tahun',
+            'tanggal_terbit',
             'judul',
+
             'penerbit',
             'vol',
             'ISBN',
@@ -40,9 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format'=>'raw',
                 'value' => function($data){
             if(!empty($data->f_karya)){
-            return
-            Html::a('<i class="fa fa-search"></i> View', ['buku/display', 'id' => $data->ID],['class' => 'btn btn-warning','target'=>'_blank']).'&nbsp;&nbsp;'.
-            Html::a('<i class="fa fa-download"></i> Download', ['buku/download', 'id' => $data->ID],['class' => 'btn btn-primary']);
+            return Html::a('<i class="fa fa-search"></i> View', $data->f_karya,['class' => 'btn btn-warning','target'=>'_blank']).'&nbsp;&nbsp;';
+           
             }
             else
             {

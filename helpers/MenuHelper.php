@@ -97,6 +97,8 @@ class MenuHelper
 		        'items'=>[
 		           	['label' => 'Penelitian', 'url' => ['/penelitian/index']],
 		           	['label' => 'Publikasi karya', 'url' => ['/publikasi/index']],
+		           	['label' => 'Buku', 'url' => ['/buku/index']],
+		           	['label' => 'Karya Lain', 'url' => ['/luaran-lain/index']],
 		           	['label' => 'Paten/HKI', 'url' => ['/hki/index']],
 		           	
 		        ]
