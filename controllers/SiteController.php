@@ -1047,7 +1047,8 @@ class SiteController extends AppController
 
                     if(empty($model))
                         $model = new Penelitian;
-                    // $model->NIY = Yii::$app->user->identity->NIY;
+                    
+                    $model->NIY = Yii::$app->user->identity->NIY;
                     $model->sister_id = $item->id_penelitian_pengabdian;
                     $model->judul_penelitian_pengabdian = $item->judul_penelitian_pengabdian;
                     $model->nama_skim = $item->nama_skim;
