@@ -258,7 +258,24 @@ class SiteController extends AppController
                     if($model->save())
                     {
                         $counter++;
-   
+                        
+                        // $full_url = $sister_baseurl.'/PengelolaJurnal/detail';
+                        // $response = $client->post($full_url, [
+                        //     'body' => json_encode([
+                        //         'id_token' => $sisterToken,
+                        //         'id_dosen' => $user->sister_id,
+                        //         'id_riwayat_pengelola_jurnal' => $item->id_riwayat_pengelola_jurnal
+                        //     ]), 
+                        //     'headers' => ['Content-type' => 'application/json']
+
+                        // ]);
+
+                        // $response = json_decode($response->getBody());
+                        // if($response->error_code == 0)
+                        // {
+                        //     $detail = $response->data;
+                        //     print_r($detail);exit;
+                        // } 
                     }
 
                     else
