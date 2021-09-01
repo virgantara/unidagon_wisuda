@@ -156,7 +156,7 @@ class SiteController extends AppController
                     [
                         'modul' => 'jurnal_pengajaran',
                         'data' => $res5['message'],
-                        'source' => 'SISTER'
+                        'source' => 'SIAKAD'
                     ],
                     [
                         'modul' => 'pengajaran',
