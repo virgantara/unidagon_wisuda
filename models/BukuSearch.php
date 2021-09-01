@@ -19,7 +19,7 @@ class BukuSearch extends Buku
     {
         return [
             [['ID', 'tahun'], 'integer'],
-            [['NIY', 'judul', 'penerbit', 'ISBN', 'vol', 'link', 'ver','namanya'], 'safe'],
+            [['NIY', 'judul', 'penerbit', 'ISBN', 'vol', 'link', 'ver'], 'safe'],
         ];
     }
 
@@ -60,14 +60,14 @@ class BukuSearch extends Buku
             return $dataProvider;
         }
 
-        $dataProvider->sort->attributes['namanya'] = [
-        // The tables are the ones our relation are configured to
-        // in my case they are prefixed with "tbl_"
-        'asc' => ['data_diri.nama' => SORT_ASC],
-        'desc' => ['data_diri.nama' => SORT_DESC],
-        ];
+        // $dataProvider->sort->attributes['namanya'] = [
+        // // The tables are the ones our relation are configured to
+        // // in my case they are prefixed with "tbl_"
+        // 'asc' => ['data_diri.nama' => SORT_ASC],
+        // 'desc' => ['data_diri.nama' => SORT_DESC],
+        // ];
         
-        $query->joinWith('bukuData');
+        // $query->joinWith('bukuData');
         // grid filtering conditions
         $query->andFilterWhere([
             'ID' => $this->ID,
@@ -80,7 +80,7 @@ class BukuSearch extends Buku
 //            ->andFilterWhere(['like', 'f_karya', $this->f_karya])
             ->andFilterWhere(['like', 'ISBN', $this->ISBN])
             ->andFilterWhere(['like', 'vol', $this->vol])
-            ->andFilterWhere(['like', 'data_diri.nama', $this->namanya])
+            // ->andFilterWhere(['like', 'data_diri.nama', $this->namanya])
             ->andFilterWhere(['like', 'link', $this->link])
             ->andFilterWhere(['like', 'ver', $this->ver]);
 

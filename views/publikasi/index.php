@@ -24,12 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
       echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
     }
     ?>
-    <p>
-        <?= Html::a('Create Publikasi', ['create'], ['class' => 'btn btn-success']) ?>
-        
 
-
-    </p>
     
     <?php
     $gridColumns = [
