@@ -11,7 +11,6 @@ $this->title = 'Publikasi';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<h3><?= Html::encode($this->title) ?></h3>
 <div class="row">
     <div class="col-md-12">
         <div class="panel">
@@ -19,6 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
 <div class="panel-body ">
+     <p>
+        <?= Html::a('Create Publikasi', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
       echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';

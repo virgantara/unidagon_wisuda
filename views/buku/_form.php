@@ -44,7 +44,7 @@ $listPublikasi = ArrayHelper::map(\app\models\JenisLuaran::find()->where(['keywo
                 'pluginOptions' => [
                     'showUpload' => false,
                 ]
-            ])->label(false).'NB: File format is pdf, png, jpeg, jpg and maximal sized 1 MB<br><br>' ?>
+            ])->label(false).'NB: File format is pdf and max size 3 MB<br><br>' ?>
  
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

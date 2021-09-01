@@ -22,7 +22,9 @@ $list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
 <div class="panel-body ">
-
+    <p>
+        <?= Html::a('Create Penelitian', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
       echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
@@ -74,6 +76,7 @@ $list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
 <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'responsiveWrap' => false,
         'columns' => $gridColumns,
         'containerOptions' => ['style' => 'overflow: auto'], 
         'headerRowOptions' => ['class' => 'kartik-sheet-style'],

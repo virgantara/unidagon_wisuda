@@ -192,8 +192,9 @@ class BukuController extends Controller
             if ($model->load(Yii::$app->request->post())) {
 
                 $model->f_karya = UploadedFile::getInstance($model,'f_karya');
-                if($model->f_karya){
-                    $f_penugasan = $model->f_karya->tempName;
+                if($model->f_karya)
+                {
+                    $f_karya = $model->f_karya->tempName;
                     $mime_type = $model->f_karya->type;
                     $file = 'BUKU_'.$model->NIY.'_'.$model->tahun.'_'.date('YmdHis').'.'.$model->f_karya->extension;
                     
@@ -220,6 +221,11 @@ class BukuController extends Controller
 
                 if($model->validate())
                     $model->save();
+                else{
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                            
+                    throw new \Exception;
+                }
 
                 $listAuthors = $model->bukuAuthors;
                 foreach($listAuthors as $d)
