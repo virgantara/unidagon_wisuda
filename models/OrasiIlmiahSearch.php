@@ -19,7 +19,7 @@ class OrasiIlmiahSearch extends OrasiIlmiah
     {
         return [
             [['id', 'id_kategori_capaian_luaran', 'id_kategori_pembicara'], 'integer'],
-            [['NIY', 'sister_id', 'nama_kategori_kegiatan', 'nama_kategori_pencapaian', 'kategori_kegiatan_id', 'judul_buku_makalah', 'nama_pertemuan_ilmiah', 'penyelenggara_kegiatan', 'tanggal_pelaksanaan', 'no_sk_tugas', 'tanggal_sk_penugasan', 'bahasa', 'updated_at', 'created_at'], 'safe'],
+            [['NIY', 'nama_kategori_kegiatan', 'nama_kategori_pencapaian', 'kategori_kegiatan_id', 'judul_buku_makalah', 'nama_pertemuan_ilmiah', 'penyelenggara_kegiatan', 'tanggal_pelaksanaan', 'no_sk_tugas', 'tanggal_sk_penugasan', 'bahasa', 'sister_id', 'tingkat_pertemuan_id', 'updated_at', 'created_at'], 'safe'],
         ];
     }
 
@@ -60,16 +60,15 @@ class OrasiIlmiahSearch extends OrasiIlmiah
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'id_kategori_capaian_luaran' => $this->id_kategori_capaian_luaran,
             'tanggal_pelaksanaan' => $this->tanggal_pelaksanaan,
-            'id_kategori_pembicara' => $this->id_kategori_pembicara,
             'tanggal_sk_penugasan' => $this->tanggal_sk_penugasan,
+            'id_kategori_capaian_luaran' => $this->id_kategori_capaian_luaran,
+            'id_kategori_pembicara' => $this->id_kategori_pembicara,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
         ]);
 
         $query->andFilterWhere(['like', 'NIY', $this->NIY])
-            ->andFilterWhere(['like', 'sister_id', $this->sister_id])
             ->andFilterWhere(['like', 'nama_kategori_kegiatan', $this->nama_kategori_kegiatan])
             ->andFilterWhere(['like', 'nama_kategori_pencapaian', $this->nama_kategori_pencapaian])
             ->andFilterWhere(['like', 'kategori_kegiatan_id', $this->kategori_kegiatan_id])
@@ -77,7 +76,9 @@ class OrasiIlmiahSearch extends OrasiIlmiah
             ->andFilterWhere(['like', 'nama_pertemuan_ilmiah', $this->nama_pertemuan_ilmiah])
             ->andFilterWhere(['like', 'penyelenggara_kegiatan', $this->penyelenggara_kegiatan])
             ->andFilterWhere(['like', 'no_sk_tugas', $this->no_sk_tugas])
-            ->andFilterWhere(['like', 'bahasa', $this->bahasa]);
+            ->andFilterWhere(['like', 'bahasa', $this->bahasa])
+            ->andFilterWhere(['like', 'sister_id', $this->sister_id])
+            ->andFilterWhere(['like', 'tingkat_pertemuan_id', $this->tingkat_pertemuan_id]);
 
         return $dataProvider;
     }

@@ -275,6 +275,8 @@ class SiteController extends AppController
                         $model->NIY = Yii::$app->user->identity->NIY;
                         $model->sister_id = $detail->id_riwayat_pembicara_orasi;
                         $model->nama_kategori_kegiatan = $detail->nama_kategori_kegiatan;
+                        $model->id_kategori_pembicara = $detail->id_kategori_pembicara;
+                        $model->id_kategori_capaian_luaran = $detail->id_kategori_capaian_luaran;
                         $model->nama_kategori_pencapaian = $detail->nama_kategori_pencapaian;
                         $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
                         $model->judul_buku_makalah = $detail->judul_buku_makalah;
