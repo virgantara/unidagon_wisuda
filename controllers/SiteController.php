@@ -14,6 +14,7 @@ use app\models\Pengajaran;
 use app\models\CatatanHarian;
 use app\models\Organisasi;
 use app\models\PengelolaJurnal;
+use app\models\OrasiIlmiah;
 use app\models\TugasDosenBkd;
 use app\models\Penelitian;
 use app\models\Publikasi;
@@ -23,6 +24,7 @@ use app\models\MasterLevel;
 use app\models\GameLevelClass;
 use app\models\Prodi;
 use app\models\User;
+use app\models\SisterFiles;
 use app\models\PasswordResetRequestForm;
 use app\models\ResetPasswordForm;
 use app\models\ContactForm;
@@ -129,6 +131,7 @@ class SiteController extends AppController
             $res6 = $this->importPengajaran();
             $res7 = $this->importPublikasi();
             $res8 = $this->importPengelolaJurnal();
+            $res9 = $this->importOrasiIlmiah();
             $code = $res1['code'];
             $results = [
                 'code' => $code,
@@ -173,12 +176,188 @@ class SiteController extends AppController
                         'data' => $res8['message'],
                         'source' => 'SISTER'
                     ],
+                    [
+                        'modul' => 'orasi_ilmiah',
+                        'data' => $res9['message'],
+                        'source' => 'SISTER'
+                    ],
                 ]
             ];
 
         }
         echo json_encode($results);
         die(); 
+    }
+
+    protected function importOrasiIlmiah()
+    {
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+        $results = [];
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $sisterToken = \app\helpers\MyHelper::getSisterToken();
+        if(!isset($sisterToken)){
+            $sisterToken = MyHelper::getSisterToken();
+        }
+
+        // print_r($sisterToken);exit;
+        $sister_baseurl = Yii::$app->params['sister_baseurl'];
+        $headers = ['content-type' => 'application/json'];
+        $client = new \GuzzleHttp\Client([
+            'timeout'  => 5.0,
+            'headers' => $headers,
+            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+        ]);
+        $full_url = $sister_baseurl.'/OrasiIlmiah';
+        $response = $client->post($full_url, [
+            'body' => json_encode([
+                'id_token' => $sisterToken,
+                'id_dosen' => $user->sister_id,
+                'updated_after' => [
+                    'tahun' => '2000',
+                    'bulan' => '01',
+                    'tanggal' => '01'
+                ]
+            ]), 
+            'headers' => ['Content-type' => 'application/json']
+
+        ]); 
+        
+        $results = [];
+       
+        $response = json_decode($response->getBody());
+        
+        if($response->error_code == 0)
+        {
+            $results = $response->data;
+            
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            $counter = 0;
+            $errors ='';
+            try     
+            {
+                foreach($results as $item)
+                {
+                   
+                    
+                    $full_url = $sister_baseurl.'/OrasiIlmiah/detail';
+                    $response = $client->post($full_url, [
+                        'body' => json_encode([
+                            'id_token' => $sisterToken,
+                            'id_dosen' => $user->sister_id,
+                            'id_riwayat_pembicara_orasi' => $item->id_riwayat_pembicara_orasi
+                        ]), 
+                        'headers' => ['Content-type' => 'application/json']
+
+                    ]);
+
+                    $response = json_decode($response->getBody());
+                    if($response->error_code == 0)
+                    {
+                        $detail = $response->data;
+                        // echo '<pre>';
+                        // print_r($item);
+                        // print_r($detail);
+                        // echo '</pre>';
+                        // exit;
+
+                        $model = \app\models\OrasiIlmiah::find()->where([
+                            'sister_id' => $item->id_riwayat_pembicara_orasi
+                        ])->one();
+
+                        if(empty($model))
+                            $model = new \app\models\OrasiIlmiah;
+
+
+                        $model->NIY = Yii::$app->user->identity->NIY;
+                        $model->sister_id = $detail->id_riwayat_pembicara_orasi;
+                        $model->nama_kategori_kegiatan = $detail->nama_kategori_kegiatan;
+                        $model->nama_kategori_pencapaian = $detail->nama_kategori_pencapaian;
+                        $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
+                        $model->judul_buku_makalah = $detail->judul_buku_makalah;
+                        $model->nama_pertemuan_ilmiah = $detail->nama_pertemuan_ilmiah;
+                        $model->penyelenggara_kegiatan = $detail->penyelenggara_kegiatan;
+                        $model->tanggal_pelaksanaan = $detail->tanggal_pelaksanaan;
+                        $model->no_sk_tugas = $detail->no_sk_tugas;
+                        $model->tanggal_sk_penugasan = $detail->tanggal_sk_penugasan;
+                        $model->bahasa = $detail->bahasa;
+                        
+                        if(!empty($detail->files))
+                        {
+                            foreach($detail->files as $file)
+                            {
+                                $pf = SisterFiles::findOne($file->id_dokumen);
+                                if(empty($pf))
+                                    $pf = new SisterFiles;
+
+                                $pf->id_dokumen = $file->id_dokumen;
+                                $pf->parent_id = $item->id_riwayat_pembicara_orasi;
+                                $pf->nama_dokumen = $file->nama_dokumen;
+                                $pf->nama_file = $file->nama_file;
+                                $pf->jenis_file = $file->jenis_file;
+                                $pf->tanggal_upload = $file->tanggal_upload;
+                                $pf->nama_jenis_dokumen = $file->nama_jenis_dokumen;
+                                $pf->tautan = $file->tautan;
+                                $pf->keterangan_dokumen = $file->keterangan_dokumen;
+
+                                if(!$pf->save())
+                                {
+                                    $errors .= 'OI: '.\app\helpers\MyHelper::logError($pf);
+                                    throw new \Exception;
+                                }
+                            }
+                        }
+
+                        if($model->save())
+                        {
+                            $counter++;
+                      
+                        }
+
+                        else
+                        {
+                            $errors .= \app\helpers\MyHelper::logError($model);
+                            throw new \Exception;
+                        }
+                    } 
+                    
+
+                    
+                }
+
+                $transaction->commit();
+                $results = [
+                    'code' => 200,
+                    'message' => $counter.' data imported'
+                    
+                ];
+            }
+
+            catch (\Exception $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                $results = [
+                    'code' => 500,
+                    'message' => $errors
+                ];
+            } 
+        }
+
+
+        else
+        {
+            $errors .= json_encode($response);
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+        }
+
+        return $results;
+
     }
 
     protected function importPengelolaJurnal()
