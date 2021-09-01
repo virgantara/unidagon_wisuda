@@ -112,9 +112,10 @@ class MenuHelper
 		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_pengabdian">{label}</a>',
 		        'items'=>[
 		           	['label' => 'Pengabdian', 'url' => ['/pengabdian/index']],
+		           	['label' => 'Pengelola jurnal', 'url' => ['/pengelola-jurnal/index']],
 		           	['label' => 'Pembicara', 'url' => ['/pembicara/index']],
 		           	['label' => 'Jabatan Struktural', 'url' => ['/organisasi/index']],
-		           	['label' => 'Pengelola jurnal', 'url' => ['/pengelola-jurnal/index']],
+		           	
 		        ]
 	        ];
 

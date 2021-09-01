@@ -128,6 +128,7 @@ class SiteController extends AppController
             $res5 = $this->importJurnal();
             $res6 = $this->importPengajaran();
             $res7 = $this->importPublikasi();
+            $res8 = $this->importPengelolaJurnal();
             $code = $res1['code'];
             $results = [
                 'code' => $code,
@@ -167,12 +168,138 @@ class SiteController extends AppController
                         'data' => $res7['message'],
                         'source' => 'SISTER'
                     ],
+                    [
+                        'modul' => 'pengelola_jurnal',
+                        'data' => $res8['message'],
+                        'source' => 'SISTER'
+                    ],
                 ]
             ];
 
         }
         echo json_encode($results);
         die(); 
+    }
+
+    protected function importPengelolaJurnal()
+    {
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+        $results = [];
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $sisterToken = \app\helpers\MyHelper::getSisterToken();
+        if(!isset($sisterToken)){
+            $sisterToken = MyHelper::getSisterToken();
+        }
+
+        // print_r($sisterToken);exit;
+        $sister_baseurl = Yii::$app->params['sister_baseurl'];
+        $headers = ['content-type' => 'application/json'];
+        $client = new \GuzzleHttp\Client([
+            'timeout'  => 5.0,
+            'headers' => $headers,
+            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+        ]);
+        $full_url = $sister_baseurl.'/PengelolaJurnal';
+        $response = $client->post($full_url, [
+            'body' => json_encode([
+                'id_token' => $sisterToken,
+                'id_dosen' => $user->sister_id,
+                'updated_after' => [
+                    'tahun' => '2000',
+                    'bulan' => '01',
+                    'tanggal' => '01'
+                ]
+            ]), 
+            'headers' => ['Content-type' => 'application/json']
+
+        ]); 
+        
+        $results = [];
+       
+        $response = json_decode($response->getBody());
+        
+        if($response->error_code == 0)
+        {
+            $results = $response->data;
+            
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            $counter = 0;
+            $errors ='';
+            try     
+            {
+                foreach($results as $item)
+                {
+                   
+                    // print_r($item);exit;
+                    $model = \app\models\PengelolaJurnal::find()->where([
+                        'sister_id' => $item->id_riwayat_pengelola_jurnal
+                    ])->one();
+
+                    if(empty($model))
+                        $model = new \app\models\PengelolaJurnal;
+
+
+                    $model->NIY = Yii::$app->user->identity->NIY;
+                    $model->sister_id = $item->id_riwayat_pengelola_jurnal;
+                    $model->peran_dalam_kegiatan = $item->peran_dalam_kegiatan;
+                    $model->no_sk_tugas = $item->no_sk_tugas;
+                    $model->apakah_masih_aktif = $item->apakah_masih_aktif;
+                    $model->nama_media_publikasi = $item->nama_media_publikasi;
+                    $model->kategori_kegiatan_id = (string)$item->id_kategori_kegiatan;
+                    $model->tgl_sk_tugas = $item->sk_penugasan_terhitung_mulai_tanggal;
+                    $model->tgl_sk_tugas_selesai = $item->tanggal_berakhir_sk;
+
+                    
+
+                    if($model->save())
+                    {
+                        $counter++;
+   
+                    }
+
+                    else
+                    {
+                        $errors .= \app\helpers\MyHelper::logError($model);
+                        throw new \Exception;
+                    }
+
+                    
+                }
+
+                $transaction->commit();
+                $results = [
+                    'code' => 200,
+                    'message' => $counter.' data imported'
+                    
+                ];
+            }
+
+            catch (\Exception $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                $results = [
+                    'code' => 500,
+                    'message' => $errors
+                ];
+            } 
+        }
+
+
+        else
+        {
+            $errors .= json_encode($response);
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+        }
+
+        return $results;
+
     }
 
     protected function importPublikasi()

@@ -34,11 +34,12 @@ foreach($listKomponen as $k)
     $listKomponenKegiatan[$k->nama] = $tmp;
 }
 
-$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('140');
+$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('130');
 
 
 // echo '<pre>';
-// print_r($temp);
+// echo $model->kategori_kegiatan_id;
+// print_r($listKegiatan);
 // echo '</pre>';
 // exit;
 
@@ -60,10 +61,11 @@ $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
     <div class="form-group">
         <label class="control-label col-md-3">Kategori Kegiatan</label>
         <div class="col-md-9">
+            
         <?= $form->field($model, 'kategori_kegiatan_id',['options' => ['tag' => false]])->widget(Select2::classname(), [
             'data' => $listKegiatan,
 
-            'options'=>['placeholder'=>Yii::t('app','- Pilih Kategori Kegiatan -')],
+            'options'=>['placeholder'=>Yii::t('app','- Pilih Kategori Kegiatan -'),'id'=>'kategori_kegiatan_id'],
             'pluginOptions' => [
                 'allowClear' => true,
             ],
@@ -152,3 +154,13 @@ $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<?php 
+
+$this->registerJs(' 
+
+
+
+', \yii\web\View::POS_READY);
+
+?>

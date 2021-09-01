@@ -43,7 +43,7 @@ class PengelolaJurnal extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['peran_dalam_kegiatan','komponen_kegiatan_id','kategori_kegiatan_id'], 'required'],
+            [['peran_dalam_kegiatan','kategori_kegiatan_id'], 'required'],
             [['tgl_sk_tugas', 'tgl_sk_tugas_selesai', 'updated_at', 'created_at','is_claimed','sks_bkd'], 'safe'],
             [['komponen_kegiatan_id'], 'integer'],
             [['sks_bkd'], 'number'],
