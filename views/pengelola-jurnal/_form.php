@@ -34,7 +34,7 @@ foreach($listKomponen as $k)
     $listKomponenKegiatan[$k->nama] = $tmp;
 }
 
-$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('130');
+$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('1307');
 
 $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
