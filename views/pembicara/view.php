@@ -59,9 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
     <div class="panel-body ">
 
-    <p>
-        <?= Html::a('Create Pembicara File', ['pembicara-files/create','id'=>$model->id], ['class' => 'btn btn-success']) ?>
-    </p>
+  
     <?php
     $gridColumns = [
     [
@@ -79,7 +77,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'jenis_file',
             'tanggal_upload',
             'nama_jenis_dokumen',
-            'tautan',
+            [
+                'attribute' => 'tautan',
+                'format' => 'raw',
+                'value' => function($data){
+                    return Html::a('Link',$data->tautan,['target'=>'_blank']);
+                }
+            ],
             'keterangan_dokumen',
             //'updated_at',
             //'created_at',

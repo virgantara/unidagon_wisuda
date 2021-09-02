@@ -56,6 +56,7 @@ $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
 <div class="pengabdian-form">
 
     <?php $form = ActiveForm::begin(); ?>
+    <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?> 
     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
       echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';

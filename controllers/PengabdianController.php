@@ -506,6 +506,7 @@ class PengabdianController extends AppController
             return $this->redirect(Yii::$app->params['sso_login']);
         }
         $model = $this->findModel($id);
+        $model->scenario = 'update';
         $model->NIY = Yii::$app->user->identity->NIY;
         $model->jenis_penelitian_pengabdian = 'M';
 
@@ -557,8 +558,12 @@ class PengabdianController extends AppController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-        $this->findVer($id)->delete();
+        $model = $this->findModel($id);
+
+        foreach($model->pengabdianAnggotas as $ang)
+            $ang->delete();
+
+        $model->delete();
 
         return $this->redirect(['index']);
     }

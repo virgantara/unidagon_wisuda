@@ -11,6 +11,9 @@ use kartik\date\DatePicker;
 /* @var $form yii\widgets\ActiveForm */
 
 $listPublikasi = ArrayHelper::map(\app\models\JenisLuaran::find()->where(['keyword' => 'buku'])->all(),'id','nama');
+
+$list_jenis_bahan_ajar = ArrayHelper::map(\app\models\JenisBahanAjar::find()->orderBy(['nama'=>SORT_ASC])->all(),'nama','nama');
+$list_capaian_luaran = ArrayHelper::map(\app\models\CapaianLuaran::find()->all(),'nama','nama');
 ?>
 <?php $form = ActiveForm::begin(); ?>
 <div class="col-lg-6">
@@ -18,6 +21,8 @@ $listPublikasi = ArrayHelper::map(\app\models\JenisLuaran::find()->where(['keywo
     <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>    
 
     <?= $form->field($model, 'jenis_luaran_id')->dropDownList($listPublikasi, ['prompt'=>'..Pilih Jenis Luaran..']);?>
+    <?= $form->field($model, 'id_jenis_bahan_ajar')->dropDownList($list_jenis_bahan_ajar, ['prompt'=>'..Pilih Jenis Bahan Ajar..']);?>
+    <?= $form->field($model, 'id_kategori_capaian_luaran')->dropDownList($list_capaian_luaran, ['prompt'=>'..Pilih Jenis Capaian Luaran..']);?>
     <?= $form->field($model, 'tahun')->textInput() ?>
     <?= $form->field($model, 'tanggal_terbit')->widget(
         DatePicker::className(),[
@@ -37,8 +42,20 @@ $listPublikasi = ArrayHelper::map(\app\models\JenisLuaran::find()->where(['keywo
     <?= $form->field($model, 'vol')->textInput(['maxlength' => true]) ?>
     
     <?= $form->field($model, 'ISBN')->textInput(['maxlength' => true]) ?>
-    
-    <?= $form->field($model, 'link')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'no_sk_tugas',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+     <?= $form->field($model, 'tanggal_sk_penugasan',['options' => ['tag' => false]])->widget(
+            DatePicker::className(),[
+                'name' => 'tanggal_sk_penugasan', 
+                'value' => date('Y-m-d', strtotime('0 days')),
+                'options' => ['placeholder' => 'Pilih tanggal  ...'],
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'yyyy-mm-dd',
+                    'todayHighlight' => true
+                ]
+            ]
+        );?>
+
      <?= $form->field($model, 'f_karya')->widget(FileInput::classname(), [
                 'options' => ['accept' => ''],
                 'pluginOptions' => [

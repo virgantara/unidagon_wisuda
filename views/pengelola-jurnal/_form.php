@@ -5,34 +5,7 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 
-$query = \app\models\KomponenKegiatan::find();
-$query->alias('p');
-$query->select(['p.nama']);
-$query->joinWith(['unsur as u']);
-$query->where([
-  'u.kode' => 'ABDIMAS'
-]);
-$query->groupBy(['p.nama']);
-$query->orderBy(['p.nama'=>SORT_ASC]);
 
-$listKomponen = $query->all();
-// $listKomponen = ArrayHelper::map($listKomponen,'id',function($data){
-//     return $data->subunsur;
-// });
-$listKomponenKegiatan = [];
-
-foreach($listKomponen as $k)
-{
-    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
-   
-    $tmp = [];
-    foreach($list as $item)
-    {
-        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
-    }
-
-    $listKomponenKegiatan[$k->nama] = $tmp;
-}
 
 $listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('1307');
 

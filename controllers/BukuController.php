@@ -41,7 +41,7 @@ class BukuController extends Controller
         if (Yii::$app->user->isGuest) {
             return $this->goBack();
         }else{ 
-             $searchModel = new BukuSearch();
+            $searchModel = new BukuSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
             return $this->render('index', [
@@ -292,7 +292,7 @@ class BukuController extends Controller
         foreach($model->bukuAuthors as $author)
             $author->delete();
         
-        $this->findVer($id)->delete();
+        $model->delete();
 
         return $this->redirect(['index']);
     }

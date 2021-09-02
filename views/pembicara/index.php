@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Tambah Data', ['create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('<i class="fa fa-download"></i> Import dari SISTER', ['import'], ['class' => 'btn btn-primary']) ?>
+      
     </p>
     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
@@ -44,7 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'id_pembicara',
             // 'id_induk_katgiat',
             'judul_makalah',
-            'nama_kategori_kegiatan',
+            [
+                'attribute' => 'id_kategori_kegiatan',
+                'value' => function($data){
+                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
+                }
+            ],
             
             'nama_pertemuan_ilmiah',
             'penyelenggara_kegiatan',

@@ -56,6 +56,13 @@ class SisterFilesSearch extends SisterFiles
             return $dataProvider;
         }
 
+        if(!empty($this->parent_id))
+        {
+            $query->andWhere([
+                'parent_id' => $this->parent_id,
+            ]);
+        }
+
         // grid filtering conditions
         $query->andFilterWhere([
             'tanggal_upload' => $this->tanggal_upload,

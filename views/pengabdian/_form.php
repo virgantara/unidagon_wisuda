@@ -1,4 +1,7 @@
 <?php
+
+
+use app\helpers\MyHelper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -37,11 +40,13 @@ foreach($listKomponen as $k)
     $listKomponenKegiatan[$k->nama] = $tmp;
 }
 
-$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('130');
+$listKegiatan1 = MyHelper::convertKategoriKegiatan('1302');
 
+$listKegiatan2 = MyHelper::convertKategoriKegiatan('1304');
 
+$listKegiatan = array_merge($listKegiatan1, $listKegiatan2);
 // echo '<pre>';
-// print_r($temp);
+// print_r($listKegiatan);
 // echo '</pre>';
 // exit;
 
@@ -55,6 +60,7 @@ $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
 <div class="pengabdian-form">
 
     <?php $form = ActiveForm::begin(); ?>
+    <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
       echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
@@ -136,6 +142,12 @@ $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
         <label class="control-label col-md-3">Tahun Pelaksanaan</label>
         <div class="col-md-9">
         <?= $form->field($model, 'tahun_dilaksanakan',['options' => ['tag' => false]])->dropDownList($years,['prompt'=>'- Pilih Tahun -'])->label(false) ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-3">Jenis Sumber Dana</label>
+        <div class="col-md-9">
+        <?= $form->field($model, 'jenis_sumber_dana',['options' => ['tag' => false]])->dropDownList(MyHelper::listJenisSumberDana())->label(false) ?>
         </div>
     </div>
     <div class="form-group">

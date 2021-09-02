@@ -211,7 +211,7 @@ class MyHelper
         $sister_password = Yii::$app->params['sister_password'];
         $headers = ['content-type' => 'application/json'];
         $client = new \GuzzleHttp\Client([
-            'timeout'  => 5.0,
+            'timeout'  => 10.0,
             'headers' => $headers,
             // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
         ]);

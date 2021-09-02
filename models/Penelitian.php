@@ -59,6 +59,7 @@ class Penelitian extends \yii\db\ActiveRecord
         return [
             [['judul_penelitian_pengabdian', 'tahun_usulan', 'tahun_dilaksanakan', 'tahun_pelaksanaan_ke'], 'required'],
             [['tahun_kegiatan', 'durasi_kegiatan', 'tahun_usulan', 'tahun_dilaksanakan', 'tahun_pelaksanaan_ke', 'komponen_kegiatan_id'], 'integer'],
+            [['kategori_kegiatan_id','komponen_kegiatan_id'],'required','on'=>'update'],
             [['dana_institusi_lain', 'nilai', 'dana_pt'], 'number'],
             [['tgl_sk_tugas', 'updated_at', 'created_at','jenis_sumber_dana'], 'safe'],
             [['NIY'], 'string', 'max' => 15],

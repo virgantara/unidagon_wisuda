@@ -515,6 +515,7 @@ class PenelitianController extends AppController
             return $this->redirect(Yii::$app->params['sso_login']);
         }
         $model = $this->findModel($id);
+        $model->scenario = 'update';
         $model->NIY = Yii::$app->user->identity->NIY;
 
         if ($model->load(Yii::$app->request->post())) 

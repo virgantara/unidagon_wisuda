@@ -386,6 +386,8 @@ class HkiController extends AppController
         foreach($model->hkiAuthors as $author)
             $author->delete();
 
+        $model->delete();
+
         return $this->redirect(['index']);
     }
 

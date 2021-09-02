@@ -9,34 +9,6 @@ use kartik\select2\Select2;
 /* @var $model app\models\OrasiIlmiah */
 /* @var $form yii\widgets\ActiveForm */
 
-$arr= [];
-$is_readonly = ['class'=>'form-control','maxlength' => true];
-$query = \app\models\KomponenKegiatan::find();
-$query->alias('p');
-$query->select(['p.nama']);
-$query->joinWith(['unsur as u']);
-$query->where([
-  'u.kode' => 'RISET'
-]);
-$query->groupBy(['p.nama']);
-$query->orderBy(['p.nama'=>SORT_ASC]);
-
-$listKomponen = $query->all();
-
-$listKomponenKegiatan = [];
-
-foreach($listKomponen as $k)
-{
-    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
-   
-    $tmp = [];
-    foreach($list as $item)
-    {
-        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
-    }
-
-    $listKomponenKegiatan[$k->nama] = $tmp;
-}
 
 $listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('110900');
 
@@ -49,7 +21,7 @@ $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama')
 <div class="orasi-ilmiah-form">
 
     <?php $form = ActiveForm::begin(); ?>
-
+    <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
     <?= $form->field($model, 'NIY',['options' => ['tag' => false]])->textInput(['class'=>'form-control','readonly' => 'readonly']) ?>
     <?= $form->field($model, 'kategori_kegiatan_id',['options' => ['tag' => false]])->widget(Select2::classname(), [
             'data' => $listKegiatan,

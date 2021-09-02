@@ -81,7 +81,7 @@ class MenuHelper
 		           	['label' => 'Bimbingan Mahasiswa', 'url' => ['/bimbingan-mahasiswa/index']],
 		           	['label' => 'Pengujian Mahasiswa', 'url' => ['/pengajaran/index']],
 		           	['label' => 'Visiting Scientist', 'url' => ['/visiting-scientist/index']],
-		           	['label' => 'Bahan Ajar', 'url' => ['/produk-ajar/index']],
+		           	['label' => 'Bahan Ajar', 'url' => ['/buku/index']],
 		           	['label' => 'Orasi ilmiah', 'url' => ['/orasi-ilmiah/index']],
 		           	['label' => 'Tugas Tambahan', 'url' => ['/jabatan/index']],
 		        ]
@@ -97,7 +97,7 @@ class MenuHelper
 		        'items'=>[
 		           	['label' => 'Penelitian', 'url' => ['/penelitian/index']],
 		           	['label' => 'Publikasi karya', 'url' => ['/publikasi/index']],
-		           	['label' => 'Buku', 'url' => ['/buku/index']],
+		           	// ['label' => 'Buku', 'url' => ['/buku/index']],
 		           	['label' => 'Karya Lain', 'url' => ['/luaran-lain/index']],
 		           	['label' => 'Paten/HKI', 'url' => ['/hki/index']],
 		           	

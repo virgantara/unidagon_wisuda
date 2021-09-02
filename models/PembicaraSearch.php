@@ -19,7 +19,7 @@ class PembicaraSearch extends Pembicara
     {
         return [
             [['id', 'id_kategori_pembicara'], 'integer'],
-            [['id_pembicara', 'nama_kategori_kegiatan', 'judul_makalah', 'nama_pertemuan_ilmiah', 'penyelenggara_kegiatan', 'tanggal_pelaksanaan', 'sister_id', 'no_sk_tugas', 'updated_at', 'created_at', 'NIY'], 'safe'],
+            [['id_pembicara', 'nama_kategori_kegiatan', 'judul_makalah', 'nama_pertemuan_ilmiah', 'penyelenggara_kegiatan', 'tanggal_pelaksanaan', 'sister_id', 'no_sk_tugas', 'updated_at', 'created_at', 'NIY','id_kategori_kegiatan'], 'safe'],
         ];
     }
 
@@ -61,6 +61,7 @@ class PembicaraSearch extends Pembicara
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'id_kategori_kegiatan' => $this->id_kategori_kegiatan,
             'id_kategori_pembicara' => $this->id_kategori_pembicara,
             'tanggal_pelaksanaan' => $this->tanggal_pelaksanaan,
             'updated_at' => $this->updated_at,

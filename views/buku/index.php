@@ -34,11 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'judul',
                             'contentOptions' => ['style' => 'width:30%;  white-space: normal;'],
                         ],
-                        'namaJenisPublikasi',
-                        'tahun',
-                        'penerbit',
-                        'vol',
+                        'id_jenis_bahan_ajar',
+                        // 'namaJenisPublikasi',
                         'ISBN',
+                        'tanggal_terbit',
+                        'penerbit',
                         [
                             'attribute'=>'f_karya',
                             'format'=>'raw',
@@ -53,11 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                             }
                         ],
-                        [
-                            'attribute' => 'ver',
-                            'format' => 'raw',
-                            'filter' => ['Belum Diverifikasi' => 'Belum Diverivikasi', 'Sudah Diverifikasi' => 'Sudah Diverifikasi','Ditolak' => 'Ditolak']
-                        ],
+                        
                     ['class' => 'yii\grid\ActionColumn']
                 ];?>    
 
