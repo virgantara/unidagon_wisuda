@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
+use yii\helpers\ArrayHelper;
+$list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PengelolaJurnalSearch */
@@ -54,11 +56,41 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'peran_dalam_kegiatan',
-            'nama_media_publikasi',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'nama_media_publikasi',
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
             'sks_bkd',
-            'no_sk_tugas',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'no_sk_tugas',
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
             // 'apakah_masih_aktif',
             'tgl_sk_tugas',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'tingkat',
+                'filter' => $list_tingkat,
+                'refreshGrid' => true,
+                'editableOptions' => [
+                    'data' => $list_tingkat,
+                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                    'asPopover' => false
+                ],
+                'value' => function($data){
+                    return !empty($data->tingkat0) ? $data->tingkat0->nama : '-';
+                }
+            ],
             //'tgl_sk_tugas_selesai',
 
             //'NIY',

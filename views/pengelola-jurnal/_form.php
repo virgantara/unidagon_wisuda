@@ -36,6 +36,7 @@ foreach($listKomponen as $k)
 
 $listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('130');
 
+$list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
 // echo '<pre>';
 // echo $model->kategori_kegiatan_id;
@@ -100,7 +101,19 @@ $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
         <?= $form->field($model, 'nama_media_publikasi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true])->label(false) ?>
         </div>
     </div>
+    <div class="form-group">
+        <label class="control-label col-md-3">Tingkat</label>
+        <div class="col-md-9">
+         <?= $form->field($model, 'tingkat',['options' => ['tag' => false]])->widget(Select2::classname(), [
+            'data' => $list_tingkat,
 
+            'options'=>['placeholder'=>Yii::t('app','- Pilih Tingkat -')],
+            'pluginOptions' => [
+                'allowClear' => true,
+            ],
+        ])->label(false);?>
+        </div>
+    </div>
     <div class="form-group">
         <label class="control-label col-md-3">No SK Penugasan</label>
         <div class="col-md-9">

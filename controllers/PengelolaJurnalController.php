@@ -161,6 +161,38 @@ class PengelolaJurnalController extends AppController
     {
         $searchModel = new PengelolaJurnalSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (Yii::$app->request->post('hasEditable')) {
+            // instantiate your book model for saving
+            $id = Yii::$app->request->post('editableKey');
+            $model = PengelolaJurnal::findOne($id);
+
+            // store a default json response as desired by editable
+            $out = json_encode(['output'=>'', 'message'=>'']);
+
+            
+            $posted = current($_POST['PengelolaJurnal']);
+            $post = ['PengelolaJurnal' => $posted];
+
+            // load model like any single model validation
+            if ($model->load($post)) {
+            // can save model or do something before saving model
+                if($model->save())
+                {
+                    $out = json_encode(['output'=>'', 'message'=>'']);
+                }
+
+                else
+                {
+                    $error = \app\helpers\MyHelper::logError($model);
+                    $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                }
+
+                
+            }
+            // return ajax json encoded response and exit
+            echo $out;
+            return;
+        }
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -225,7 +257,7 @@ class PengelolaJurnalController extends AppController
             if($model->validate())
             {
                 $komponen = \app\models\KomponenKegiatan::findOne($model->komponen_kegiatan_id);
-                $model->sks_bkd = $komponen->angka_kredit;
+                $model->sks_bkd = !empty($komponen) ? $komponen->angka_kredit :0;
                 $model->save();
             }
             

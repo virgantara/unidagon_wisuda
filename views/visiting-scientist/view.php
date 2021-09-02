@@ -46,6 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'no_sk_tugas',
             'tanggal_sk_penugasan',
             'durasi',
+            'tingkat',
             'NIY',
             'sister_id',
             'updated_at',

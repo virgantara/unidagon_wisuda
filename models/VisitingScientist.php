@@ -48,7 +48,7 @@ class VisitingScientist extends \yii\db\ActiveRecord
     {
         return [
             [['durasi_kegiatan', 'id_kategori_capaian_luaran', 'durasi'], 'integer'],
-            [['tanggal_pelaksanaan', 'tanggal_sk_penugasan', 'updated_at', 'created_at'], 'safe'],
+            [['tanggal_pelaksanaan', 'tanggal_sk_penugasan', 'updated_at', 'created_at','tingkat'], 'safe'],
             [['perguruan_tinggi_pengundang', 'nama_penelitian_pengabdian', 'nama_kategori_pencapaian', 'kegiatan_penting_yang_dilakukan'], 'string', 'max' => 255],
             [['kategori_kegiatan_id'], 'string', 'max' => 10],
             [['id_penelitian_pengabdian', 'id_universitas', 'no_sk_tugas', 'sister_id'], 'string', 'max' => 100],
@@ -57,6 +57,7 @@ class VisitingScientist extends \yii\db\ActiveRecord
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
             [['id_kategori_capaian_luaran'], 'exist', 'skipOnError' => true, 'targetClass' => CapaianLuaran::className(), 'targetAttribute' => ['id_kategori_capaian_luaran' => 'id']],
             [['id_universitas'], 'exist', 'skipOnError' => true, 'targetClass' => Pt::className(), 'targetAttribute' => ['id_universitas' => 'id']],
+            [['tingkat'], 'exist', 'skipOnError' => true, 'targetClass' => Tingkat::className(), 'targetAttribute' => ['tingkat' => 'id']],
         ];
     }
 
@@ -125,5 +126,10 @@ class VisitingScientist extends \yii\db\ActiveRecord
     public function getUniversitas()
     {
         return $this->hasOne(Pt::className(), ['id' => 'id_universitas']);
+    }
+
+    public function getTingkat0()
+    {
+        return $this->hasOne(Tingkat::className(), ['id' => 'tingkat']);
     }
 }

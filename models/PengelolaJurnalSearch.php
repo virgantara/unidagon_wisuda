@@ -19,7 +19,7 @@ class PengelolaJurnalSearch extends PengelolaJurnal
     {
         return [
             [['id', 'komponen_kegiatan_id'], 'integer'],
-            [['peran_dalam_kegiatan', 'no_sk_tugas', 'apakah_masih_aktif', 'tgl_sk_tugas', 'tgl_sk_tugas_selesai', 'nama_media_publikasi', 'kategori_kegiatan_id', 'NIY', 'sister_id', 'is_claimed', 'updated_at', 'created_at'], 'safe'],
+            [['peran_dalam_kegiatan', 'no_sk_tugas', 'apakah_masih_aktif', 'tgl_sk_tugas', 'tgl_sk_tugas_selesai', 'nama_media_publikasi', 'kategori_kegiatan_id', 'NIY', 'sister_id', 'is_claimed', 'tingkat', 'updated_at', 'created_at'], 'safe'],
             [['sks_bkd'], 'number'],
         ];
     }
@@ -43,8 +43,8 @@ class PengelolaJurnalSearch extends PengelolaJurnal
     public function search($params)
     {
         $query = PengelolaJurnal::find();
-        $query->alias('p');
-        $query->where(['p.NIY' => Yii::$app->user->identity->NIY]);
+        $query->alias('t');
+        $query->where(['t.NIY' => Yii::$app->user->identity->NIY]);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -77,7 +77,8 @@ class PengelolaJurnalSearch extends PengelolaJurnal
             ->andFilterWhere(['like', 'kategori_kegiatan_id', $this->kategori_kegiatan_id])
             ->andFilterWhere(['like', 'NIY', $this->NIY])
             ->andFilterWhere(['like', 'sister_id', $this->sister_id])
-            ->andFilterWhere(['like', 'is_claimed', $this->is_claimed]);
+            ->andFilterWhere(['like', 'is_claimed', $this->is_claimed])
+            ->andFilterWhere(['like', 'tingkat', $this->tingkat]);
 
         return $dataProvider;
     }

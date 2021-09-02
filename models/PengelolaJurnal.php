@@ -20,12 +20,14 @@ use Yii;
  * @property string|null $sister_id
  * @property float|null $sks_bkd
  * @property string|null $is_claimed
+ * @property string|null $tingkat
  * @property string|null $updated_at
  * @property string|null $created_at
  *
  * @property KategoriKegiatan $kategoriKegiatan
  * @property KomponenKegiatan $komponenKegiatan
  * @property User $nIY
+ * @property Tingkat $tingkat0
  */
 class PengelolaJurnal extends \yii\db\ActiveRecord
 {
@@ -43,18 +45,19 @@ class PengelolaJurnal extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['peran_dalam_kegiatan','kategori_kegiatan_id'], 'required'],
-            [['tgl_sk_tugas', 'tgl_sk_tugas_selesai', 'updated_at', 'created_at','is_claimed','sks_bkd'], 'safe'],
+            [['peran_dalam_kegiatan'], 'required'],
+            [['tgl_sk_tugas', 'tgl_sk_tugas_selesai', 'updated_at', 'created_at'], 'safe'],
             [['komponen_kegiatan_id'], 'integer'],
             [['sks_bkd'], 'number'],
             [['peran_dalam_kegiatan', 'nama_media_publikasi'], 'string', 'max' => 255],
             [['no_sk_tugas', 'sister_id'], 'string', 'max' => 100],
-            [['apakah_masih_aktif', 'is_claimed'], 'string', 'max' => 1],
+            [['apakah_masih_aktif', 'is_claimed', 'tingkat'], 'string', 'max' => 1],
             [['kategori_kegiatan_id'], 'string', 'max' => 10],
             [['NIY'], 'string', 'max' => 15],
             [['kategori_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KategoriKegiatan::className(), 'targetAttribute' => ['kategori_kegiatan_id' => 'id']],
             [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
+            [['tingkat'], 'exist', 'skipOnError' => true, 'targetClass' => Tingkat::className(), 'targetAttribute' => ['tingkat' => 'id']],
         ];
     }
 
@@ -71,12 +74,13 @@ class PengelolaJurnal extends \yii\db\ActiveRecord
             'tgl_sk_tugas' => 'Tgl Sk Tugas',
             'tgl_sk_tugas_selesai' => 'Tgl Sk Tugas Selesai',
             'nama_media_publikasi' => 'Nama Media Publikasi',
-            'kategori_kegiatan_id' => 'Kategori Kegiatan',
-            'komponen_kegiatan_id' => 'Komponen BKD',
+            'kategori_kegiatan_id' => 'Kategori Kegiatan ID',
+            'komponen_kegiatan_id' => 'Komponen Kegiatan ID',
             'NIY' => 'Niy',
             'sister_id' => 'Sister ID',
             'sks_bkd' => 'Sks Bkd',
             'is_claimed' => 'Is Claimed',
+            'tingkat' => 'Tingkat',
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',
         ];
@@ -110,5 +114,15 @@ class PengelolaJurnal extends \yii\db\ActiveRecord
     public function getNIY()
     {
         return $this->hasOne(User::className(), ['NIY' => 'NIY']);
+    }
+
+    /**
+     * Gets query for [[Tingkat0]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTingkat0()
+    {
+        return $this->hasOne(Tingkat::className(), ['id' => 'tingkat']);
     }
 }

@@ -41,6 +41,7 @@ foreach($listKomponen as $k)
 }
 
 $listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('1113');
+$list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
 $list_capaian_luaran = ArrayHelper::map(\app\models\CapaianLuaran::find()->all(),'id','nama');
 ?>
@@ -69,6 +70,14 @@ $list_capaian_luaran = ArrayHelper::map(\app\models\CapaianLuaran::find()->all()
             ],
         ])?>
     <?= $form->field($model, 'kegiatan_penting_yang_dilakukan',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'tingkat',['options' => ['tag' => false]])->widget(Select2::classname(), [
+        'data' => $list_tingkat,
+
+        'options'=>['placeholder'=>Yii::t('app','- Pilih Tingkat Pertemuan -')],
+        'pluginOptions' => [
+            'allowClear' => true,
+        ],
+    ])?>
     <?= $form->field($model, 'tanggal_pelaksanaan',['options' => ['tag' => false]])->widget(
             DatePicker::className(),[
                 'name' => 'tanggal_pelaksanaan', 

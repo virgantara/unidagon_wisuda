@@ -39,6 +39,39 @@ class VisitingScientistController extends Controller
         $searchModel = new VisitingScientistSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        if (Yii::$app->request->post('hasEditable')) {
+            // instantiate your book model for saving
+            $id = Yii::$app->request->post('editableKey');
+            $model = VisitingScientist::findOne($id);
+
+            // store a default json response as desired by editable
+            $out = json_encode(['output'=>'', 'message'=>'']);
+
+            
+            $posted = current($_POST['VisitingScientist']);
+            $post = ['VisitingScientist' => $posted];
+
+            // load model like any single model validation
+            if ($model->load($post)) {
+            // can save model or do something before saving model
+                if($model->save())
+                {
+                    $out = json_encode(['output'=>'', 'message'=>'']);
+                }
+
+                else
+                {
+                    $error = \app\helpers\MyHelper::logError($model);
+                    $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                }
+
+                
+            }
+            // return ajax json encoded response and exit
+            echo $out;
+            return;
+        }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

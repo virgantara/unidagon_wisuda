@@ -19,7 +19,7 @@ class VisitingScientistSearch extends VisitingScientist
     {
         return [
             [['id', 'durasi_kegiatan', 'id_kategori_capaian_luaran', 'durasi'], 'integer'],
-            [['perguruan_tinggi_pengundang', 'tanggal_pelaksanaan', 'kategori_kegiatan_id', 'nama_penelitian_pengabdian', 'id_penelitian_pengabdian', 'nama_kategori_pencapaian', 'id_universitas', 'kegiatan_penting_yang_dilakukan', 'no_sk_tugas', 'tanggal_sk_penugasan', 'NIY', 'sister_id', 'updated_at', 'created_at'], 'safe'],
+            [['perguruan_tinggi_pengundang', 'tanggal_pelaksanaan', 'kategori_kegiatan_id', 'nama_penelitian_pengabdian', 'id_penelitian_pengabdian', 'nama_kategori_pencapaian', 'id_universitas', 'kegiatan_penting_yang_dilakukan', 'no_sk_tugas', 'tanggal_sk_penugasan', 'NIY', 'sister_id', 'updated_at', 'created_at','tingkat'], 'safe'],
         ];
     }
 
@@ -60,6 +60,7 @@ class VisitingScientistSearch extends VisitingScientist
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'tingkat' => $this->tingkat,
             'durasi_kegiatan' => $this->durasi_kegiatan,
             'tanggal_pelaksanaan' => $this->tanggal_pelaksanaan,
             'id_kategori_capaian_luaran' => $this->id_kategori_capaian_luaran,

@@ -2,13 +2,16 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
-
+use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\VisitingScientistSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Visiting Scientists';
 $this->params['breadcrumbs'][] = $this->title;
+
+$list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
+
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -36,8 +39,31 @@ $this->params['breadcrumbs'][] = $this->title;
     ],
             // 'id',
             'perguruan_tinggi_pengundang',
-            'durasi_kegiatan',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'durasi_kegiatan',
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
             'tanggal_pelaksanaan',
+            // 'tingkat',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'tingkat',
+                'filter' => $list_tingkat,
+                'refreshGrid' => true,
+                'editableOptions' => [
+                    'data' => $list_tingkat,
+                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                    'asPopover' => false
+                ],
+                'value' => function($data){
+                    return !empty($data->tingkat0) ? $data->tingkat0->nama : '-';
+                }
+            ],
             // 'kategori_kegiatan_id',
             //'nama_penelitian_pengabdian',
             //'id_penelitian_pengabdian',
