@@ -53,6 +53,7 @@ $listJenisPublikasi = ArrayHelper::map(\app\models\JenisPublikasi::find()->all()
 <div class="publikasi-form">
 
     <?php $form = ActiveForm::begin(); ?>
+    <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
     <div class="form-group">
         <label class="control-label col-md-3">Nama Kategori Kegiatan</label>
         <div class="col-md-9">

@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <?=$results->judul_publikasi_paten;?>
+                <?=$results->judul;?>
                 </div></td>
 
                 </tr>
@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <?=$results->nama_jenis_publikasi;?>
+                <?=$results->jenis_publikasi;?>
                 </div></td>
 
                 </tr>
@@ -101,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <?=$results->nama_kategori_pencapaian;?>
+                <?=$results->kategori_capaian_luaran;?>
                 </div></td>
 
                 </tr>
@@ -113,7 +113,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <a href="<?=$results->tautan_laman_jurnal;?>" target="_blank">Klik di sini</a>
+                <a href="<?=$results->tautan;?>" target="_blank">Klik di sini</a>
                 </div></td>
 
                 </tr>
@@ -125,7 +125,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <?=!empty($results->tanggal_terbit) ? \app\helpers\MyHelper::convertTanggalIndo($results->tanggal_terbit) : '-';?>
+                <?=!empty($results->tanggal) ? \app\helpers\MyHelper::convertTanggalIndo($results->tanggal) : '-';?>
                 </div></td>
 
                 </tr>
@@ -147,7 +147,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <?=$results->nomor_hasil_publikasi;?>
+                <?=$results->nomor;?>
                 </div></td>
 
                 </tr>
@@ -169,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <?=$results->nama_penerbit;?>
+                <?=$results->penerbit;?>
                 </div></td>
 
                 </tr>
@@ -180,7 +180,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <a href="<?=$results->DOI_publikasi;?>" target="_blank">Klik di sini</a>
+                <a href="<?=$results->doi;?>" target="_blank">Klik di sini</a>
                 </div></td>
 
                 </tr>
@@ -191,7 +191,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div class="col-lg-9">
-                <?=$results->ISSN_publikasi;?>
+                <?=$results->e_issn;?>
                 </div></td>
 
                 </tr>
@@ -301,20 +301,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 <tbody>
 
                 <?php 
-                if(!empty($results->files))
+                if(!empty($results->dokumen))
                 {
-                    foreach($results->files as $q=>$file)
+                    foreach($results->dokumen as $q=>$file)
                     {
 
                 
                 ?>
                 <tr>
                 <td ><?=$q+1;?></td>
-                <td><?=$file->nama_dokumen;?></td>
+                <td><?=$file->nama;?></td>
                 <td><?=$file->nama_file;?></td>
                 <td><?=$file->jenis_file;?></td>
                 <td><?=$file->tanggal_upload;?></td>
-                <td><?=$file->nama_jenis_dokumen;?></td>
+                <td><?=$file->jenis_dokumen;?></td>
                 <td><a href="<?=$file->tautan;?>" target="_blank">Link</a></td>
                 <td></td>
                 </tr>

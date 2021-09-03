@@ -65,7 +65,6 @@ class Penelitian extends \yii\db\ActiveRecord
             [['NIY'], 'string', 'max' => 15],
             [['judul_penelitian_pengabdian'], 'string', 'max' => 500],
             [['status', 'sister_id', 'nama_skim', 'no_sk_tugas', 'skim_kegiatan_id', 'kelompok_bidang_id'], 'string', 'max' => 100],
-            [['dana_dikti'], 'string', 'max' => 150],
             [['tempat_kegiatan'], 'string', 'max' => 255],
             [['nama_tahun_ajaran', 'kategori_kegiatan_id'], 'string', 'max' => 10],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],

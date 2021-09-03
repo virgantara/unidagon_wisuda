@@ -12,6 +12,24 @@ class MyHelper
 		return ['mandiri'=>'Mandiri/PT','dalam' => 'Institusi Dalam Negeri','luar' => 'Institusi Luar Negeri'];
 	} 
 
+	public static function clearLogSync($niy){
+		$models = \app\models\LogSync::find([
+			'NIY' => $niy
+		])->all();
+
+		foreach($models as $m)
+			$m->delete();
+	}
+
+	public static function createLogSync($niy, $keterangan){
+		
+		$model = new \app\models\LogSync;
+		$model->id = \app\helpers\MyHelper::gen_uuid();
+		$model->NIY = $niy;
+		$model->keterangan = $keterangan;
+		$model->save();
+	}
+
 	public static function listSatker()
     {
         $query = \app\models\UnitKerja::find();
@@ -215,23 +233,24 @@ class MyHelper
             'headers' => $headers,
             // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
         ]);
-        $full_url = $sister_baseurl.'/Login';
-        $response = $client->post($full_url, [
-            'body' => json_encode([
-                'username' => $sister_username,
-                'password' => $sister_password,
-                'id_pengguna' => $sister_id_pengguna
-            ]), 
-            'headers' => ['Content-type' => 'application/json']
-
-        ]); 
-        
-        $response = json_decode($response->getBody());
+        // $full_url = $sister_baseurl.'/Login';
         $id_token = '';
-        if($response->error_code == 0)
-        {
-        	$data = [
-        		'id_token' => $response->data->id_token,
+        $full_url = $sister_baseurl.'/authorize';
+        try {
+	        $response = $client->post($full_url, [
+	            'body' => json_encode([
+	                'username' => $sister_username,
+	                'password' => $sister_password,
+	                'id_pengguna' => $sister_id_pengguna
+	            ]), 
+	            'headers' => ['Content-type' => 'application/json']
+
+	        ]); 
+	        
+	        $response = json_decode($response->getBody());
+
+	        $data = [
+        		'id_token' => $response->token,
         		'created_at' => date('Y-m-d H:i:s')
         	];
 
@@ -240,13 +259,16 @@ class MyHelper
             
             file_put_contents($tokenPath, json_encode($data));
         	return true;
-        }
+	    }	
 
-        else
-        {
-        	print_r($response);exit;
-        	return false;
-        }
+	    catch(\Exception $e)
+	    {
+	    	print_r($e->getMessage());
+	    	return false;
+
+	    }
+        
+        
 	}
 
 	public static function gen_uuid() {

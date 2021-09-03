@@ -37,9 +37,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'tanggal_sk',
             'sk_inpassing_terhitung_mulai_tanggal',
             //'NIY',
+            'pangkat',
+            'golongan',
+            'masa_kerja_tahun',
+            'masa_kerja_bulan',
     [
         'class' => 'yii\grid\ActionColumn',
-        'template' => '{update}'
+        'template' => '{view}'
     ]
 ];?>    
 <?= GridView::widget([

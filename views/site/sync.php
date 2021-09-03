@@ -44,7 +44,18 @@ $this->title = 'UNIDA Gontor Lecturer Data';
            
 </div>   
 
-
+<?php 
+if(count($user->logSyncs) > 0)
+{
+?>
+<div class="alert alert-danger">
+<?php
+echo Html::a('See Error Logs',['log-sync/index'],['target'=>'_blank']);
+ ?>
+ </div>
+ <?php
+}
+?>
 <?php
 
 $this->registerJs(' 

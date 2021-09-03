@@ -47,7 +47,7 @@ class VisitingScientist extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['durasi_kegiatan', 'id_kategori_capaian_luaran', 'durasi'], 'integer'],
+            [['id_kategori_capaian_luaran'], 'integer'],
             [['tanggal_pelaksanaan', 'tanggal_sk_penugasan', 'updated_at', 'created_at','tingkat'], 'safe'],
             [['perguruan_tinggi_pengundang', 'nama_penelitian_pengabdian', 'nama_kategori_pencapaian', 'kegiatan_penting_yang_dilakukan'], 'string', 'max' => 255],
             [['kategori_kegiatan_id'], 'string', 'max' => 10],
@@ -75,7 +75,7 @@ class VisitingScientist extends \yii\db\ActiveRecord
             'nama_penelitian_pengabdian' => 'Nama Penelitian Pengabdian',
             'id_penelitian_pengabdian' => 'Penelitian Pengabdian',
             'nama_kategori_pencapaian' => 'Nama Kategori Pencapaian',
-            'id_kategori_capaian_luaran' => 'Kategori Capaian Luaran',
+            'id_kategori_capaian_luaran' => 'Kategori Capaian Luaran ID',
             'id_universitas' => 'Universitas',
             'kegiatan_penting_yang_dilakukan' => 'Kegiatan Penting Yang Dilakukan',
             'no_sk_tugas' => 'No SK Tugas',

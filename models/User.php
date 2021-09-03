@@ -648,4 +648,9 @@ class User extends UserIdentity
     {
         return $this->hasMany(Support::className(), ['NIY' => 'NIY']);
     }
+
+    public function getLogSyncs()
+    {
+        return $this->hasMany(LogSync::className(), ['NIY' => 'NIY']);
+    }
 }

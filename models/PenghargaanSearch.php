@@ -18,8 +18,8 @@ class PenghargaanSearch extends Penghargaan
     public function rules()
     {
         return [
-            [['ID', 'tahun'], 'integer'],
-            [['NIY', 'bentuk', 'pemberi', 'f_penghargaan', 'ver', 'sister_id', 'updated_at', 'created_at'], 'safe'],
+            [['ID', 'tahun', 'id_tingkat_penghargaan', 'id_jenis_penghargaan'], 'integer'],
+            [['NIY', 'bentuk', 'pemberi', 'f_penghargaan', 'ver', 'sister_id', 'tingkat_penghargaan', 'jenis_penghargaan', 'kategori_kegiatan_id', 'updated_at', 'created_at'], 'safe'],
         ];
     }
 
@@ -42,7 +42,8 @@ class PenghargaanSearch extends Penghargaan
     public function search($params)
     {
         $query = Penghargaan::find();
-
+        $query->alias('p');
+        $query->where(['p.NIY' => Yii::$app->user->identity->NIY]);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -61,6 +62,8 @@ class PenghargaanSearch extends Penghargaan
         $query->andFilterWhere([
             'ID' => $this->ID,
             'tahun' => $this->tahun,
+            'id_tingkat_penghargaan' => $this->id_tingkat_penghargaan,
+            'id_jenis_penghargaan' => $this->id_jenis_penghargaan,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
         ]);
@@ -70,7 +73,10 @@ class PenghargaanSearch extends Penghargaan
             ->andFilterWhere(['like', 'pemberi', $this->pemberi])
             ->andFilterWhere(['like', 'f_penghargaan', $this->f_penghargaan])
             ->andFilterWhere(['like', 'ver', $this->ver])
-            ->andFilterWhere(['like', 'sister_id', $this->sister_id]);
+            ->andFilterWhere(['like', 'sister_id', $this->sister_id])
+            ->andFilterWhere(['like', 'tingkat_penghargaan', $this->tingkat_penghargaan])
+            ->andFilterWhere(['like', 'jenis_penghargaan', $this->jenis_penghargaan])
+            ->andFilterWhere(['like', 'kategori_kegiatan_id', $this->kategori_kegiatan_id]);
 
         return $dataProvider;
     }

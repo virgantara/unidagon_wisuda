@@ -4,7 +4,7 @@ return [
 
    'api_baseurl' => 'http://localhost:1926',
    'sso_url' => 'http://local.sso.com:30101',
-   'sister_baseurl' => 'http://sister.unida.gontor.ac.id/api.php/0.1',
+   'sister_baseurl' => 'http://sister.unida.gontor.ac.id/ws.php/1.0',
    'sister_id_pengguna' => '',
    'sister_username' => '',
    'sister_password' => '',

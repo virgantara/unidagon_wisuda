@@ -14,6 +14,8 @@ use Yii;
  * @property int|null $jenis_publikasi_id
  * @property string|null $nama_kategori_kegiatan
  * @property string|null $kategori_kegiatan_id
+ * @property string|null $kategori_capaian_luaran
+ * @property int|null $id_kategori_capaian_luaran
  * @property string|null $tanggal_terbit
  * @property string|null $sister_id
  * @property string|null $tautan_laman_jurnal
@@ -24,9 +26,11 @@ use Yii;
  * @property string|null $penerbit
  * @property string|null $doi
  * @property string|null $issn
+ * @property string|null $edisi
  * @property string|null $is_claimed
  * @property int|null $kegiatan_id
  * @property float|null $sks_bkd
+ * @property int|null $jumlah_sitasi
  * @property string|null $updated_at
  * @property string|null $created_at
  *
@@ -52,14 +56,15 @@ class Publikasi extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['jenis_publikasi_id', 'kegiatan_id'], 'integer'],
-            [['tanggal_terbit', 'updated_at', 'created_at','jumlah_sitasi'], 'safe'],
+            [['kategori_kegiatan_id','jenis_publikasi_id','tanggal_terbit'],'required'],
+            [['jenis_publikasi_id', 'id_kategori_capaian_luaran', 'kegiatan_id', 'jumlah_sitasi'], 'integer'],
+            [['tanggal_terbit', 'updated_at', 'created_at'], 'safe'],
             [['sks_bkd'], 'number'],
-            [['judul_publikasi_paten', 'nama_jenis_publikasi', 'nama_kategori_kegiatan', 'tautan_laman_jurnal', 'tautan', 'penerbit', 'doi', 'issn'], 'string', 'max' => 255],
+            [['judul_publikasi_paten', 'nama_jenis_publikasi', 'nama_kategori_kegiatan', 'kategori_capaian_luaran', 'tautan_laman_jurnal', 'tautan', 'penerbit', 'doi', 'issn'], 'string', 'max' => 255],
             [['NIY'], 'string', 'max' => 15],
             [['kategori_kegiatan_id', 'sister_id'], 'string', 'max' => 100],
             [['volume', 'nomor'], 'string', 'max' => 5],
-            [['halaman'], 'string', 'max' => 50],
+            [['halaman', 'edisi'], 'string', 'max' => 50],
             [['is_claimed'], 'string', 'max' => 1],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
             [['kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['kegiatan_id' => 'id']],
@@ -80,21 +85,24 @@ class Publikasi extends \yii\db\ActiveRecord
             'nama_jenis_publikasi' => 'Nama Jenis Publikasi',
             'jenis_publikasi_id' => 'Jenis Publikasi ID',
             'nama_kategori_kegiatan' => 'Nama Kategori Kegiatan',
-            'kategori_kegiatan_id' => 'Kategori Kegiatan ID',
+            'kategori_kegiatan_id' => 'Kategori Kegiatan',
+            'kategori_capaian_luaran' => 'Kategori Capaian Luaran',
+            'id_kategori_capaian_luaran' => 'Kategori Capaian Luaran',
             'tanggal_terbit' => 'Tanggal Terbit',
             'sister_id' => 'Sister ID',
             'tautan_laman_jurnal' => 'Tautan Laman Jurnal',
             'tautan' => 'Tautan',
             'volume' => 'Volume',
             'nomor' => 'Nomor',
-            'jumlah_sitasi' => 'Jumlah Sitasi',
             'halaman' => 'Halaman',
             'penerbit' => 'Penerbit',
             'doi' => 'Doi',
             'issn' => 'Issn',
+            'edisi' => 'Edisi',
             'is_claimed' => 'Is Claimed',
             'kegiatan_id' => 'Kegiatan ID',
             'sks_bkd' => 'Sks Bkd',
+            'jumlah_sitasi' => 'Jumlah Sitasi',
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',
         ];

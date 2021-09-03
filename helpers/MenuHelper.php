@@ -128,7 +128,7 @@ class MenuHelper
 		        'items'=>[
 		           	['label' => 'Anggota Profesi', 'url' => ['/organisasi/index']],
 		           	
-		           	['label' => 'Penghargaan', 'url' => '#'],
+		           	['label' => 'Penghargaan', 'url' => ['/penghargaan/index']],
 		           	
 		           	['label' => 'Penunjang lain', 'url' => ['penunjang-lain/index']],
 		        ]

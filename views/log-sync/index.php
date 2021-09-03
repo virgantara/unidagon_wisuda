@@ -2,14 +2,12 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
-use yii\helpers\ArrayHelper;
-$list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\PenghargaanSearch */
+/* @var $searchModel app\models\LogSyncSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Penghargaans';
+$this->title = 'Log Syncs';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -22,9 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 <div class="panel-body ">
 
-    <p>
-        <?= Html::a('Create Penghargaan', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+
     <?php
     $gridColumns = [
     [
@@ -36,30 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
-
-            'jenis_penghargaan',
-            [
-                'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'tingkat_penghargaan',
-                'filter' => $list_tingkat,
-                'refreshGrid' => true,
-                'editableOptions' => [
-                    'data' => $list_tingkat,
-                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
-                    'asPopover' => false
-                ],
-                
-            ],
-            'tahun',
-            'bentuk',
-            'pemberi',
-
-            'f_penghargaan',
-            //'ver',
-            //'sister_id',
-            //'updated_at',
+            'keterangan:ntext',
+     
+            'updated_at',
             'created_at',
-    ['class' => 'yii\grid\ActionColumn']
 ];?>    
 <?= GridView::widget([
         'dataProvider' => $dataProvider,

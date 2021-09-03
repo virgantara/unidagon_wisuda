@@ -420,23 +420,27 @@ class PublikasiController extends AppController
             'headers' => $headers,
             // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
         ]);
-        $full_url = $sister_baseurl.'/Publikasi/detail';
-        $response = $client->post($full_url, [
-            'body' => json_encode([
-                'id_token' => $sisterToken,
-                'id_dosen' => $user->sister_id,
-                'id_riwayat_publikasi_paten' => $model->sister_id
-            ]), 
-            'headers' => ['Content-type' => 'application/json']
-
-        ]); 
-        
+        $full_url = $sister_baseurl.'/publikasi/'.$model->sister_id;
         $results = [];
-       
-        $response = json_decode($response->getBody());
-        if($response->error_code == 0){
-            $results = $response->data;
+        try{
+            $response = $client->get($full_url, [
+
+               'headers' => [
+                            'Accept' => 'application/json',
+                            'Authorization' => 'Bearer '.$sisterToken
+                        ]
+
+            ]); 
+
+            $results = json_decode($response->getBody());
         }
+
+        catch(\Exception $e)
+        {
+            print_r($e->getMessage());
+        }
+        
+        
         // echo '<pre>';
         // print_r($results);
         // echo '</pre>';

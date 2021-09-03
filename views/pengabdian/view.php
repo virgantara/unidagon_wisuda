@@ -115,6 +115,31 @@ $list_status = array_combine($list_status, $list_status);
 </div>
 
 
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel">
+            <div class="panel-heading">
+                
+                    <h3>File dari SISTER</h3>
+                
+            </div>
+            <div class="panel-body">
+                <h4>
+                <ol>
+                <?php 
+
+                $sisterFiles = \app\models\SisterFiles::find()->where(['parent_id'=>$model->sister_id])->all();
+                foreach($sisterFiles as $file)
+                {
+                    echo '<li>'.Html::a($file->nama_dokumen,$file->tautan,['target'=>'_blank']).'</li>';
+                }
+                ?>
+                </ol>
+                </h4>
+            </div>
+        </div>
+    </div>
+</div>
 <?php
 
 

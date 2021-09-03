@@ -42,7 +42,8 @@ class VisitingScientistSearch extends VisitingScientist
     public function search($params)
     {
         $query = VisitingScientist::find();
-
+        $query->alias('p');
+        $query->where(['p.NIY' => Yii::$app->user->identity->NIY]);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([

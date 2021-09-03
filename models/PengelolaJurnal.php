@@ -15,6 +15,7 @@ use Yii;
  * @property string|null $tgl_sk_tugas_selesai
  * @property string|null $nama_media_publikasi
  * @property string|null $kategori_kegiatan_id
+ * @property string|null $id_media_publikasi
  * @property int|null $komponen_kegiatan_id
  * @property string|null $NIY
  * @property string|null $sister_id
@@ -46,7 +47,6 @@ class PengelolaJurnal extends \yii\db\ActiveRecord
     {
         return [
             [['peran_dalam_kegiatan'], 'required'],
-            [['komponen_kegiatan_id','kategori_kegiatan_id','tgl_sk_tugas','tgl_sk_tugas_selesai','tingkat'], 'required','on' => 'update'],
             [['tgl_sk_tugas', 'tgl_sk_tugas_selesai', 'updated_at', 'created_at'], 'safe'],
             [['komponen_kegiatan_id'], 'integer'],
             [['sks_bkd'], 'number'],
@@ -54,6 +54,7 @@ class PengelolaJurnal extends \yii\db\ActiveRecord
             [['no_sk_tugas', 'sister_id'], 'string', 'max' => 100],
             [['apakah_masih_aktif', 'is_claimed', 'tingkat'], 'string', 'max' => 1],
             [['kategori_kegiatan_id'], 'string', 'max' => 10],
+            [['id_media_publikasi'], 'string', 'max' => 50],
             [['NIY'], 'string', 'max' => 15],
             [['kategori_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KategoriKegiatan::className(), 'targetAttribute' => ['kategori_kegiatan_id' => 'id']],
             [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
@@ -76,6 +77,7 @@ class PengelolaJurnal extends \yii\db\ActiveRecord
             'tgl_sk_tugas_selesai' => 'Tgl Sk Tugas Selesai',
             'nama_media_publikasi' => 'Nama Media Publikasi',
             'kategori_kegiatan_id' => 'Kategori Kegiatan ID',
+            'id_media_publikasi' => 'Id Media Publikasi',
             'komponen_kegiatan_id' => 'Komponen Kegiatan ID',
             'NIY' => 'Niy',
             'sister_id' => 'Sister ID',
