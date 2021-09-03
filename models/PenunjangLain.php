@@ -47,6 +47,7 @@ class PenunjangLain extends \yii\db\ActiveRecord
         return [
             [['komponen_kegiatan_id', 'jenis_panitia_id'], 'integer'],
             [['jenis_panitia_id', 'tingkat_id'], 'required'],
+            [['komponen_kegiatan_id','kategori_kegiatan_id'], 'required','on' => 'update'],
             [['tanggal_mulai', 'tanggal_selesai', 'updated_at', 'created_at'], 'safe'],
             [['sks_bkd'], 'number'],
             [['kategori_kegiatan_id'], 'string', 'max' => 100],

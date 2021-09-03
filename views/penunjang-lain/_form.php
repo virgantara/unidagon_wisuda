@@ -38,7 +38,14 @@ foreach($listKomponen as $k)
     $listKomponenKegiatan[$k->nama] = $tmp;
 }
 
-$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('140');
+
+$listKegiatan1 = \app\helpers\MyHelper::convertKategoriKegiatan('1401');
+$listKegiatan2 = \app\helpers\MyHelper::convertKategoriKegiatan('1402');
+$listKegiatan3 = \app\helpers\MyHelper::convertKategoriKegiatan('1404');
+$listKegiatan4 = \app\helpers\MyHelper::convertKategoriKegiatan('1405');
+$listKegiatan5 = \app\helpers\MyHelper::convertKategoriKegiatan('1407');
+$listKegiatan6 = \app\helpers\MyHelper::convertKategoriKegiatan('1411');
+$listKegiatan = array_merge($listKegiatan1, $listKegiatan2, $listKegiatan3, $listKegiatan4, $listKegiatan5, $listKegiatan6);
 
 $listJenisPanitia = ArrayHelper::map($list_jenis,'id_jenis_panitia','nama_jenis_kegiatan_kepanitiaan');
 $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');

@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Penghargaan */
+/* @var $model app\models\Penghargaan */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -12,16 +12,26 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'bentuk')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'NIY',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
 
-    <?= $form->field($model, 'pemberi')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'tahun',['options' => ['tag' => false]])->textInput() ?>
 
-    <?= $form->field($model, 'tahun')->textInput() ?>
+    <?= $form->field($model, 'bentuk',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
 
-    <?= $form->field($model, 'f_penghargaan')->fileInput().'NB: File format is pdf, png, jpeg, jpg and maximal sized 1 MB<br><br>' ?>
+    <?= $form->field($model, 'pemberi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+
+    <?= $form->field($model, 'f_penghargaan',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+
+    <?= $form->field($model, 'ver',['options' => ['tag' => false]])->dropDownList([ 'Belum Diverifikasi' => 'Belum Diverifikasi', 'Sudah Diverifikasi' => 'Sudah Diverifikasi', 'Ditolak' => 'Ditolak', ], ['prompt' => '']) ?>
+
+    <?= $form->field($model, 'sister_id',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+
+    <?= $form->field($model, 'updated_at',['options' => ['tag' => false]])->textInput() ?>
+
+    <?= $form->field($model, 'created_at',['options' => ['tag' => false]])->textInput() ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

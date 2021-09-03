@@ -7,42 +7,49 @@ use Yii;
 /**
  * This is the model class for table "penghargaan".
  *
- * @property integer $ID
+ * @property int $ID
  * @property string $NIY
- * @property integer $tahun
+ * @property int $tahun
  * @property string $bentuk
  * @property string $pemberi
- * @property string $f_penghargaan
+ * @property string|null $f_penghargaan
+ * @property string $ver
+ * @property string|null $sister_id
+ * @property string|null $updated_at
+ * @property string|null $created_at
+ *
+ * @property User $nIY
  */
 class Penghargaan extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public $namanya;
     public static function tableName()
     {
         return 'penghargaan';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
         return [
             [['NIY', 'tahun', 'bentuk', 'pemberi'], 'required'],
             [['tahun'], 'integer'],
+            [['ver'], 'string'],
+            [['updated_at', 'created_at'], 'safe'],
             [['NIY'], 'string', 'max' => 15],
-            [['bentuk','namanya'], 'string', 'max' => 100],
-            [['pemberi','ver'], 'string', 'max' => 50],
+            [['bentuk', 'sister_id'], 'string', 'max' => 100],
+            [['pemberi'], 'string', 'max' => 50],
             [['f_penghargaan'], 'string', 'max' => 200],
-            [['f_penghargaan'], 'file', 'extensions' => 'jpg,jpeg,png,pdf'],
+            [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -50,18 +57,23 @@ class Penghargaan extends \yii\db\ActiveRecord
             'ID' => 'ID',
             'NIY' => 'Niy',
             'tahun' => 'Tahun',
-            'namanya' => 'Nama',
-            'bentuk' => 'Bentuk Penghargaan',
+            'bentuk' => 'Bentuk',
             'pemberi' => 'Pemberi',
-            'f_penghargaan' => 'Sertifikasi Penghargaan',
-            'ver' => 'Status Verifikasi',
+            'f_penghargaan' => 'F Penghargaan',
+            'ver' => 'Ver',
+            'sister_id' => 'Sister ID',
+            'updated_at' => 'Updated At',
+            'created_at' => 'Created At',
         ];
     }
-    
-    public function getPenghargaanDosen(){
-        return $this->hasOne(Dosen::className(),['NIY'=>'NIY']);
-    }
-    public function getPenghargaanData(){
-        return $this->hasOne(DataDiri::className(),['NIY'=>'NIY']);
+
+    /**
+     * Gets query for [[NIY]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNIY()
+    {
+        return $this->hasOne(User::className(), ['NIY' => 'NIY']);
     }
 }
