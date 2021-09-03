@@ -42,6 +42,9 @@ class BimbinganMahasiswaSearch extends BimbinganMahasiswa
     public function search($params)
     {
         $query = BimbinganMahasiswa::find();
+        $query->alias('t');
+
+        $query->joinWith(['bimbinganMahasiswaDosens as d']);
 
         // add conditions that should always apply here
 
@@ -74,6 +77,8 @@ class BimbinganMahasiswaSearch extends BimbinganMahasiswa
             ->andFilterWhere(['like', 'sk_penugasan', $this->sk_penugasan])
             ->andFilterWhere(['like', 'keterangan', $this->keterangan])
             ->andFilterWhere(['like', 'sister_id', $this->sister_id]);
+
+        $query->andWhere(['d.NIY' => Yii::$app->user->identity->NIY]);
 
         return $dataProvider;
     }

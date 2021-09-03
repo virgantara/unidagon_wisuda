@@ -20,9 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 <div class="panel-body ">
 
-    <p>
-        <?= Html::a('Create Bimbingan Mahasiswa', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
     <?php
     $gridColumns = [
     [
@@ -34,14 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
-            'id',
+            // 'id',
             'judul',
             'jenis_bimbingan',
             'program_studi',
             'semester',
-            //'lokasi',
-            //'sk_penugasan',
-            //'tanggal_sk_penugasan',
+            'lokasi',
+            'sk_penugasan',
+            'tanggal_sk_penugasan',
             //'keterangan',
             //'komunal',
             //'sister_id',
