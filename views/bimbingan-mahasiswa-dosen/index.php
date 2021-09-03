@@ -4,10 +4,10 @@ use yii\helpers\Html;
 use kartik\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\BimbinganMahasiswaSearch */
+/* @var $searchModel app\models\BimbinganMahasiswaDosenSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Bimbingan Mahasiswas';
+$this->title = 'Bimbingan Mahasiswa Dosens';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="panel-body ">
 
     <p>
-        <?= Html::a('Create Bimbingan Mahasiswa', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Bimbingan Mahasiswa Dosen', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?php
     $gridColumns = [
@@ -35,16 +35,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
             'id',
-            'judul',
-            'jenis_bimbingan',
-            'program_studi',
-            'semester',
-            //'lokasi',
-            //'sk_penugasan',
-            //'tanggal_sk_penugasan',
-            //'keterangan',
-            //'komunal',
-            //'sister_id',
+            'NIY',
+            'id_sdm',
+            'nama',
+            'kategori_kegiatan',
+            //'urutan',
+            //'bimbingan_mahasiswa_id',
             //'updated_at',
             //'created_at',
     ['class' => 'yii\grid\ActionColumn']

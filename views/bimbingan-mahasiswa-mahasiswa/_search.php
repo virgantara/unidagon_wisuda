@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\BimbinganMahasiswaSearch */
+/* @var $model app\models\BimbinganMahasiswaMahasiswaSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="bimbingan-mahasiswa-search">
+<div class="bimbingan-mahasiswa-mahasiswa-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -17,25 +17,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'judul') ?>
+    <?= $form->field($model, 'nomor_induk') ?>
 
-    <?= $form->field($model, 'jenis_bimbingan') ?>
+    <?= $form->field($model, 'nama') ?>
 
-    <?= $form->field($model, 'program_studi') ?>
+    <?= $form->field($model, 'peran') ?>
 
-    <?= $form->field($model, 'semester') ?>
-
-    <?php // echo $form->field($model, 'lokasi') ?>
-
-    <?php // echo $form->field($model, 'sk_penugasan') ?>
-
-    <?php // echo $form->field($model, 'tanggal_sk_penugasan') ?>
-
-    <?php // echo $form->field($model, 'keterangan') ?>
-
-    <?php // echo $form->field($model, 'komunal') ?>
-
-    <?php // echo $form->field($model, 'sister_id') ?>
+    <?= $form->field($model, 'bimbingan_mahasiswa_id') ?>
 
     <?php // echo $form->field($model, 'updated_at') ?>
 

@@ -14,6 +14,9 @@ use app\helpers\MyHelper;
 use app\models\LoginForm;
 use app\models\CatatanHarian;
 
+use app\models\BimbinganMahasiswa;
+use app\models\BimbinganMahasiswaDosen;
+use app\models\BimbinganMahasiswaMahasiswa;
 use app\models\Buku;
 use app\models\Hki;
 use app\models\Pembicara;
@@ -155,6 +158,7 @@ class SiteController extends AppController
             $res14 = $this->importOrganisasi();
             $res15 = $this->importPenunjangLain();
             $res16 = $this->importPenghargaan();
+            $res17 = $this->importBimbinganMahasiswa();
 
             $code = $res1['code'];
             
@@ -241,7 +245,11 @@ class SiteController extends AppController
                         'data' => $res16['message'],
                         'source' => 'SISTER'
                     ],
-                    
+                    [
+                        'modul' => 'bimbingan_mahasiswa',
+                        'data' => $res17['message'],
+                        'source' => 'SISTER'
+                    ],
                 ]
             ];
 
@@ -250,7 +258,7 @@ class SiteController extends AppController
         die(); 
     }
 
-    protected function importPenunjangLain()
+    protected function importBimbinganMahasiswa()
     {
         if(!parent::handleEmptyUser())
         {
@@ -274,7 +282,7 @@ class SiteController extends AppController
         $results = [];
         try     
         {
-            $full_url = $sister_baseurl.'/penunjang_lain';
+            $full_url = $sister_baseurl.'/bimbingan_mahasiswa';
             $response = $client->get($full_url, [
                 'query' => [
                     'id_sdm' => $user->sister_id
@@ -314,7 +322,7 @@ class SiteController extends AppController
             
             try     
             {
-                $full_url = $sister_baseurl.'/penunjang_lain/'.$item->id;
+                $full_url = $sister_baseurl.'/bimbingan_mahasiswa/'.$item->id;
                 $resp = $client->get($full_url, [ 
                     'headers' => [
                         'Accept' => 'application/json',
@@ -324,59 +332,94 @@ class SiteController extends AppController
                 ]); 
 
                 $detail = json_decode($resp->getBody());
-                
-
-                $model = PenunjangLain::find()->where([
+               
+                $model = BimbinganMahasiswa::find()->where([
                     'sister_id' => $item->id
                 ])->one();
 
-                if(empty($model))
-                    $model = new PenunjangLain;
-
-                $tkt = \app\models\Tingkat::find()->where(['nama'=>$detail->tingkat])->one();
-
-                if(empty($tkt)){
-                    $errors .= 'Tingkat '.$detail->tingkat.' tidak ada di database';
-                    throw new \Exception;
-                    
+                if(empty($model)){
+                    $model = new BimbinganMahasiswa;
+                    $model->id = MyHelper::gen_uuid();
                 }
 
-                $model->NIY = Yii::$app->user->identity->NIY;
-                $model->sister_id = $detail->id;
-                $model->nama_kegiatan = $detail->nama;
-                $model->jenis_panitia_id = $detail->id_jenis_kepanitiaan;
-                $model->tingkat_id = $tkt->id;
-                $model->no_sk_tugas = $detail->sk_penugasan;
-                $model->tanggal_mulai = $detail->tanggal_mulai;
-                $model->tanggal_selesai = $detail->tanggal_selesai;
-                $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
-                $model->instansi = $detail->instansi;
+                $model->judul = $detail->judul;
+                $model->jenis_bimbingan = $detail->jenis_bimbingan;
+                $model->program_studi = $detail->program_studi;
+                $model->semester = $detail->semester;
+                $model->lokasi = $detail->lokasi;
+                $model->sk_penugasan = $detail->sk_penugasan;
+                $model->tanggal_sk_penugasan = $detail->tanggal_sk_penugasan;
+                $model->keterangan = $detail->keterangan;
+                $model->komunal = (int)$detail->komunal;
+                $model->sister_id = $item->id;
                 
                 if($model->save())
                 {
 
                     $counter++;
-                    if(!empty($detail->dokumen))
+                    if(!empty($detail->dosen))
                     {
-                        foreach($detail->dokumen as $file)
+                        foreach($detail->dosen as $dosen)
                         {
-                            $pf = SisterFiles::findOne($file->id);
-                            if(empty($pf))
-                                $pf = new SisterFiles;
+                            $bmd = BimbinganMahasiswaDosen::find()->where([
+                                'bimbingan_mahasiswa_id' => $model->id,
+                                'id_sdm' => $dosen->id_sdm
+                            ])->one();
 
-                            $pf->id_dokumen = $file->id;
-                            $pf->parent_id = $item->id;
-                            $pf->nama_dokumen = $file->nama;
-                            $pf->nama_file = $file->nama_file;
-                            $pf->jenis_file = $file->jenis_file;
-                            $pf->tanggal_upload = $file->tanggal_upload;
-                            $pf->nama_jenis_dokumen = $file->jenis_dokumen;
-                            $pf->tautan = $file->tautan;
-                            $pf->keterangan_dokumen = $file->keterangan;
+                            if(empty($bmd)){
+                                $bmd = new BimbinganMahasiswaDosen;
+                                $bmd->id = MyHelper::gen_uuid();
+                                $bmd->bimbingan_mahasiswa_id = $model->id;
+                                $bmd->id_sdm = $dosen->id_sdm;
+                            }
 
-                            if(!$pf->save())
+                            $bmd->nama = $dosen->nama;
+                            $bmd->kategori_kegiatan = $dosen->kategori_kegiatan;
+                            $bmd->urutan = $dosen->urutan;
+                            
+                            $user = User::find()->where(['sister_id' => $dosen->id_sdm])->one();
+
+                            if(!empty($user))
                             {
-                                $errors .= 'PF: '.\app\helpers\MyHelper::logError($pf);
+                                $bmd->NIY = $user->NIY;
+                            }
+
+                            else
+                            {
+                                $errors .= 'bmdUserNotFound: ';
+                                throw new \Exception;
+                            }                           
+
+                            if(!$bmd->save())
+                            {
+                                $errors .= 'bmd: '.\app\helpers\MyHelper::logError($bmd);
+                                throw new \Exception;
+                            }
+                        }
+                    }
+
+                    if(!empty($detail->mahasiswa))
+                    {
+                        foreach($detail->mahasiswa as $mahasiswa)
+                        {
+                            $bmm = BimbinganMahasiswaMahasiswa::find()->where([
+                                'bimbingan_mahasiswa_id' => $model->id,
+                                'nomor_induk' => $mahasiswa->nomor_induk
+                            ])->one();
+
+                            if(empty($bmm)){
+                                $bmm = new BimbinganMahasiswaMahasiswa;
+                                $bmm->id = MyHelper::gen_uuid();
+                                $bmm->bimbingan_mahasiswa_id = $model->id;
+                                $bmm->nomor_induk = $mahasiswa->nomor_induk;
+                            }
+                            $bmm->nama = $mahasiswa->nama;
+                            $bmm->peran = $mahasiswa->peran;
+                            $bmm->nomor_induk = $mahasiswa->nomor_induk;
+
+                            if(!$bmm->save())
+                            {
+                                $errors .= 'bmm: '.\app\helpers\MyHelper::logError($bmm);
                                 throw new \Exception;
                             }
                         }
@@ -398,7 +441,7 @@ class SiteController extends AppController
                 $transaction->rollBack();
                 $errors .= $e->getMessage();
                 
-                MyHelper::createLogSync($user->NIY, 'Penunjang Lain '.$errors);
+                MyHelper::createLogSync($user->NIY, 'BimbinganMahasiswa '.$errors);
                 continue;
             } 
             
@@ -557,6 +600,171 @@ class SiteController extends AppController
                 $errors .= $e->getMessage();
                 
                 MyHelper::createLogSync($user->NIY, 'Penghargaan '.$errors);
+                continue;
+            } 
+            
+        }
+
+        $results = [
+            'code' => 200,
+            'message' => $counter.' data imported'
+            
+        ];
+
+        return $results;
+
+
+    }
+
+    protected function importPenunjangLain()
+    {
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $sisterToken = \app\helpers\MyHelper::getSisterToken();
+        if(!isset($sisterToken)){
+            $sisterToken = MyHelper::getSisterToken();
+        }
+
+        // print_r($sisterToken);exit;
+        $sister_baseurl = Yii::$app->params['sister_baseurl'];
+        $headers = ['content-type' => 'application/json'];
+        $client = new \GuzzleHttp\Client([
+            'timeout'  => 5.0,
+            'headers' => $headers,
+            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+        ]);
+        $results = [];
+        try     
+        {
+            $full_url = $sister_baseurl.'/penunjang_lain';
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id
+                ], 
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+            
+            $response = json_decode($response->getBody());
+            
+            $results = $response;    
+        }
+
+        catch(\Exception $e){
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+
+            return $results;
+        } 
+       
+
+        $results = $response;
+        $counter = 0;
+        $errors ='';
+            
+        foreach($results as $item)
+        {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            
+            
+            try     
+            {
+                $full_url = $sister_baseurl.'/penunjang_lain/'.$item->id;
+                $resp = $client->get($full_url, [ 
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
+
+                ]); 
+
+                $detail = json_decode($resp->getBody());
+                
+
+                $model = PenunjangLain::find()->where([
+                    'sister_id' => $item->id
+                ])->one();
+
+                if(empty($model))
+                    $model = new PenunjangLain;
+
+                $tkt = \app\models\Tingkat::find()->where(['nama'=>$detail->tingkat])->one();
+
+                if(empty($tkt)){
+                    $errors .= 'Tingkat '.$detail->tingkat.' tidak ada di database';
+                    throw new \Exception;
+                    
+                }
+
+                $model->NIY = Yii::$app->user->identity->NIY;
+                $model->sister_id = $detail->id;
+                $model->nama_kegiatan = $detail->nama;
+                $model->jenis_panitia_id = $detail->id_jenis_kepanitiaan;
+                $model->tingkat_id = $tkt->id;
+                $model->no_sk_tugas = $detail->sk_penugasan;
+                $model->tanggal_mulai = $detail->tanggal_mulai;
+                $model->tanggal_selesai = $detail->tanggal_selesai;
+                $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
+                $model->instansi = $detail->instansi;
+                
+                if($model->save())
+                {
+
+                    $counter++;
+                    if(!empty($detail->dokumen))
+                    {
+                        foreach($detail->dokumen as $file)
+                        {
+                            $pf = SisterFiles::findOne($file->id);
+                            if(empty($pf))
+                                $pf = new SisterFiles;
+
+                            $pf->id_dokumen = $file->id;
+                            $pf->parent_id = $item->id;
+                            $pf->nama_dokumen = $file->nama;
+                            $pf->nama_file = $file->nama_file;
+                            $pf->jenis_file = $file->jenis_file;
+                            $pf->tanggal_upload = $file->tanggal_upload;
+                            $pf->nama_jenis_dokumen = $file->jenis_dokumen;
+                            $pf->tautan = $file->tautan;
+                            $pf->keterangan_dokumen = $file->keterangan;
+
+                            if(!$pf->save())
+                            {
+                                $errors .= 'PF: '.\app\helpers\MyHelper::logError($pf);
+                                throw new \Exception;
+                            }
+                        }
+                    }
+                    $transaction->commit();
+                    
+                }
+
+                else
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                    throw new \Exception;
+                }
+                
+
+            }
+
+            catch (\Exception $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                
+                MyHelper::createLogSync($user->NIY, 'Penunjang Lain '.$errors);
                 continue;
             } 
             

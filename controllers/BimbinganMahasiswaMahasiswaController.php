@@ -3,17 +3,17 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\BimbinganMahasiswa;
-use app\models\BimbinganMahasiswaSearch;
+use app\models\BimbinganMahasiswaMahasiswa;
+use app\models\BimbinganMahasiswaMahasiswaSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
 /**
- * BimbinganMahasiswaController implements the CRUD actions for BimbinganMahasiswa model.
+ * BimbinganMahasiswaMahasiswaController implements the CRUD actions for BimbinganMahasiswaMahasiswa model.
  */
-class BimbinganMahasiswaController extends Controller
+class BimbinganMahasiswaMahasiswaController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -31,12 +31,12 @@ class BimbinganMahasiswaController extends Controller
     }
 
     /**
-     * Lists all BimbinganMahasiswa models.
+     * Lists all BimbinganMahasiswaMahasiswa models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new BimbinganMahasiswaSearch();
+        $searchModel = new BimbinganMahasiswaMahasiswaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -46,7 +46,7 @@ class BimbinganMahasiswaController extends Controller
     }
 
     /**
-     * Displays a single BimbinganMahasiswa model.
+     * Displays a single BimbinganMahasiswaMahasiswa model.
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -59,13 +59,13 @@ class BimbinganMahasiswaController extends Controller
     }
 
     /**
-     * Creates a new BimbinganMahasiswa model.
+     * Creates a new BimbinganMahasiswaMahasiswa model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new BimbinganMahasiswa();
+        $model = new BimbinganMahasiswaMahasiswa();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', "Data tersimpan");
@@ -78,7 +78,7 @@ class BimbinganMahasiswaController extends Controller
     }
 
     /**
-     * Updates an existing BimbinganMahasiswa model.
+     * Updates an existing BimbinganMahasiswaMahasiswa model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
@@ -99,7 +99,7 @@ class BimbinganMahasiswaController extends Controller
     }
 
     /**
-     * Deletes an existing BimbinganMahasiswa model.
+     * Deletes an existing BimbinganMahasiswaMahasiswa model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
@@ -113,15 +113,15 @@ class BimbinganMahasiswaController extends Controller
     }
 
     /**
-     * Finds the BimbinganMahasiswa model based on its primary key value.
+     * Finds the BimbinganMahasiswaMahasiswa model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
-     * @return BimbinganMahasiswa the loaded model
+     * @return BimbinganMahasiswaMahasiswa the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = BimbinganMahasiswa::findOne($id)) !== null) {
+        if (($model = BimbinganMahasiswaMahasiswa::findOne($id)) !== null) {
             return $model;
         }
 

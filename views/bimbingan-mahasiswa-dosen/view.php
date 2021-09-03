@@ -4,10 +4,10 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\BimbinganMahasiswa */
+/* @var $model app\models\BimbinganMahasiswaDosen */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Bimbingan Mahasiswas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Bimbingan Mahasiswa Dosens', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="block-header">
@@ -33,16 +33,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'judul',
-            'jenis_bimbingan',
-            'program_studi',
-            'semester',
-            'lokasi',
-            'sk_penugasan',
-            'tanggal_sk_penugasan',
-            'keterangan',
-            'komunal',
-            'sister_id',
+            'NIY',
+            'id_sdm',
+            'nama',
+            'kategori_kegiatan',
+            'urutan',
+            'bimbingan_mahasiswa_id',
             'updated_at',
             'created_at',
         ],

@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\BimbinganMahasiswa;
+use app\models\BimbinganMahasiswaDosen;
 
 /**
- * BimbinganMahasiswaSearch represents the model behind the search form of `app\models\BimbinganMahasiswa`.
+ * BimbinganMahasiswaDosenSearch represents the model behind the search form of `app\models\BimbinganMahasiswaDosen`.
  */
-class BimbinganMahasiswaSearch extends BimbinganMahasiswa
+class BimbinganMahasiswaDosenSearch extends BimbinganMahasiswaDosen
 {
     /**
      * {@inheritdoc}
@@ -18,8 +18,8 @@ class BimbinganMahasiswaSearch extends BimbinganMahasiswa
     public function rules()
     {
         return [
-            [['id', 'judul', 'jenis_bimbingan', 'program_studi', 'semester', 'lokasi', 'sk_penugasan', 'tanggal_sk_penugasan', 'keterangan', 'sister_id', 'updated_at', 'created_at'], 'safe'],
-            [['komunal'], 'integer'],
+            [['id', 'NIY', 'id_sdm', 'nama', 'kategori_kegiatan', 'bimbingan_mahasiswa_id', 'updated_at', 'created_at'], 'safe'],
+            [['urutan'], 'integer'],
         ];
     }
 
@@ -41,7 +41,7 @@ class BimbinganMahasiswaSearch extends BimbinganMahasiswa
      */
     public function search($params)
     {
-        $query = BimbinganMahasiswa::find();
+        $query = BimbinganMahasiswaDosen::find();
 
         // add conditions that should always apply here
 
@@ -59,21 +59,17 @@ class BimbinganMahasiswaSearch extends BimbinganMahasiswa
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'tanggal_sk_penugasan' => $this->tanggal_sk_penugasan,
-            'komunal' => $this->komunal,
+            'urutan' => $this->urutan,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
         ]);
 
         $query->andFilterWhere(['like', 'id', $this->id])
-            ->andFilterWhere(['like', 'judul', $this->judul])
-            ->andFilterWhere(['like', 'jenis_bimbingan', $this->jenis_bimbingan])
-            ->andFilterWhere(['like', 'program_studi', $this->program_studi])
-            ->andFilterWhere(['like', 'semester', $this->semester])
-            ->andFilterWhere(['like', 'lokasi', $this->lokasi])
-            ->andFilterWhere(['like', 'sk_penugasan', $this->sk_penugasan])
-            ->andFilterWhere(['like', 'keterangan', $this->keterangan])
-            ->andFilterWhere(['like', 'sister_id', $this->sister_id]);
+            ->andFilterWhere(['like', 'NIY', $this->NIY])
+            ->andFilterWhere(['like', 'id_sdm', $this->id_sdm])
+            ->andFilterWhere(['like', 'nama', $this->nama])
+            ->andFilterWhere(['like', 'kategori_kegiatan', $this->kategori_kegiatan])
+            ->andFilterWhere(['like', 'bimbingan_mahasiswa_id', $this->bimbingan_mahasiswa_id]);
 
         return $dataProvider;
     }
