@@ -18,6 +18,33 @@ use yii\httpclient\Client;
 
 class BkdController extends AppController
 {
+
+    public function actionGantiPeriode()
+    {
+        $tahun_id = $_POST['tahun'];
+        // $tahun_id = $dataPost['tahun_id'];
+        $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+
+        if(!empty($bkd_periode))
+        {
+          $session = Yii::$app->session;
+          $session->set('bkd_periode',$bkd_periode->tahun_id);
+          $session->set('bkd_periode_nama',$bkd_periode->nama_periode);
+          $session->set('tgl_awal',$bkd_periode->tanggal_bkd_awal);
+          $session->set('tgl_akhir',$bkd_periode->tanggal_bkd_akhir);
+          Yii::$app->getSession()->setFlash('success','Periode BKD telah diubah');
+          
+        }
+
+        else{
+          Yii::$app->getSession()->setFlash('danger','Oops, Periode BKD not found');
+          
+        }
+
+        return $this->redirect(Yii::$app->request->referrer);
+
+    }
+
     public function actionIndex()
     {
         if(!parent::handleEmptyUser())
@@ -27,7 +54,25 @@ class BkdController extends AppController
 
         $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
         
-        $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
 
         $unsur_utama = \app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all();
         $results = [];
@@ -38,7 +83,7 @@ class BkdController extends AppController
           foreach($item->komponenKegiatans as $komponen)
           {
             $list_bkd = BkdDosen::find()->where([
-              'tahun_id' => $bkd_periode->tahun_id,
+              'tahun_id' => $tahun_id,
               'dosen_id' => $user->ID,
               'komponen_id' => $komponen->id
             ])->all();
@@ -60,7 +105,7 @@ class BkdController extends AppController
         $pengajaran = Pengajaran::find()->where([
             'NIY' => Yii::$app->user->identity->NIY,
             // 'is_claimed' => 1,
-            'tahun_akademik' => $bkd_periode->tahun_id
+            'tahun_akademik' => $tahun_id
         ])->all();
 
         // print_r($tahun_akademik);exit;
@@ -72,8 +117,6 @@ class BkdController extends AppController
 
         $query->andWhere(['not',['kegiatan_id' => null]]);
 
-        $sd = $bkd_periode->tanggal_bkd_awal;
-        $ed = $bkd_periode->tanggal_bkd_akhir;
 
 
         $query->andFilterWhere(['between','tanggal_terbit',$sd, $ed]);
@@ -166,7 +209,26 @@ class BkdController extends AppController
         
         $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
         
-        $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
+
 
         $unsur_utama = \app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all();
         $results = [];
@@ -195,7 +257,6 @@ class BkdController extends AppController
           ];
         }
 
-        $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
 
         $pengajaran = Pengajaran::find()->where([
             'NIY' => Yii::$app->user->identity->NIY,

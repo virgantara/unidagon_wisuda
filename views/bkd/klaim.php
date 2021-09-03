@@ -2,14 +2,42 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
+use app\helpers\MyHelper;
 use app\assets\IntroAsset;
 IntroAsset::register($this);
 
 $list_tahun = ArrayHelper::map($list_bkd_periode,'tahun_id','nama_periode');
+
+$session = Yii::$app->session;
+$tahun_id = '';
+$sd = '';
+$ed = '';
+$bkd_periode = null;
+if($session->has('bkd_periode'))
+{
+  $tahun_id = $session->get('bkd_periode');
+  $bkd_periode = $session->get('bkd_periode_nama');
+  $sd = $session->get('tgl_awal');
+  $ed = $session->get('tgl_akhir');  
+}
+
 ?>
-<h1>Klaim Kegiatan BKD</h1>
+<h1>Klaim Kegiatan BKD Periode <?=$bkd_periode;?> (<?=MyHelper::convertTanggalIndo($sd);?> - <?=MyHelper::convertTanggalIndo($ed);?>)</h1>
 <p>
-    <?= Html::dropDownList('tahun','', $list_tahun, ['id' => 'tahun_list']) ?>
+<?php
+use yii\widgets\ActiveForm;
+?>
+<?php $form = ActiveForm::begin([
+    'action' => ['bkd/ganti-periode'],
+]); ?>
+    <?= Html::dropDownList('tahun','', $list_tahun, ['id' => 'ganti-periode','prompt'=>'- Pilih Periode -']) ?>
+    <?= Html::submitButton('Update', ['class' => 'btn btn-primary']) ?>
+ <?php ActiveForm::end(); ?>
+ <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
 </p>
 <div class="row">
 	<div class="col-md-12">
@@ -148,7 +176,7 @@ introguide.setOptions({
         {
             intro: "Periode BKD yang berjalan. Periode ini hanya bisa diubah oleh bagian Admin Biro SDM",
             title: "Pilihan Periode",
-            element : "#tahun_list"
+            element : "#ganti-periode"
         },
         {
             intro: "Data ini bersumber dari SIAKAD pada tahun periode BKD",
@@ -232,7 +260,7 @@ $(document).on("click",".btn-claim-pengelolaJurnal",function(e){
         success: function(res){
             var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#tahun_list").trigger("change")
+                $("#ganti-periode").trigger("change")
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -270,7 +298,7 @@ $(document).on("click",".btn-claim-organisasi",function(e){
         success: function(res){
             var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#tahun_list").trigger("change")
+                $("#ganti-periode").trigger("change")
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -308,7 +336,7 @@ $(document).on("click",".btn-claim-penunjang-lain",function(e){
         success: function(res){
             var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#tahun_list").trigger("change")
+                $("#ganti-periode").trigger("change")
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -344,7 +372,7 @@ $(document).on("click",".btn-claim-pengabdian",function(e){
         success: function(res){
             var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#tahun_list").trigger("change")
+                $("#ganti-periode").trigger("change")
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -382,7 +410,7 @@ $(document).on("click",".btn-claim-publikasi",function(e){
         success: function(res){
             var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#tahun_list").trigger("change")
+                $("#ganti-periode").trigger("change")
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -421,7 +449,7 @@ $(document).on("click",".btn-claim",function(e){
         success: function(res){
             var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#tahun_list").trigger("change")
+                $("#ganti-periode").trigger("change")
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -588,7 +616,7 @@ function getPengabdian(tahun){
                 row += "<td></td>"
                 row += "<td></td>"
                 row += "<td>"+obj.sks_bkd+"</td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#tahun_list").val()+"\' data-sks=\'"+obj.sks_bkd+"\' data-item=\'"+obj.id+"\' class=\'btn-claim-pengelolaJurnal\'/></td>"
+                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#ganti-periode").val()+"\' data-sks=\'"+obj.sks_bkd+"\' data-item=\'"+obj.id+"\' class=\'btn-claim-pengelolaJurnal\'/></td>"
                 row += "</tr>"
 
             })
@@ -628,7 +656,7 @@ function getPenunjang(tahun){
                 row += "<td>"+(counter)+"</td>"
                 row += "<td>Menjadi "+obj.jabatan+" pada organisasi "+obj.organisasi+" dari tanggal "+obj.tanggal_mulai_keanggotaan+" hingga tanggal "+obj.selesai_keanggotaan+"</td>"
                 row += "<td>"+obj.sks_bkd+"</td>"
-                row += "<td><input type=\'checkbox\' data-ta=\'"+$("#tahun_list").val()+"\' "+isClaimed+" data-item=\'"+obj.ID+"\' class=\'btn-claim-organisasi\'/></td>"
+                row += "<td><input type=\'checkbox\' data-ta=\'"+$("#ganti-periode").val()+"\' "+isClaimed+" data-item=\'"+obj.ID+"\' class=\'btn-claim-organisasi\'/></td>"
                 row += "</tr>"
 
             })
@@ -660,7 +688,7 @@ function getPenunjang(tahun){
                 row += "<td>"+(counter)+"</td>"
                 row += "<td>Menjadi "+obj.peran+" pada kegiatan "+obj.nama_kegiatan+" dari tanggal "+obj.tanggal_mulai+" hingga tanggal "+obj.tanggal_selesai+"</td>"
                 row += "<td>"+obj.sks_bkd+"</td>"
-                row += "<td><input type=\'checkbox\' data-ta=\'"+$("#tahun_list").val()+"\' "+isClaimed+" data-item=\'"+obj.id+"\' class=\'btn-claim-penunjang-lain\'/></td>"
+                row += "<td><input type=\'checkbox\' data-ta=\'"+$("#ganti-periode").val()+"\' "+isClaimed+" data-item=\'"+obj.id+"\' class=\'btn-claim-penunjang-lain\'/></td>"
                 row += "</tr>"
 
             })
@@ -715,16 +743,20 @@ function getJadwal(tahun){
     });
 }
 
-$(document).on("change","#tahun_list",function(e){
+$(document).on("change","#ganti-periode",function(e){
     e.preventDefault()
 
     getJadwal($(this).val())
     getPublikasi($(this).val())
     getPengabdian($(this).val())
     getPenunjang($(this).val())
+
+  
+
 })
 
- $("#tahun_list").trigger("change")
+ $("#ganti-periode").trigger("change")
+
 
 ', \yii\web\View::POS_READY);
 

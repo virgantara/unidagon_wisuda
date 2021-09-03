@@ -1,7 +1,10 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 
+$list_bkd_periode = \app\models\BkdPeriode::find()->orderBy(['tahun_id'=>SORT_DESC])->all();
+$list_tahun = ArrayHelper::map($list_bkd_periode,'tahun_id','nama_periode');
 
 /* @var $this yii\web\View */
 
@@ -109,10 +112,39 @@ else{
     $label_cd = '<span style="color:#d9534f"><i class="lnr lnr-thumbs-down"></i> belum mencukupi</label>';
 }
 
-?>
-<h1>Progres BKD Anda Semester ini (<?=$bkd_periode->nama_periode;?>)</h1>
-<h3>Tanggal <?=\app\helpers\MyHelper::convertTanggalIndo($bkd_periode->tanggal_bkd_awal);?> sampai dengan <?=\app\helpers\MyHelper::convertTanggalIndo($bkd_periode->tanggal_bkd_akhir);?></h3>
+$session = Yii::$app->session;
+$tahun_id = '';
+$sd = '';
+$ed = '';
+$bkd_periode = null;
+if($session->has('bkd_periode'))
+{
+  $tahun_id = $session->get('bkd_periode');
+  $bkd_periode = $session->get('bkd_periode_nama');
+  $sd = $session->get('tgl_awal');
+  $ed = $session->get('tgl_akhir');  
+}
 
+
+?>
+<h1>Progres BKD Anda Semester ini (<?=$bkd_periode;?>)</h1>
+<h3>Tanggal <?=\app\helpers\MyHelper::convertTanggalIndo($sd);?> sampai dengan <?=\app\helpers\MyHelper::convertTanggalIndo($ed);?></h3>
+<p>
+<?php
+use yii\widgets\ActiveForm;
+?>
+<?php $form = ActiveForm::begin([
+    'action' => ['bkd/ganti-periode'],
+]); ?>
+    <?= Html::dropDownList('tahun','', $list_tahun, ['id' => 'ganti-periode','prompt'=>'- Pilih Periode -']) ?>
+    <?= Html::submitButton('Update', ['class' => 'btn btn-primary']) ?>
+ <?php ActiveForm::end(); ?>
+ <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
+</p>
 <div class="row">
     <div class="col-md-12">	
         <div class="panel">
@@ -190,3 +222,11 @@ else{
 </div>   
 
 
+<?php 
+
+$this->registerJs(' 
+    
+
+', \yii\web\View::POS_READY);
+
+?>

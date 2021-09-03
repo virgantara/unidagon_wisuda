@@ -33,11 +33,33 @@ class OrganisasiController extends AppController
 
     public function actionAjaxList()
     {
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
+
         $dataPost = $_POST['dataPost'];
         $query = Organisasi::find();
         $query->where([
           'NIY' => Yii::$app->user->identity->NIY,
         ]);
+        $tgl = date('Y-m-d');
+        $query->andWhere('"'.$sd.'" BETWEEN tanggal_mulai_keanggotaan AND selesai_keanggotaan ');
 
 
         $results = $query->asArray()->all();

@@ -162,6 +162,25 @@ else{
 ?>
 <h1>Pencapaian Anda Semester ini (<?=$bkd_periode->nama_periode;?>)</h1>
 <h4><?=\app\helpers\MyHelper::convertTanggalIndo($bkd_periode->tanggal_bkd_awal);?> sampai dengan <?=\app\helpers\MyHelper::convertTanggalIndo($bkd_periode->tanggal_bkd_akhir);?></h4>
+<p>
+<?php
+$list_bkd_periode = \app\models\BkdPeriode::find()->orderBy(['tahun_id'=>SORT_DESC])->all();
+$list_tahun = \yii\helpers\ArrayHelper::map($list_bkd_periode,'tahun_id','nama_periode');
+
+use yii\widgets\ActiveForm;
+?>
+<?php $form = ActiveForm::begin([
+    'action' => ['bkd/ganti-periode'],
+]); ?>
+    <?= Html::dropDownList('tahun','', $list_tahun, ['id' => 'ganti-periode','prompt'=>'- Pilih Periode -']) ?>
+    <?= Html::submitButton('Update', ['class' => 'btn btn-primary']) ?>
+ <?php ActiveForm::end(); ?>
+ <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
+</p>
 <div class="row" data-step="1" data-intro="Yuk, ikuti tur pengenalan fitur baru, yaitu Beban Kinerja Dosen atau yang biasa disebut BKD" data-title="Selamat datang di E-Khidmah">
     <div class="col-md-6">
     

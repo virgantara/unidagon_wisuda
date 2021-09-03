@@ -34,11 +34,36 @@ class PenunjangLainController extends AppController
     public function actionAjaxList()
     {
         $dataPost = $_POST['dataPost'];
+        
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
+
         $query = PenunjangLain::find();
         $query->where([
           'NIY' => Yii::$app->user->identity->NIY,
         ]);
+        $tgl = date('Y-m-d');
+        $query->andWhere('"'.$sd.'" BETWEEN tanggal_mulai AND tanggal_selesai');
+
         $results = [];
+
         foreach($query->all() as $item)
         {
             $results[] = [
