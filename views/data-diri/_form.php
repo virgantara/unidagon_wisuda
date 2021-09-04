@@ -177,6 +177,8 @@ $kepakaran_id_parent = !empty($model->kepakaran) && !empty($model->kepakaran->pa
     <?php 
     if(!empty($results))
     {
+        // print_r($results);
+        // exit
     ?>
     <div class="col-md-6">
         <div class="row">
@@ -191,38 +193,38 @@ $kepakaran_id_parent = !empty($model->kepakaran) && !empty($model->kepakaran->pa
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">NIDN</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nidn;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['kepegawaian']->nidn;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Nama</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nama_dosen;?>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['profil']->nama;?>
                             </td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Jenis Kelamin</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->jenis_kelamin;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['profil']->jenis_kelamin;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Tempat Lahir</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->tempat_lahir;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['profil']->tempat_lahir;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Tanggal Lahir</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=\app\helpers\MyHelper::convertTanggalIndo($results->tanggal_lahir);?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=\app\helpers\MyHelper::convertTanggalIndo($results['profil']->tanggal_lahir);?></td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e7eaec;">
                             <td class="col-lg-6 col-md-3 col-xs-12">Nama Ibu Kandung</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nama_ibu_kandung;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['profil']->nama_ibu_kandung;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">No HP</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nomor_hp;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['alamat']->telepon_hp;?></td>
                             </tr>
                             </tbody>
                     
@@ -241,31 +243,17 @@ $kepakaran_id_parent = !empty($model->kepakaran) && !empty($model->kepakaran->pa
                     <div class="panel-body">
                         <table class="table">
                             <tbody>
-                            <tr>
-                            <td class="col-lg-6 col-md-3 col-xs-12">Program Studi</td>
-                            <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nama_program_studi;?></td>
-                            </tr>
-                            <tr>
-                            <td class="col-lg-6 col-md-3 col-xs-12">Status Keaktifan</td>
-                            <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->status_aktif_sekarang;?>
-                            </td>
-                            </tr>
+                            
+                           
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Nomor SK TMMD</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->no_sk_pengangkatan;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['kepegawaian']->sk_tmmd;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Tanggal Mulai Menjadi Dosen (TMMD)</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=\app\helpers\MyHelper::convertTanggalIndo($results->sk_pengangkatan_terhitung_mulai_tanggal);?></td>
-                            </tr>
-                            <tr>
-                            <td class="col-lg-6 col-md-3 col-xs-12">Pangkat/Golongan</td>
-                            <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nama_golongan;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=\app\helpers\MyHelper::convertTanggalIndo($results['kepegawaian']->tmmd);?></td>
                             </tr>
                            
                             </tbody>
@@ -288,64 +276,60 @@ $kepakaran_id_parent = !empty($model->kepakaran) && !empty($model->kepakaran->pa
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">NIK</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nik;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['kependudukan']->nik;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Agama</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nama_agama;?>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['kependudukan']->agama;?>
                             </td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Kewarganegaraan</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->kewarganegaraan;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['kependudukan']->kewarganegaraan;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Status Perkawinan</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->status_perkawinan;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['keluarga']->status_kawin;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Nama Suami/Istri</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nama_suami_istri;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['keluarga']->nama_pasangan;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Pekerjaan Suami/Istri</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->pekerjaan;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['keluarga']->pekerjaan_pasangan;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Alamat</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->alamat;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['alamat']->alamat;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">RT/RW</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->no_rt.' / '.$results->no_rw;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['alamat']->rt.' / '.$results['alamat']->rw;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Dusun</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->nama_dusun;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['alamat']->dusun;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Desa</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->kelurahan;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['alamat']->kelurahan;?></td>
                             </tr>
                             <tr>
                             <td class="col-lg-6 col-md-3 col-xs-12">Kota/Kabupaten</td>
                             <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->kota_kabupaten;?></td>
+                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results['alamat']->kota_kabupaten;?></td>
                             </tr>
-                            <tr>
-                            <td class="col-lg-6 col-md-3 col-xs-12">Provinsi</td>
-                            <td>:</td>
-                            <td class="col-lg-6 col-md-3 col-xs-12"><?=$results->provinsi;?></td>
-                            </tr>
+                      
 
                             </tbody>
                     

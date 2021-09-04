@@ -234,29 +234,93 @@ class DataDiriController extends AppController
                 'headers' => $headersSister,
                 // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
             ]);
-            $full_url = $sister_baseurl.'/Dosen/detail';
-            $responseSister = $sisterClient->post($full_url, [
-                'body' => json_encode([
-                    'id_token' => $sisterToken,
-                    'id_dosen' => $user->sister_id
-                ]), 
-                'headers' => ['Content-type' => 'application/json']
+            $full_url = $sister_baseurl.'/data_pribadi/profil/'.$user->sister_id;
+            $dataProfil = $sisterClient->get($full_url, [
+                
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
 
-            ]); 
-            
+            ]);  
            
-            $responseSister = json_decode($responseSister->getBody());
-            if($responseSister->error_code == 0){
-                $results = $responseSister->data;
-            }
+            $dataProfil = json_decode($dataProfil->getBody());
 
-            else if($response->error_code == 100){
-                if(!MyHelper::wsSisterLogin()){
-                    throw new \Exception("Error Creating SISTER Token", 1);
-                    
-                }
-            }
+            $results['profil'] = $dataProfil;
+
+            $full_url = $sister_baseurl.'/data_pribadi/lain/'.$user->sister_id;
+            $dataProfil = $sisterClient->get($full_url, [
+                
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+           
+            $dataProfil = json_decode($dataProfil->getBody());
+
+            $results['lain'] = $dataProfil;
+
+            $full_url = $sister_baseurl.'/data_pribadi/kependudukan/'.$user->sister_id;
+            $dataProfil = $sisterClient->get($full_url, [
+                
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+           
+            $dataProfil = json_decode($dataProfil->getBody());
+
+            $results['kependudukan'] = $dataProfil;
+
+            $full_url = $sister_baseurl.'/data_pribadi/kepegawaian/'.$user->sister_id;
+            $dataProfil = $sisterClient->get($full_url, [
+                
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+           
+            $dataProfil = json_decode($dataProfil->getBody());
+
+            $results['kepegawaian'] = $dataProfil;
+
+            $full_url = $sister_baseurl.'/data_pribadi/keluarga/'.$user->sister_id;
+            $dataProfil = $sisterClient->get($full_url, [
+                
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+           
+            $dataProfil = json_decode($dataProfil->getBody());
+
+            $results['keluarga'] = $dataProfil;
+
+            $full_url = $sister_baseurl.'/data_pribadi/alamat/'.$user->sister_id;
+            $dataProfil = $sisterClient->get($full_url, [
+                
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+           
+            $dataProfil = json_decode($dataProfil->getBody());
+
+            $results['alamat'] = $dataProfil;
+
+            
         }
+
         if ($model->load(Yii::$app->request->post())) 
         {
             $connection = \Yii::$app->db;
