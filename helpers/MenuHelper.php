@@ -72,6 +72,18 @@ class MenuHelper
 
 	        $menuItems[] = [
 	    		'template' => '<a href="{url}">{label}</a>',
+		        'label' => '<i class="fa fa-cubes"></i><span>Kompetensi</span><i class="icon-submenu lnr lnr-chevron-left"></i>', 
+		        'url' => '#',
+		        'submenuTemplate' => "\n<div id='pages_kompetensi' class='collapse'><ul class='nav'>\n{items}\n</ul></div>\n",
+		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_kompetensi">{label}</a>',
+		        'items'=>[
+		           	['label' => 'Sertifikasi', 'url' => ['/sertifikasi/index']],
+	                ['label' => 'Tes', 'url' => ['/tes/index']]
+		        ]
+	        ];
+
+	        $menuItems[] = [
+	    		'template' => '<a href="{url}">{label}</a>',
 		        'label' => '<i class="lnr lnr-book"></i><span>Pelaks. Pendidikan</span><i class="icon-submenu lnr lnr-chevron-left"></i>', 
 		        'url' => '#',
 		        'submenuTemplate' => "\n<div id='pages_pendidikan' class='collapse'><ul class='nav'>\n{items}\n</ul></div>\n",

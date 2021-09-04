@@ -29,6 +29,8 @@ use app\models\PenunjangLain;
 use app\models\Publikasi;
 use app\models\OrasiIlmiah;
 use app\models\Organisasi;
+use app\models\Sertifikasi;
+use app\models\Tes;
 use app\models\VisitingScientist;
 
 use app\models\TugasDosenBkd;
@@ -159,6 +161,8 @@ class SiteController extends AppController
             $res15 = $this->importPenunjangLain();
             $res16 = $this->importPenghargaan();
             $res17 = $this->importBimbinganMahasiswa();
+            $res18 = $this->importSertifikasi();
+            $res19 = $this->importTes();
 
             $code = $res1['code'];
             
@@ -250,12 +254,276 @@ class SiteController extends AppController
                         'data' => $res17['message'],
                         'source' => 'SISTER'
                     ],
+                    [
+                        'modul' => 'sertifikasi',
+                        'data' => $res18['message'],
+                        'source' => 'SISTER'
+                    ],
+                    [
+                        'modul' => 'tes',
+                        'data' => $res19['message'],
+                        'source' => 'SISTER'
+                    ],
                 ]
             ];
 
         }
         echo json_encode($results);
         die(); 
+    }
+
+    protected function importSertifikasi()
+    {
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $sisterToken = \app\helpers\MyHelper::getSisterToken();
+        if(!isset($sisterToken)){
+            $sisterToken = MyHelper::getSisterToken();
+        }
+
+        // print_r($sisterToken);exit;
+        $sister_baseurl = Yii::$app->params['sister_baseurl'];
+        $headers = ['content-type' => 'application/json'];
+        $client = new \GuzzleHttp\Client([
+            'timeout'  => 5.0,
+            'headers' => $headers,
+            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+        ]);
+        $errors = '';
+        $results = [];
+        try     
+        {
+            $full_url = $sister_baseurl.'/sertifikasi_profesi';
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id
+                ], 
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+            
+            $response = json_decode($response->getBody());
+            
+            $results = $response;    
+        }
+
+        catch(\Exception $e){
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+
+            return $results;
+        } 
+       
+
+        $results = $response;
+        $counter = 0;
+        $errors ='';
+            
+        foreach($results as $item)
+        {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            
+            
+            try     
+            {
+                $full_url = $sister_baseurl.'/sertifikasi_profesi/'.$item->id;
+                $resp = $client->get($full_url, [ 
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
+
+                ]); 
+
+                $detail = json_decode($resp->getBody());
+                // print_r($detail);exit;
+                $model = Sertifikasi::find()->where([
+                    'sister_id' => $item->id
+                ])->one();
+
+                if(empty($model)){
+                    $model = new Sertifikasi;
+                    $model->id = MyHelper::gen_uuid();
+                }
+
+                $model->jenis_sertifikasi = $detail->jenis_sertifikasi;
+                $model->bidang_studi = $detail->bidang_studi;
+                $model->tahun_sertifikasi = $detail->tahun_sertifikasi;
+                $model->sk_sertifikasi = $detail->sk_sertifikasi;
+                $model->id_jenis_sertifikasi = $detail->id_jenis_sertifikasi;
+                $model->id_bidang_studi = $detail->id_bidang_studi;
+                $model->NIY = Yii::$app->user->identity->NIY;
+                $model->sister_id = $item->id;
+                
+                if($model->save())
+                {
+
+                    $counter++;
+                    
+                    $transaction->commit();
+                    
+                }
+
+                else
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                    throw new \Exception;
+                }
+                
+
+            }
+
+            catch (\Exception $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                
+                MyHelper::createLogSync($user->NIY, 'Tes '.$errors);
+                continue;
+            } 
+            
+        }
+
+        $results = [
+            'code' => 200,
+            'message' => $counter.' data imported'
+            
+        ];
+
+        return $results;
+
+
+    }
+
+    protected function importTes()
+    {
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+        $errors = '';
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $sisterToken = \app\helpers\MyHelper::getSisterToken();
+        if(!isset($sisterToken)){
+            $sisterToken = MyHelper::getSisterToken();
+        }
+
+        // print_r($sisterToken);exit;
+        $sister_baseurl = Yii::$app->params['sister_baseurl'];
+        $headers = ['content-type' => 'application/json'];
+        $client = new \GuzzleHttp\Client([
+            'timeout'  => 5.0,
+            'headers' => $headers,
+            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+        ]);
+        $results = [];
+        try     
+        {
+            $full_url = $sister_baseurl.'/nilai_tes';
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id
+                ], 
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+            
+            $response = json_decode($response->getBody());
+            
+            $results = $response;    
+        }
+
+        catch(\Exception $e){
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+
+            return $results;
+        } 
+       
+
+        $results = $response;
+        $counter = 0;
+        $errors ='';
+            
+        foreach($results as $item)
+        {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            
+            
+            try     
+            {
+                
+                $model = Tes::find()->where([
+                    'sister_id' => $item->id
+                ])->one();
+
+                if(empty($model)){
+                    $model = new Tes;
+                    $model->id = MyHelper::gen_uuid();
+                }
+
+                $model->nama = $item->nama;
+                $model->skor = $item->skor;
+                $model->jenis_tes = $item->jenis_tes;
+                $model->penyelenggara = $item->penyelenggara;
+                $model->tahun = $item->tahun;
+                $model->NIY = Yii::$app->user->identity->NIY;
+                $model->sister_id = $item->id;
+                
+                if($model->save())
+                {
+
+                    $counter++;
+                    
+                    $transaction->commit();
+                    
+                }
+
+                else
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                    throw new \Exception;
+                }
+                
+
+            }
+
+            catch (\Exception $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                
+                MyHelper::createLogSync($user->NIY, 'Tes '.$errors);
+                continue;
+            } 
+            
+        }
+
+        $results = [
+            'code' => 200,
+            'message' => $counter.' data imported'
+            
+        ];
+
+        return $results;
+
+
     }
 
     protected function importBimbinganMahasiswa()
