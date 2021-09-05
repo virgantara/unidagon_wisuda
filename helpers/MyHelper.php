@@ -400,6 +400,10 @@ class MyHelper
 
 	public static function convertTanggalIndo($date)
 	{
+
+		if(empty($date))
+			return '';
+
 		$bulan = array (
 			1 =>   'Januari',
 			'Februari',
@@ -419,6 +423,9 @@ class MyHelper
 		// variabel pecahkan 0 = tanggal
 		// variabel pecahkan 1 = bulan
 		// variabel pecahkan 2 = tahun
+	 
+		if(empty($pecahkan[2]))
+			return '';
 	 
 		return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
 	}
