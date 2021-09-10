@@ -21,6 +21,27 @@ class UjiMahasiswaController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['create','update','delete','index','view'],
+                'rules' => [
+                    [
+                        'actions' => ['create','update','delete','index','view'],
+                        'allow' => true,
+                        'roles' => ['theCreator'],
+                    ],
+                    [
+                        'actions' => ['index','view','delete'],
+                        'allow' => true,
+                        'roles' => ['Dosen'],
+                    ],
+                    // [
+                    //     'allow' => true,
+                    //     'roles' => ['@'],
+                    // ],
+
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

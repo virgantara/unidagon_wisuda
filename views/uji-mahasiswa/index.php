@@ -7,7 +7,7 @@ use kartik\grid\GridView;
 /* @var $searchModel app\models\UjiMahasiswaSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Uji Mahasiswas';
+$this->title = 'Pengujian Mahasiswa';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -19,10 +19,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
 <div class="panel-body ">
-
-    <p>
-        <?= Html::a('Create Uji Mahasiswa', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <div class="alert alert-info">
+        <i class="fa fa-exclamation"></i> Data Pengujian Mahasiswa hanya bisa diupdate dari FEEDER.
+    </div>
     <?php
     $gridColumns = [
     [
@@ -37,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'id',
             // 'id_aktivitas',
             'judul',
+            'nama_jenis_aktivitas',
             // 'id_uji',
             [
                 'attribute' => 'id_kategori_kegiatan',
@@ -44,10 +44,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
                 }
             ],
+            'id_semester',
+            'lokasi',
+            'sk_tugas',
+            'tanggal_sk_tugas',
+            [
+                'attribute' => 'tanggal_sk_tugas',
+                'filterType' => GridView::FILTER_DATE_RANGE,
+            ],
             //'nama_kategori_kegiatan',
             //'id_dosen',
             //'NIY',
-            //'penguji_ke',
+            'penguji_ke',
             //'updated_at',
             //'created_at',
     ['class' => 'yii\grid\ActionColumn']

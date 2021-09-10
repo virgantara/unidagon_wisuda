@@ -78,11 +78,11 @@ class PublikasiSearch extends Publikasi
 
 
         $query->andWhere('"'.Yii::$app->user->identity->NIY.'" IN  (SELECT NIY FROM publikasi_author pa WHERE pa.pub_id = t.id)');
-        // if ( ! is_null($this->tanggal_terbit) && strpos($this->tanggal_terbit, ' - ') !== false ) {
-        //     list($start_date, $end_date) = explode(' - ', $this->tanggal_terbit);
-        //     $query->andFilterWhere(['between', 'tanggal_terbit', $start_date, $end_date]);
-        //     $this->tanggal_terbit = null;
-        // }
+        if ( ! is_null($this->tanggal_terbit) && strpos($this->tanggal_terbit, ' - ') !== false ) {
+            list($start_date, $end_date) = explode(' - ', $this->tanggal_terbit);
+            $query->andFilterWhere(['between', 'tanggal_terbit', $start_date, $end_date]);
+            $this->tanggal_terbit = null;
+        }
 
         return $dataProvider;
     }

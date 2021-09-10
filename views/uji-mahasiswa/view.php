@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\UjiMahasiswa */
 
-$this->title = $model->id;
+$this->title = $model->judul;
 $this->params['breadcrumbs'][] = ['label' => 'Uji Mahasiswas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -32,15 +32,29 @@ $this->params['breadcrumbs'][] = $this->title;
 <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
-            'id_aktivitas',
+            // 'id_aktivitas',
             'judul',
-            'id_uji',
-            'id_kategori_kegiatan',
-            'nama_kategori_kegiatan',
-            'id_dosen',
-            'NIY',
+            'nama_jenis_aktivitas',
+            // 'id_uji',
+            [
+                'attribute' => 'id_kategori_kegiatan',
+                'value' => function($data){
+                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
+                }
+            ],
+            'id_semester',
+            'lokasi',
+            'sk_tugas',
+            'tanggal_sk_tugas',
+            
+            //'nama_kategori_kegiatan',
+            //'id_dosen',
+            //'NIY',
             'penguji_ke',
+            // 'id_uji',
+            // 'id_dosen',
+            // 'NIY',
+            // 'penguji_ke',
             'updated_at',
             'created_at',
         ],

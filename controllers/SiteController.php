@@ -123,7 +123,7 @@ class SiteController extends AppController
 
     public function actionAjaxImport()
     {
-        
+        $start = microtime(true);
         $errors ='';
         $results = [];
         
@@ -168,8 +168,11 @@ class SiteController extends AppController
 
             $code = $res1['code'];
             
+
+            $time_elapsed_secs = microtime(true) - $start;
             $results = [
                 'code' => $code,
+                'elapsed_time' => $time_elapsed_secs,
                 'items' => [
                     [
                         'modul' => 'pengabdian',
@@ -275,11 +278,13 @@ class SiteController extends AppController
             ];
 
         }
+
+
         echo json_encode($results);
         die(); 
     }
 
-    public function actionImportUjiMahasiswa()
+    protected function importUjiMahasiswa()
     {
         if(!parent::handleEmptyUser())
         {
@@ -323,38 +328,70 @@ class SiteController extends AppController
             $temps = $response->getBody()->getContents();
       
             $temps = json_decode($temps);
+
             if($temps->error_code == 0)
-            {   
+            {
                 foreach($temps->data as $res)
                 {
                         
-                    $model = UjiMahasiswa::find()->where(['id_uji' => $res->id_uji])->one();
-                    if(empty($model))
-                    {
-                        $model = new UjiMahasiswa();
-                        $model->id = MyHelper::gen_uuid();
-                        $model->id_uji = $res->id_uji;
-                        $model->id_aktivitas = $res->id_aktivitas;
-                    }
+                    $params = [
+                        'act' => 'GetListAktivitasMahasiswa',
+                        'token'   => $token,
+                        'filter' => "id_aktivitas='".($res->id_aktivitas)."'"
+                    ];
 
-                    $model->judul = $res->judul;
-                    $model->id_kategori_kegiatan = (string)$res->id_kategori_kegiatan;
-                    $model->nama_kategori_kegiatan = $res->nama_kategori_kegiatan;
-                    $model->id_dosen = $res->id_dosen;
-                    $model->NIY = $user->NIY;
-                    $model->penguji_ke = $res->penguji_ke;
-
-                    if($model->save())
+                    $response = $client->request('POST', '/ws/live2.php',[
+                        'headers' => $headers,
+                        'body' => json_encode($params)
+                    ]);
+                    
+                    $list_aktivitas = $response->getBody()->getContents();
+                    
+                    $list_aktivitas = json_decode($list_aktivitas);
+                    if($list_aktivitas->error_code == 0)
                     {
-                        $counter++;
-                    }
 
-                    else
-                    {
-                        $errors .= MyHelper::logError($model);
-                        throw new \Exception;
-                        
+                        foreach($list_aktivitas->data as $act)
+                        {
+                            
+                            $model = UjiMahasiswa::find()->where(['id_uji' => $res->id_uji])->one();
+                            if(empty($model))
+                            {
+                                $model = new UjiMahasiswa();
+                                $model->id = MyHelper::gen_uuid();
+                                $model->id_uji = $res->id_uji;
+                                $model->id_aktivitas = $res->id_aktivitas;
+                            }
+
+                            $model->judul = $res->judul;
+                            $model->id_kategori_kegiatan = (string)$res->id_kategori_kegiatan;
+                            $model->nama_kategori_kegiatan = $res->nama_kategori_kegiatan;
+                            $model->id_dosen = $res->id_dosen;
+                            $model->NIY = $user->NIY;
+                            $model->penguji_ke = $res->penguji_ke;
+                            $model->id_jenis_aktivitas = $act->id_jenis_aktivitas;
+                            $model->nama_jenis_aktivitas = $act->nama_jenis_aktivitas;
+                            $model->id_prodi = $act->id_prodi;
+                            $model->id_semester = $act->id_semester;
+                            $model->lokasi = $act->lokasi;
+                            $model->sk_tugas = $act->sk_tugas;
+                            $model->tanggal_sk_tugas = $act->tanggal_sk_tugas;
+
+                            if($model->save())
+                            {
+                                $counter++;
+                            }
+
+                            else
+                            {
+                                $errors .= MyHelper::logError($model);
+                                throw new \Exception;
+                                
+                            }
+                        }
+
                     }
+                    
                 }
 
                 $results = [
@@ -367,7 +404,7 @@ class SiteController extends AppController
                     
             }
 
-            else if($results->error_code == 100){
+            else if($temps->error_code == 100){
                 MyHelper::wsFeederLogin();
                 goto refresh;
                 // $errors .= 'Error: '.$results->error_code.' - '.$results->error_desc;
@@ -375,7 +412,7 @@ class SiteController extends AppController
             }
 
             else{
-                $errors .= 'Error: '.$results->error_code.' - '.$results->error_desc;
+                $errors .= 'Error: '.$temps->error_code.' - '.$temps->error_desc;
                 throw new \Exception;
             }
                 
@@ -406,8 +443,8 @@ class SiteController extends AppController
 
         
 
-        print_r($results);
-        exit;
+        // print_r($results);
+        // exit;
         return $results;
 
     }
