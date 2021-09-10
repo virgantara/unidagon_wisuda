@@ -147,7 +147,7 @@ $(document).on("click","#btn-import",function(e){
                 })
 
                 $("#tabel-sync > tbody").append(row);
-                Swal.fire(\'Yeay\', "Elapsed time: "+elapsedTime, \'error\')
+                Swal.fire(\'Yeay\', "Elapsed time: "+elapsedTime, \'success\')
             }
 
             else{
