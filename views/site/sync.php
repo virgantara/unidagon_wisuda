@@ -133,7 +133,7 @@ $(document).on("click","#btn-import",function(e){
         success: function (data) {
             Swal.close();
             var res = $.parseJSON(data)
-            var elapsedTime = res.elapsed_time
+            var elapsedTime = Math.round(res.elapsed_time * 1000) / 1000
             if(res.code == 200){
                 $("#tabel-sync > tbody").empty();
                 var row = "";
@@ -147,7 +147,7 @@ $(document).on("click","#btn-import",function(e){
                 })
 
                 $("#tabel-sync > tbody").append(row);
-                Swal.fire(\'Yeay\', "Elapsed time: "+elapsedTime, \'success\')
+                Swal.fire(\'Yeay\', "Import succeed. Elapsed time: "+elapsedTime+" secs", \'success\')
             }
 
             else{
