@@ -10,13 +10,16 @@ $this->title = $model->judul_publikasi_paten;
 $this->params['breadcrumbs'][] = ['label' => 'Publikasis', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="block-header">
-    <h2><?= Html::encode($this->title) ?></h2>
-</div>
 <div class="row">
    <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
+                <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
+                
+            </div>
+
+            <div class="panel-body ">
+            <p>
                 <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                 <?= Html::a('Delete', ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
@@ -25,14 +28,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         'method' => 'post',
                     ],
                 ]) ?>
-            </div>
-
-            <div class="panel-body ">
-        
+            </p>
             <?= DetailView::widget([
                     'model' => $model,
                     'attributes' => [
-                        'id',
+                        // 'id',
                         [
                             'attribute' => 'kegiatan_id',
                             'value' => function($data){
@@ -40,11 +40,32 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         'judul_publikasi_paten',
-                        'nama_jenis_publikasi',
+                        [
+                            'attribute' => 'jenis_publikasi_id',
+                            'value' => function($data){
+                                return !empty($data->jenisPublikasi) ? $data->jenisPublikasi->nama : '';
+                            }
+                        ],
+                        [
+                            'attribute' => 'kegiatan_id',
+                            'value' => function($data){
+                                return !empty($data->kegiatan) ? $data->kegiatan->subunsur : '';
+                            }
+                        ],
                         'tanggal_terbit',
-                        'sister_id',
+                        'tautan_laman_jurnal:url',
+                        'tautan:url',
+                        'volume',
+                        'nomor',
+                        'halaman',
+                        'penerbit',
+                        'doi:url',
+                        'issn',
+                        'jumlah_sitasi',
+                        'sks_bkd',
                         'updated_at',
                         'created_at',
+                        'sister_id',
                     ],
                 ]) ?>
 

@@ -31,6 +31,7 @@ use app\models\OrasiIlmiah;
 use app\models\Organisasi;
 use app\models\Sertifikasi;
 use app\models\Tes;
+use app\models\UjiMahasiswa;
 use app\models\VisitingScientist;
 
 use app\models\TugasDosenBkd;
@@ -163,6 +164,7 @@ class SiteController extends AppController
             $res17 = $this->importBimbinganMahasiswa();
             $res18 = $this->importSertifikasi();
             $res19 = $this->importTes();
+            $res20 = $this->importUjiMahasiswa();
 
             $code = $res1['code'];
             
@@ -264,6 +266,11 @@ class SiteController extends AppController
                         'data' => $res19['message'],
                         'source' => 'SISTER'
                     ],
+                    [
+                        'modul' => 'uji_mahasiswa',
+                        'data' => $res20['message'],
+                        'source' => 'FEEDER'
+                    ],
                 ]
             ];
 
@@ -271,6 +278,140 @@ class SiteController extends AppController
         echo json_encode($results);
         die(); 
     }
+
+    public function actionImportUjiMahasiswa()
+    {
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+
+        $counter=0;
+        $results = [];
+
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        $errors = '';
+
+        try 
+        {
+            $feeder_baseurl = Yii::$app->params['feeder']['baseurl'];
+            $feeder_username = Yii::$app->params['feeder']['username'];
+            $feeder_password = Yii::$app->params['feeder']['password'];
+            
+            $client = new \GuzzleHttp\Client([
+                'base_uri' => $feeder_baseurl
+                
+            ]);
+            $headers = ['Content-Type'=>'application/json'];
+
+            refresh:
+
+            $token = MyHelper::getFeederToken();
+            $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+            $params = [
+                'act' => 'GetListUjiMahasiswa',
+                'token'   => $token,
+                'filter' => "id_dosen='".($user->sister_id)."'"
+            ];
+
+            $response = $client->request('POST', '/ws/live2.php',[
+                'headers' => $headers,
+                'body' => json_encode($params)
+            ]);
+            
+            $temps = $response->getBody()->getContents();
+      
+            $temps = json_decode($temps);
+            if($temps->error_code == 0)
+            {   
+                foreach($temps->data as $res)
+                {
+                        
+                    $model = UjiMahasiswa::find()->where(['id_uji' => $res->id_uji])->one();
+                    if(empty($model))
+                    {
+                        $model = new UjiMahasiswa();
+                        $model->id = MyHelper::gen_uuid();
+                        $model->id_uji = $res->id_uji;
+                        $model->id_aktivitas = $res->id_aktivitas;
+                    }
+
+                    $model->judul = $res->judul;
+                    $model->id_kategori_kegiatan = (string)$res->id_kategori_kegiatan;
+                    $model->nama_kategori_kegiatan = $res->nama_kategori_kegiatan;
+                    $model->id_dosen = $res->id_dosen;
+                    $model->NIY = $user->NIY;
+                    $model->penguji_ke = $res->penguji_ke;
+
+                    if($model->save())
+                    {
+                        $counter++;
+                    }
+
+                    else
+                    {
+                        $errors .= MyHelper::logError($model);
+                        throw new \Exception;
+                        
+                    }
+                }
+
+                $results = [
+                    'code' => 200,
+                    'message' => $counter.' data imported'
+                    
+                ];
+
+                $transaction->commit();
+                    
+            }
+
+            else if($results->error_code == 100){
+                MyHelper::wsFeederLogin();
+                goto refresh;
+                // $errors .= 'Error: '.$results->error_code.' - '.$results->error_desc;
+                // throw new \Exception;
+            }
+
+            else{
+                $errors .= 'Error: '.$results->error_code.' - '.$results->error_desc;
+                throw new \Exception;
+            }
+                
+           
+        }
+
+        catch (\Exception $e) 
+        {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+            
+        }
+
+        catch (\Throwable $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+        }
+
+        
+
+        print_r($results);
+        exit;
+        return $results;
+
+    }
+
 
     protected function importSertifikasi()
     {

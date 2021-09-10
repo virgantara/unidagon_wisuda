@@ -173,24 +173,135 @@ class MyHelper
 		return $temps;
 	}
 
+	public static function getFeederToken()
+	{
+		$feederToken = '';
+		$tokenPath = Yii::getAlias('@webroot').'/credentials/token/feeder_token.json';
+     	   
+        if (file_exists($tokenPath)) 
+        {
+            $accessToken = json_decode(file_get_contents($tokenPath), true);
+            $feederToken = $accessToken['id_token'];
+
+            
+        }
+
+        else{
+	        if(!MyHelper::wsFeederLogin()){
+	            throw new \Exception("Error Creating FEEDER Token", 1);
+	        }
+
+	        else {
+	            $accessToken = json_decode(file_get_contents($tokenPath), true);
+	            $feederToken = $accessToken['id_token'];
+	        }
+        }
+
+        return $feederToken;
+	}
+
+	public static function wsFeederLogin()
+	{
+		$feeder_baseurl = Yii::$app->params['feeder']['baseurl'];
+        $feeder_username = Yii::$app->params['feeder']['username'];
+        $feeder_password = Yii::$app->params['feeder']['password'];
+        
+        $client = new \GuzzleHttp\Client([
+            'base_uri' => $feeder_baseurl
+            
+        ]);
+        $token = '';
+        $errors = '';
+        try 
+        {
+        	$headers = ['Content-Type'=>'application/json'];
+        	
+        	$params = [
+                'act' => 'GetToken',
+                'username'   => $feeder_username,
+                'password'   => $feeder_password,
+            ];
+
+
+            $response = $client->request('POST', '/ws/live2.php',[
+                'headers' => $headers,
+                'body' => json_encode($params)
+            ]);
+	       
+	        $results = $response->getBody()->getContents();
+	        $results = json_decode($results);
+	        if($results->error_code == 0)
+            {
+		        $data = [
+	        		'id_token' => $results->data->token,
+	        		'created_at' => date('Y-m-d H:i:s')
+	        	];
+
+	        	$tokenPath = Yii::getAlias('@webroot').'/credentials/token/feeder_token.json';
+		 
+	            
+	            file_put_contents($tokenPath, json_encode($data));
+	        }
+
+	        else
+	        {
+	        	$errors .= $results->error_desc;
+                throw new \Exception;
+	        }
+
+        	return true;
+	    }	
+
+	    catch(\Exception $e)
+	    {
+	    	$errors .= $e->getMessage();
+	    	print_r($errors);exit;
+	    	return false;
+
+	    }
+        
+        
+	}
+
 	public static function getSisterToken()
 	{
-		$tokenPath = Yii::getAlias('@webroot').'/credentials/token/sister_token.json';
-        $sisterToken = '';
+		$sisterToken = '';
+		try
+		{
+			$tokenPath = Yii::getAlias('@webroot').'/credentials/token/sister_token.json';
+	        
 
-        if (file_exists($tokenPath)) {
-            $accessToken = json_decode(file_get_contents($tokenPath), true);
-            $sisterToken = $accessToken['id_token'];
-            $created_at = $accessToken['created_at'];
-            $date     = new \DateTime(date('Y-m-d H:i:s', strtotime($created_at)));
-			$current  = new \DateTime(date('Y-m-d H:i:s'));
-			$interval = $date->diff($current);
-			// $inv = $interval->format('%I');
-			$minutes = $interval->days * 24 * 60;
-			$minutes += $interval->h * 60;
-			$minutes += $interval->i;
-			if($minutes > 5){
-				if(!MyHelper::wsSisterLogin()){
+	        if (file_exists($tokenPath)) {
+	            $accessToken = json_decode(file_get_contents($tokenPath), true);
+	            $sisterToken = $accessToken['id_token'];
+	            $created_at = $accessToken['created_at'];
+	            $date     = new \DateTime(date('Y-m-d H:i:s', strtotime($created_at)));
+				$current  = new \DateTime(date('Y-m-d H:i:s'));
+				$interval = $date->diff($current);
+				// $inv = $interval->format('%I');
+				$minutes = $interval->days * 24 * 60;
+				$minutes += $interval->h * 60;
+				$minutes += $interval->i;
+				if($minutes > 5){
+					if(!MyHelper::wsSisterLogin()){
+			            throw new \Exception("Error Creating SISTER Token", 1);
+			        }
+
+			        else {
+			            $accessToken = json_decode(file_get_contents($tokenPath), true);
+			            $sisterToken = $accessToken['id_token'];
+			        }
+				}
+
+				else{
+					
+					$accessToken = json_decode(file_get_contents($tokenPath), true);
+			        $sisterToken = $accessToken['id_token'];
+				}
+	        }
+
+	        else{
+		        if(!MyHelper::wsSisterLogin()){
 		            throw new \Exception("Error Creating SISTER Token", 1);
 		        }
 
@@ -198,45 +309,37 @@ class MyHelper
 		            $accessToken = json_decode(file_get_contents($tokenPath), true);
 		            $sisterToken = $accessToken['id_token'];
 		        }
-			}
-
-			else{
-				
-				$accessToken = json_decode(file_get_contents($tokenPath), true);
-		        $sisterToken = $accessToken['id_token'];
-			}
-        }
-
-        else{
-	        if(!MyHelper::wsSisterLogin()){
-	            throw new \Exception("Error Creating SISTER Token", 1);
 	        }
+		}
 
-	        else {
-	            $accessToken = json_decode(file_get_contents($tokenPath), true);
-	            $sisterToken = $accessToken['id_token'];
-	        }
-        }
+		catch(\Exception $e)
+		{
+			print_r($e->getMessage());
+			// exit;
+		}
+		
 
         return $sisterToken;
 	}
 
 	public static function wsSisterLogin()
 	{
-		$sister_baseurl = Yii::$app->params['sister_baseurl'];
-        $sister_id_pengguna = Yii::$app->params['sister_id_pengguna'];
-        $sister_username = Yii::$app->params['sister_username'];
-        $sister_password = Yii::$app->params['sister_password'];
-        $headers = ['content-type' => 'application/json'];
-        $client = new \GuzzleHttp\Client([
-            'timeout'  => 10.0,
-            'headers' => $headers,
-            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
-        ]);
-        // $full_url = $sister_baseurl.'/Login';
-        $id_token = '';
-        $full_url = $sister_baseurl.'/authorize';
-        try {
+		try 
+		{
+			$sister_baseurl = Yii::$app->params['sister_baseurl'];
+	        $sister_id_pengguna = Yii::$app->params['sister_id_pengguna'];
+	        $sister_username = Yii::$app->params['sister_username'];
+	        $sister_password = Yii::$app->params['sister_password'];
+	        $headers = ['content-type' => 'application/json'];
+	        $client = new \GuzzleHttp\Client([
+	            'timeout'  => 10.0,
+	            'headers' => $headers,
+	            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+	        ]);
+	        // $full_url = $sister_baseurl.'/Login';
+	        $id_token = '';
+	        $full_url = $sister_baseurl.'/authorize';
+        
 	        $response = $client->post($full_url, [
 	            'body' => json_encode([
 	                'username' => $sister_username,

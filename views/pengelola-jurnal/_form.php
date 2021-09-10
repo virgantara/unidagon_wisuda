@@ -11,11 +11,31 @@ $listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('1307');
 
 $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
-// echo '<pre>';
-// echo $model->kategori_kegiatan_id;
-// print_r($listKegiatan);
-// echo '</pre>';
-// exit;
+$query = \app\models\KomponenKegiatan::find();
+$query->alias('p');
+$query->select(['p.nama']);
+$query->joinWith(['unsur as u']);
+$query->where([
+  'u.kode' => 'ABDIMAS'
+]);
+$query->groupBy(['p.nama']);
+$query->orderBy(['p.nama'=>SORT_ASC]);
+
+$listKomponen = $query->all();
+$listKomponenKegiatan = [];
+
+foreach($listKomponen as $k)
+{
+    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
+   
+    $tmp = [];
+    foreach($list as $item)
+    {
+        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
+    }
+
+    $listKomponenKegiatan[$k->nama] = $tmp;
+}
 
 $years = array_combine(range(date("Y"), 2006), range(date("Y"), 2006));
 

@@ -18,6 +18,11 @@ return [
    'sso_login' => 'http://local.central.com/site/login?callback=http://local.sia.com',
     'sso_logout' => 'http://local.central.com/site/sess-logout',
     'invoke_token_uri' => 'http://local.central.com/site/invoke-token',
+    'feeder' => [
+        'baseurl' => 'http://feeder.unida.gontor.ac.id:8082',
+        'username' => '',
+        'password' => '',
+    ],
     's3' => [
         'version' => 'latest',
         'region'  => 'us-east-1',

@@ -19,7 +19,7 @@ class PublikasiSearch extends Publikasi
     {
         return [
             [['id', 'kegiatan_id'], 'integer'],
-            [['judul_publikasi_paten', 'nama_jenis_publikasi','nama_kategori_kegiatan', 'tanggal_terbit', 'sister_id', 'updated_at', 'created_at','jumlah_sitasi'], 'safe'],
+            [['judul_publikasi_paten', 'nama_jenis_publikasi','nama_kategori_kegiatan', 'tanggal_terbit', 'sister_id', 'updated_at', 'created_at','jumlah_sitasi','kategori_kegiatan_id','jenis_publikasi_id'], 'safe'],
         ];
     }
 
@@ -42,9 +42,10 @@ class PublikasiSearch extends Publikasi
     public function search($params)
     {
         $query = Publikasi::find();
-        $query->joinWith(['publikasiAuthors as pa']);
+        $query->alias('t');
+        // $query->joinWith(['publikasiAuthors as pa']);
         
-        $query->where(['pa.NIY' => Yii::$app->user->identity->NIY]);
+        
 
         // add conditions that should always apply here
 
@@ -64,7 +65,8 @@ class PublikasiSearch extends Publikasi
         $query->andFilterWhere([
             'id' => $this->id,
             'kegiatan_id' => $this->kegiatan_id,
-            'tanggal_terbit' => $this->tanggal_terbit,
+            'kategori_kegiatan_id' => $this->kategori_kegiatan_id,
+            'jenis_publikasi_id' => $this->jenis_publikasi_id,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
             'jumlah_sitasi' => $this->jumlah_sitasi,
@@ -73,6 +75,14 @@ class PublikasiSearch extends Publikasi
         $query->andFilterWhere(['like', 'judul_publikasi_paten', $this->judul_publikasi_paten])
             ->andFilterWhere(['like', 'nama_jenis_publikasi', $this->nama_jenis_publikasi])
             ->andFilterWhere(['like', 'sister_id', $this->sister_id]);
+
+
+        $query->andWhere('"'.Yii::$app->user->identity->NIY.'" IN  (SELECT NIY FROM publikasi_author pa WHERE pa.pub_id = t.id)');
+        // if ( ! is_null($this->tanggal_terbit) && strpos($this->tanggal_terbit, ' - ') !== false ) {
+        //     list($start_date, $end_date) = explode(' - ', $this->tanggal_terbit);
+        //     $query->andFilterWhere(['between', 'tanggal_terbit', $start_date, $end_date]);
+        //     $this->tanggal_terbit = null;
+        // }
 
         return $dataProvider;
     }

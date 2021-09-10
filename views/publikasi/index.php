@@ -1,14 +1,47 @@
 <?php
 
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use kartik\grid\GridView;
-
+use kartik\export\ExportMenu;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PublikasiSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Publikasi';
 $this->params['breadcrumbs'][] = $this->title;
+
+$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('120');
+$listJenisPublikasi = ArrayHelper::map(\app\models\JenisPublikasi::find()->all(),'id','nama');
+
+$query = \app\models\KomponenKegiatan::find();
+$query->alias('p');
+$query->select(['p.nama']);
+$query->joinWith(['unsur as u']);
+$query->where([
+  'u.kode' => 'RISET'
+]);
+$query->groupBy(['p.nama']);
+$query->orderBy(['p.nama'=>SORT_ASC]);
+
+$listKomponen = $query->all();
+// $listKomponen = ArrayHelper::map($listKomponen,'id',function($data){
+//     return $data->subunsur;
+// });
+$listKomponenKegiatan = [];
+
+foreach($listKomponen as $k)
+{
+    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
+   
+    $tmp = [];
+    foreach($list as $item)
+    {
+        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
+    }
+
+    $listKomponenKegiatan[$k->nama] = $tmp;
+}
 ?>
 
 <div class="row">
@@ -45,23 +78,50 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'nama_jenis_publikasi',
             [
                 'attribute' => 'kategori_kegiatan_id',
+                'class' => 'kartik\grid\EditableColumn',
+                'refreshGrid' => true,
+                'filter' => $listKegiatan,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                    'asPopover' => false,
+                    'data' => $listKegiatan
+                ],
                 'value' => function($data){
                     return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '';
                 }
             ],
             [
                 'attribute' => 'jenis_publikasi_id',
+                'class' => 'kartik\grid\EditableColumn',
+                'refreshGrid' => true,
+                'filter' => $listJenisPublikasi,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                    'asPopover' => false,
+                    'data' => $listJenisPublikasi
+                ],
                 'value' => function($data){
                     return !empty($data->jenisPublikasi) ? $data->jenisPublikasi->nama : '';
                 }
             ],
             [
+                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'kegiatan_id',
+                'filter' => $listKomponenKegiatan,
+                'refreshGrid' => true,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                    'asPopover' => false,
+                    'data' => $listKomponenKegiatan
+                ],
                 'value' => function($data){
                     return !empty($data->kegiatan) ? $data->kegiatan->subunsur : '';
                 }
             ],
-            'tanggal_terbit',
+            [
+                'attribute' => 'tanggal_terbit',
+                'filterType' => GridView::FILTER_DATE_RANGE,
+            ],
             [
                 'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'jumlah_sitasi',
@@ -76,6 +136,16 @@ $this->params['breadcrumbs'][] = $this->title;
             //'created_at',
     ['class' => 'yii\grid\ActionColumn']
 ];?>    
+<p>
+<?php 
+// Renders a export dropdown menu
+echo ExportMenu::widget([
+    'dataProvider' => $dataProvider,
+    'columns' => $gridColumns,
+    'clearBuffers' => true, //optional
+]);
+?>
+</p>
 <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -87,7 +157,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'beforeHeader'=>[
             [
                 'columns'=>[
-                    ['content'=> $this->title, 'options'=>['colspan'=>14, 'class'=>'text-center warning']], //cuma satu 
+                    ['content'=> $this->title, 'options'=>['colspan'=>9, 'class'=>'text-center warning']], //cuma satu 
                 ], 
                 'options'=>['class'=>'skip-export'] 
             ]
@@ -100,7 +170,7 @@ $this->params['breadcrumbs'][] = $this->title;
           ],
           
         'toolbar' =>  [
-            '{export}', 
+            // '{export}', 
 
            '{toggleData}' //uncoment untuk menghidupkan button menampilkan semua data..
         ],
