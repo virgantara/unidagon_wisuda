@@ -80,6 +80,8 @@ class OrasiIlmiahSearch extends OrasiIlmiah
             ->andFilterWhere(['like', 'sister_id', $this->sister_id])
             ->andFilterWhere(['like', 'tingkat_pertemuan_id', $this->tingkat_pertemuan_id]);
 
+        $query->andWhere(['NIY' => Yii::$app->user->identity->NIY]);
+
         return $dataProvider;
     }
 }
