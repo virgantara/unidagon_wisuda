@@ -73,14 +73,15 @@ class UjiMahasiswaSearch extends UjiMahasiswa
             ->andFilterWhere(['like', 'sk_tugas', $this->sk_tugas])
             ->andFilterWhere(['like', 'id_kategori_kegiatan', $this->id_kategori_kegiatan])
             ->andFilterWhere(['like', 'nama_kategori_kegiatan', $this->nama_kategori_kegiatan])
-            ->andFilterWhere(['like', 'id_dosen', $this->id_dosen])
-            ->andFilterWhere(['like', 'NIY', $this->NIY]);
+            ->andFilterWhere(['like', 'id_dosen', $this->id_dosen]);
 
         if ( ! is_null($this->tanggal_sk_tugas) && strpos($this->tanggal_sk_tugas, ' - ') !== false ) {
             list($start_date, $end_date) = explode(' - ', $this->tanggal_sk_tugas);
             $query->andFilterWhere(['between', 'tanggal_sk_tugas', $start_date, $end_date]);
             $this->tanggal_sk_tugas = null;
         }
+
+        $query->andWhere(['NIY' => Yii::$app->user->identity->NIY]);
 
         return $dataProvider;
     }
