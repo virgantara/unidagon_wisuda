@@ -93,7 +93,7 @@ class MenuHelper
 		           	['label' => 'Bimbingan Mahasiswa', 'url' => ['/bimbingan-mahasiswa/index']],
 		           	['label' => 'Pengujian Mahasiswa', 'url' => ['/uji-mahasiswa/index']],
 		           	['label' => 'Visiting Scientist', 'url' => ['/visiting-scientist/index']],
-		           	['label' => 'Bahan Ajar', 'url' => ['/buku/index']],
+		           	['label' => 'Bahan Ajar', 'url' => ['/bahan-ajar/index']],
 		           	['label' => 'Orasi ilmiah', 'url' => ['/orasi-ilmiah/index']],
 		           	['label' => 'Tugas Tambahan', 'url' => ['/jabatan/index']],
 		        ]

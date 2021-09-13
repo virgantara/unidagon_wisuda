@@ -14,6 +14,8 @@ use app\helpers\MyHelper;
 use app\models\LoginForm;
 use app\models\CatatanHarian;
 
+
+use app\models\BahanAjar;
 use app\models\BimbinganMahasiswa;
 use app\models\BimbinganMahasiswaDosen;
 use app\models\BimbinganMahasiswaMahasiswa;
@@ -25,6 +27,7 @@ use app\models\Pengabdian;
 use app\models\Pengajaran;
 use app\models\Penghargaan;
 use app\models\PengelolaJurnal;
+use app\models\Penulis;
 use app\models\PenunjangLain;
 use app\models\Publikasi;
 use app\models\OrasiIlmiah;
@@ -1803,89 +1806,199 @@ class SiteController extends AppController
 
                 $detail = json_decode($resp->getBody());
 
-
-                $model = \app\models\Buku::find()->where([
-                    'sister_id' => $item->id
-                ])->one();
-
-                if(empty($model))
-                    $model = new \app\models\Buku;
-
-
-                $model->NIY = Yii::$app->user->identity->NIY;
-                $model->sister_id = $detail->id;
-                $model->judul = $detail->judul;
-                $model->penerbit = $detail->nama_penerbit;
-                $model->ISBN = $detail->isbn;
-                $model->tanggal_terbit = $detail->tanggal_terbit;
-                $model->tahun = date('Y',strtotime($detail->tanggal_terbit));
-                $model->id_kategori_capaian_luaran = $detail->id_kategori_capaian_luaran;
-                $model->id_jenis_bahan_ajar = (string)$detail->id_jenis_bahan_ajar;
-                $model->no_sk_tugas = $detail->sk_penugasan;
-                $model->tanggal_sk_penugasan = $detail->tanggal_sk_penugasan;
-                $model->ver = 'Sudah diverifikasi';
-                $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
                 
-                if($model->save())
+                
+                if($detail->id_jenis_bahan_ajar == 1)
                 {
-                    $author = \app\models\BukuAuthor::find()->where([
-                        'buku_id' => $model->ID,
-                        'NIY' => $model->NIY
+                    // echo strtolower($detail->nama_jenis);
+                    $model = \app\models\Buku::find()->where([
+                        'sister_id' => $item->id
                     ])->one();
+
+                    if(empty($model))
+                        $model = new \app\models\Buku;
+
+
+                    $model->NIY = Yii::$app->user->identity->NIY;
+                    $model->sister_id = $detail->id;
+                    $model->judul = $detail->judul;
+                    $model->penerbit = $detail->nama_penerbit;
+                    $model->ISBN = $detail->isbn;
+                    $model->tanggal_terbit = $detail->tanggal_terbit;
+                    $model->tahun = date('Y',strtotime($detail->tanggal_terbit));
+                    $model->id_kategori_capaian_luaran = $detail->id_kategori_capaian_luaran;
+                    $model->id_jenis_bahan_ajar = (string)$detail->id_jenis_bahan_ajar;
+                    $model->no_sk_tugas = $detail->sk_penugasan;
+                    $model->tanggal_sk_penugasan = $detail->tanggal_sk_penugasan;
+                    $model->ver = 'Sudah diverifikasi';
+                    $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
                     
-                    if(empty($author))
-                        $author = new \app\models\BukuAuthor;
-                    
-                    $author->buku_id = $model->ID;
-                    $author->NIY = $model->NIY;
-                    if(!$author->save())
+                    if($model->save())
                     {
-                        foreach($author->getErrors() as $attribute){
-                            foreach($attribute as $error){
-                                $errors .= $error.' ';
+                        $author = \app\models\BukuAuthor::find()->where([
+                            'buku_id' => $model->ID,
+                            'NIY' => $model->NIY
+                        ])->one();
+                        
+                        if(empty($author))
+                            $author = new \app\models\BukuAuthor;
+                        
+                        $author->buku_id = $model->ID;
+                        $author->NIY = $model->NIY;
+                        if(!$author->save())
+                        {
+                            foreach($author->getErrors() as $attribute){
+                                foreach($attribute as $error){
+                                    $errors .= $error.' ';
+                                }
+                            }
+                            
+                            throw new \Exception;
+                        }
+
+                        if(!empty($detail->dokumen))
+                        {
+                            foreach($detail->dokumen as $file)
+                            {
+                                $pf = SisterFiles::findOne($file->id);
+                                if(empty($pf))
+                                    $pf = new SisterFiles;
+
+                                $pf->id_dokumen = $file->id;
+                                $pf->parent_id = $item->id;
+                                $pf->nama_dokumen = $file->nama;
+                                $pf->nama_file = $file->nama_file;
+                                $pf->jenis_file = $file->jenis_file;
+                                $pf->tanggal_upload = $file->tanggal_upload;
+                                $pf->nama_jenis_dokumen = $file->jenis_dokumen;
+                                $pf->tautan = $file->tautan;
+                                $pf->keterangan_dokumen = $file->keterangan;
+
+                                if(!$pf->save())
+                                {
+                                    $errors .= 'BK: '.\app\helpers\MyHelper::logError($pf);
+                                    throw new \Exception;
+                                }
                             }
                         }
                         
+                        
+                  
+                    }
+
+                    else
+                    {
+                        $errors .= \app\helpers\MyHelper::logError($model);
                         throw new \Exception;
                     }
-
-                    if(!empty($detail->dokumen))
-                    {
-                        foreach($detail->dokumen as $file)
-                        {
-                            $pf = SisterFiles::findOne($file->id);
-                            if(empty($pf))
-                                $pf = new SisterFiles;
-
-                            $pf->id_dokumen = $file->id;
-                            $pf->parent_id = $item->id;
-                            $pf->nama_dokumen = $file->nama;
-                            $pf->nama_file = $file->nama_file;
-                            $pf->jenis_file = $file->jenis_file;
-                            $pf->tanggal_upload = $file->tanggal_upload;
-                            $pf->nama_jenis_dokumen = $file->jenis_dokumen;
-                            $pf->tautan = $file->tautan;
-                            $pf->keterangan_dokumen = $file->keterangan;
-
-                            if(!$pf->save())
-                            {
-                                $errors .= 'BK: '.\app\helpers\MyHelper::logError($pf);
-                                throw new \Exception;
-                            }
-                        }
-                    }
-                    $counter++;
-              
                 }
 
                 else
                 {
-                    $errors .= \app\helpers\MyHelper::logError($model);
-                    throw new \Exception;
+                    $model = BahanAjar::find()->where([
+                        'sister_id' => $item->id
+                    ])->one();
+
+                    if(empty($model)){
+                        $model = new BahanAjar();
+                        $model->id = MyHelper::gen_uuid();
+                    }
+
+
+
+                    $model->NIY = Yii::$app->user->identity->NIY;
+                    $model->sister_id = $detail->id;
+                    $model->judul = $detail->judul;
+                    $model->nama_penerbit = $detail->nama_penerbit;
+                    $model->isbn = $detail->isbn;
+                    $model->tanggal_terbit = $detail->tanggal_terbit;
+                    $model->id_kategori_capaian_luaran = $detail->id_kategori_capaian_luaran;
+                    $model->id_jenis_bahan_ajar = (string)$detail->id_jenis_bahan_ajar;
+                    $model->sk_penugasan = $detail->sk_penugasan;
+                    $model->tanggal_sk_penugasan = $detail->tanggal_sk_penugasan;
+                   
+                    $model->id_kategori_kegiatan = (string)$detail->id_kategori_kegiatan;
+                    
+                    if($model->save())
+                    {
+
+                        if(!empty($detail->penulis))
+                        {
+                            foreach($detail->penulis as $penulis)
+                            {
+                                $usr = User::find()->where(['sister_id'=>$penulis->id_sdm])->one();
+                                $author = Penulis::find()->where([
+                                    'bahan_ajar_id' => $model->id,
+                                    'id_sdm' => $penulis->id_sdm
+                                ])->one();
+                                
+                                if(empty($author)){
+                                    $author = new Penulis;
+                                    $author->id = MyHelper::gen_uuid();
+                                    $author->bahan_ajar_id = $model->id;
+                                    $author->id_sdm = $penulis->id_sdm;
+                                }
+                                
+                                $author->NIY = !empty($usr) ? $usr->NIY : null;
+                                $author->nama = $penulis->nama;
+                                $author->urutan = $penulis->urutan;
+                                $author->afiliasi = $penulis->afiliasi;
+                                $author->jenis = $penulis->jenis;
+                                $author->peran = $penulis->peran;
+                                
+                                if(!$author->save())
+                                {
+                                    foreach($author->getErrors() as $attribute){
+                                        foreach($attribute as $error){
+                                            $errors .= $error.' ';
+                                        }
+                                    }
+                                    
+                                    throw new \Exception;
+                                }
+                            }
+                        }
+                        
+
+                        if(!empty($detail->dokumen))
+                        {
+                            foreach($detail->dokumen as $file)
+                            {
+                                $pf = SisterFiles::findOne($file->id);
+                                if(empty($pf))
+                                    $pf = new SisterFiles;
+
+                                $pf->id_dokumen = $file->id;
+                                $pf->parent_id = $item->id;
+                                $pf->nama_dokumen = $file->nama;
+                                $pf->nama_file = $file->nama_file;
+                                $pf->jenis_file = $file->jenis_file;
+                                $pf->tanggal_upload = $file->tanggal_upload;
+                                $pf->nama_jenis_dokumen = $file->jenis_dokumen;
+                                $pf->tautan = $file->tautan;
+                                $pf->keterangan_dokumen = $file->keterangan;
+
+                                if(!$pf->save())
+                                {
+                                    $errors .= 'BK: '.\app\helpers\MyHelper::logError($pf);
+                                    throw new \Exception;
+                                }
+                            }
+                        }
+                       
+                        
+                  
+                    }
+
+                    else
+                    {
+
+                        $errors .= \app\helpers\MyHelper::logError($model);
+                        throw new \Exception;
+                    }
                 }
-                
+                $counter++;
                 $transaction->commit();
-                
             }
 
             catch (\Exception $e) {
@@ -1893,6 +2006,7 @@ class SiteController extends AppController
                 $errors .= $e->getMessage();
                 
                 MyHelper::createLogSync($user->NIY, 'Bahan Ajar '.$errors);
+
                 continue;
                 // $errors .= $e->getMessage();
                 // $results = [
@@ -1902,12 +2016,13 @@ class SiteController extends AppController
             } 
        
         }
-
+        // exit;
         $results = [
             'code' => 200,
             'message' => $counter.' data imported'
             
         ];
+        
         return $results;
 
     }
