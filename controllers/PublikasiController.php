@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\helpers\MyHelper;
 use app\models\User;
+use app\models\DataDiri;
 use app\models\Publikasi;
 use app\models\JenisPublikasi;
 use app\models\KategoriKegiatan;
@@ -456,7 +457,7 @@ class PublikasiController extends AppController
             print_r($e->getMessage());
         }
         
-        
+        $docs = \app\models\SisterFiles::find()->where(['parent_id' => $model->id])->all();
         // echo '<pre>';
         // print_r($results);
         // echo '</pre>';
@@ -464,7 +465,8 @@ class PublikasiController extends AppController
 
         return $this->render('view', [
             'model' => $model,
-            'results' => $results
+            'results' => $results,
+            'docs' => $docs
         ]);
     }
 
@@ -476,10 +478,34 @@ class PublikasiController extends AppController
     public function actionCreate()
     {
         $model = new Publikasi();
+        $errors = '';
+        if ($model->load(Yii::$app->request->post())) {
+            $model->NIY = Yii::$app->user->identity->NIY;
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            try
+            {
+                if($model->save())
+                {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['view', 'id' => $model->id]);
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Data tersimpan");
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+
+                else
+                {
+                    $errors .= MyHelper::logError($model);
+                    throw new \Exception;
+                }
+            }
+
+            catch(\Exception $e){
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                Yii::$app->session->setFlash('danger', $errors);
+                return $this->redirect(['create']);
+            }
         }
 
         return $this->render('create', [

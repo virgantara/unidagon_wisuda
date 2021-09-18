@@ -7,7 +7,7 @@ IntroAsset::register($this);
 $this->title = 'UNIDA Gontor Lecturer Data';
 
 ?>
-<h1 >Impor data dari SISTER</h1>
+<h1 >Import data dari SISTER, SIAKAD, dan FEEDER</h1>
 
 <div class="row">
     <div class="col-md-12">

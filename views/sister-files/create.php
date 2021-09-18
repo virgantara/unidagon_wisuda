@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\PembicaraFiles */
 
-$this->title = 'Create Pembicara Files';
-$this->params['breadcrumbs'][] = ['label' => 'Pembicara Files', 'url' => ['index']];
+$this->title = 'Upload Dokumen';
+$this->params['breadcrumbs'][] = ['label' => 'Upload Dokumen', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <h3><?= Html::encode($this->title) ?></h3>

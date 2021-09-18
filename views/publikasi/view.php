@@ -10,8 +10,19 @@ $this->title = $model->judul_publikasi_paten;
 $this->params['breadcrumbs'][] = ['label' => 'Publikasis', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<p>
+    <?= Html::a('<i class="fa fa-arrow-left"></i> Kembali', ['index'], ['class' => 'btn btn-default']) ?>
+    <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        'class' => 'btn btn-danger',
+        'data' => [
+            'confirm' => 'Are you sure you want to delete this item?',
+            'method' => 'post',
+        ],
+    ]) ?>
+</p>
 <div class="row">
-   <div class="col-md-12">
+   <div class="col-md-8">
         <div class="panel">
             <div class="panel-heading">
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
@@ -19,16 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="panel-body ">
-            <p>
-                <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-danger',
-                    'data' => [
-                        'confirm' => 'Are you sure you want to delete this item?',
-                        'method' => 'post',
-                    ],
-                ]) ?>
-            </p>
+            
             <?= DetailView::widget([
                     'model' => $model,
                     'attributes' => [
@@ -52,20 +54,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return !empty($data->kegiatan) ? $data->kegiatan->subunsur : '';
                             }
                         ],
-                        'tanggal_terbit',
+                        'tanggal_terbit:date',
                         'tautan_laman_jurnal:url',
                         'tautan:url',
-                        'volume',
-                        'nomor',
-                        'halaman',
-                        'penerbit',
-                        'doi:url',
-                        'issn',
-                        'jumlah_sitasi',
-                        'sks_bkd',
-                        'updated_at',
-                        'created_at',
-                        'sister_id',
+                        
                     ],
                 ]) ?>
 
@@ -73,12 +65,44 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
     </div>
+    <div class="col-md-4">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Info Lainnya</h3>
+                
+            </div>
+
+            <div class="panel-body ">
+           
+            <?= DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        
+                        
+                        'nomor',
+                        'halaman',
+                        'penerbit',
+                        'doi:url',
+                        'issn',
+                        'jumlah_sitasi',
+                        // 'sks_bkd',
+                        'updated_at',
+                        'created_at',
+                        // 'sister_id',
+                    ],
+                ]) ?>
+
+            </div>
+        </div>
+    </div>
+</div>
     <?php 
     if(!empty($results))
     {
 
 
     ?>
+<div class="row">
     <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
@@ -87,169 +111,179 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="panel-body ">
         
-                
-                <div class="row">
-
-                <div class="col-md-12 col-md-12 col-xs-12">
-
                 <table class="table table-striped table-bordered">
-                <tbody><tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="judul" class="control-label">Judul Artikel</label>
+                <tbody>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="judul" class="control-label">Judul Artikel</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->judul;?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="id_jns_pub" class="control-label">Jenis</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->jenis_publikasi;?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="id_kat_capaian" class="control-label">Kategori Capaian</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->kategori_capaian_luaran;?>
+                    </div></td>
+
+                    </tr>
+                    
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="nama_jurnal" class="control-label">Tautan Laman Jurnal</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <a href="<?=$results->tautan;?>" target="_blank">Klik di sini</a>
+                    </div></td>
+
+                    </tr>
+                    
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="tgl_terbit" class="control-label">Tanggal Terbit</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=!empty($results->tanggal) ? \app\helpers\MyHelper::convertTanggalIndo($results->tanggal) : '-';?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="vol" class="control-label">Volume</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->volume;?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="no" class="control-label">Nomor</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->nomor;?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="hal" class="control-label">Halaman</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->halaman;?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="penerbit" class="control-label">Penerbit/Penyelenggara</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->penerbit;?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="doi" class="control-label">DOI</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <a href="<?=$results->doi;?>" target="_blank">Klik di sini</a>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="issn" class="control-label">ISSN</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->e_issn;?>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="url" class="control-label">Tautan Eksternal</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <a href="<?=$results->tautan;?>" target="_blank">Klik di sini</a>
+                    </div></td>
+
+                    </tr>
+                    <tr>
+                    <td class="form-group">
+                    <div class="col-lg-3">
+                    <label for="ket" class="control-label">Keterangan/Petunjuk Akses</label>
+                    </div>
+
+                    <div class="col-lg-9">
+                    <?=$results->keterangan;?>
+                    </div></td>
+
+                    </tr>
+                    </tbody>
+                    </table>
+
                 </div>
-
-                <div class="col-lg-9">
-                <?=$results->judul;?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="id_jns_pub" class="control-label">Jenis</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->jenis_publikasi;?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="id_kat_capaian" class="control-label">Kategori Capaian</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->kategori_capaian_luaran;?>
-                </div></td>
-
-                </tr>
-                
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="nama_jurnal" class="control-label">Tautan Laman Jurnal</label>
-                </div>
-
-                <div class="col-lg-9">
-                <a href="<?=$results->tautan;?>" target="_blank">Klik di sini</a>
-                </div></td>
-
-                </tr>
-                
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="tgl_terbit" class="control-label">Tanggal Terbit</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=!empty($results->tanggal) ? \app\helpers\MyHelper::convertTanggalIndo($results->tanggal) : '-';?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="vol" class="control-label">Volume</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->volume;?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="no" class="control-label">Nomor</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->nomor;?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="hal" class="control-label">Halaman</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->halaman;?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="penerbit" class="control-label">Penerbit/Penyelenggara</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->penerbit;?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="doi" class="control-label">DOI</label>
-                </div>
-
-                <div class="col-lg-9">
-                <a href="<?=$results->doi;?>" target="_blank">Klik di sini</a>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="issn" class="control-label">ISSN</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->e_issn;?>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="url" class="control-label">Tautan Eksternal</label>
-                </div>
-
-                <div class="col-lg-9">
-                <a href="<?=$results->tautan;?>" target="_blank">Klik di sini</a>
-                </div></td>
-
-                </tr>
-                <tr>
-                <td class="form-group">
-                <div class="col-lg-3">
-                <label for="ket" class="control-label">Keterangan/Petunjuk Akses</label>
-                </div>
-
-                <div class="col-lg-9">
-                <?=$results->keterangan;?>
-                </div></td>
-
-                </tr>
-                </tbody></table>
-
-                <div class="row" style="margin: 5px 0;"></div>
-                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+            <?php 
+            }
+             ?>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Penulis Dosen
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div class="alert alert-info">
+                        <i class="fa fa-exclamation"></i> Utamakan mengisi author dari SISTER
+                    </div>
                 <table class="table table-hover table-bordered table-striped">
                 <thead>
-                <tr>
-                <th colspan="6" class="bg-dark">
-                <i class="fa fa-users fa-fw"></i>
-                Penulis Dosen
-                </th>
-                </tr>
                 <tr>
                 <th >No.</th>
                 <th >Nama</th>
@@ -263,8 +297,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tbody>
                 <?php 
-                if(!empty($model->publikasiAuthors))
-                {
+
+            
+                
                     foreach($model->publikasiAuthors as $q=>$author)
                     {
 
@@ -283,7 +318,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 <?php 
                     }
-                }
+                
                 ?>
                 <tr>
                     <td colspan="6">
@@ -294,19 +329,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tbody>
 
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-                
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Dokumen
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div class="alert alert-info">
+                       <i class="fa fa-exclamation"></i> Utamakan mengupload dokumen dari SISTER
+                    </div>
+                <p>
+                    <a id="btn-add-dokumen" href="<?=Url::to(['sister-files/create','parent_id' => $model->id]) ?>" class="btn btn-success"><i class="fa fa-plus"></i> Dokumen</a>
 
-                <div class="row" style="margin: 5px 0;"></div>
+                    
+                </p>
                 <table class="table table-hover table-bordered table-striped">
                 <thead>
-                <tr>
-                <th colspan="7" class="bg-dark">
-                <i class="fa fa-file fa-fw"></i>
-                Dokumen
-                </th>
-                </tr>
-
+                
                 <tr>
                 <th >No.</th>
                 <th>Nama Dokumen</th>
@@ -343,18 +390,39 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
                 ?>
+
+                <?php 
+                if(!empty($docs))
+                {
+                    foreach($docs as $q=>$file)
+                    {
+
+                
+                ?>
+                <tr>
+                <td ><?=$q+1;?></td>
+                <td><?=$file->nama_dokumen;?></td>
+                <td><?=$file->nama_file;?></td>
+                <td><?=$file->jenis_file;?></td>
+                <td><?=$file->tanggal_upload;?></td>
+                <td><?=$file->keterangan_dokumen;?></td>
+                <td><a href="<?=$file->tautan;?>" target="_blank">Link</a></td>
+                <td></td>
+                </tr>
+                <?php 
+                    }
+                }
+                ?>
                 </tbody>
                 </table>
-
-
             </div>
         </div>
-
     </div>
-    <?php 
-    }
-    ?>
 </div>
+
+                
+                
+
 
 
 

@@ -139,10 +139,36 @@ class SiteController extends AppController
 
         if(empty($user->sister_id))
         {
+            MyHelper::clearLogSync($user->NIY);
+            
+            $res5 = $this->importJurnal();
+            $res6 = $this->importPengajaran();
+            
+            $code = $res5['code'];
+            
+
+            $time_elapsed_secs = microtime(true) - $start;
             $results = [
-                'code' => 404,
-                'message' => 'Oops, data Anda belum dipetakan'
+                'code' => $code,
+                'elapsed_time' => $time_elapsed_secs,
+                'items' => [
+                    
+                    [
+                        'modul' => 'jurnal_pengajaran',
+                        'data' => $res5['message'],
+                        'source' => 'SIAKAD'
+                    ],
+                    [
+                        'modul' => 'pengajaran',
+                        'data' => $res6['message'],
+                        'source' => 'SIAKAD'
+                    ],
+                ]
             ];
+            // $results = [
+            //     'code' => 404,
+            //     'message' => 'Oops, data Anda belum dipetakan'
+            // ];
         }
 
         else

@@ -229,94 +229,110 @@ class DataDiriController extends AppController
             
             $sister_baseurl = Yii::$app->params['sister_baseurl'];
             $headersSister = ['content-type' => 'application/json'];
-            $sisterClient = new \GuzzleHttp\Client([
-                'timeout'  => 5.0,
-                'headers' => $headersSister,
-                // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
-            ]);
-            $full_url = $sister_baseurl.'/data_pribadi/profil/'.$user->sister_id;
-            $dataProfil = $sisterClient->get($full_url, [
-                
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer '.$sisterToken
-                ]
 
-            ]);  
-           
-            $dataProfil = json_decode($dataProfil->getBody());
+            try{
+                $sisterClient = new \GuzzleHttp\Client([
+                    'timeout'  => 5.0,
+                    'headers' => $headersSister,
+                    // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+                ]);
+                $full_url = $sister_baseurl.'/data_pribadi/profil/'.$user->sister_id;
+                $dataProfil = $sisterClient->get($full_url, [
+                    
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
 
-            $results['profil'] = $dataProfil;
+                ]);  
+               
+                $dataProfil = json_decode($dataProfil->getBody());
 
-            $full_url = $sister_baseurl.'/data_pribadi/lain/'.$user->sister_id;
-            $dataProfil = $sisterClient->get($full_url, [
-                
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer '.$sisterToken
-                ]
+                $results['profil'] = $dataProfil;
 
-            ]);  
-           
-            $dataProfil = json_decode($dataProfil->getBody());
+                $full_url = $sister_baseurl.'/data_pribadi/lain/'.$user->sister_id;
+                $dataProfil = $sisterClient->get($full_url, [
+                    
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
 
-            $results['lain'] = $dataProfil;
+                ]);  
+               
+                $dataProfil = json_decode($dataProfil->getBody());
 
-            $full_url = $sister_baseurl.'/data_pribadi/kependudukan/'.$user->sister_id;
-            $dataProfil = $sisterClient->get($full_url, [
-                
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer '.$sisterToken
-                ]
+                $results['lain'] = $dataProfil;
 
-            ]);  
-           
-            $dataProfil = json_decode($dataProfil->getBody());
+                $full_url = $sister_baseurl.'/data_pribadi/kependudukan/'.$user->sister_id;
+                $dataProfil = $sisterClient->get($full_url, [
+                    
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
 
-            $results['kependudukan'] = $dataProfil;
+                ]);  
+               
+                $dataProfil = json_decode($dataProfil->getBody());
 
-            $full_url = $sister_baseurl.'/data_pribadi/kepegawaian/'.$user->sister_id;
-            $dataProfil = $sisterClient->get($full_url, [
-                
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer '.$sisterToken
-                ]
+                $results['kependudukan'] = $dataProfil;
 
-            ]);  
-           
-            $dataProfil = json_decode($dataProfil->getBody());
+                $full_url = $sister_baseurl.'/data_pribadi/kepegawaian/'.$user->sister_id;
+                $dataProfil = $sisterClient->get($full_url, [
+                    
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
 
-            $results['kepegawaian'] = $dataProfil;
+                ]);  
+               
+                $dataProfil = json_decode($dataProfil->getBody());
 
-            $full_url = $sister_baseurl.'/data_pribadi/keluarga/'.$user->sister_id;
-            $dataProfil = $sisterClient->get($full_url, [
-                
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer '.$sisterToken
-                ]
+                $results['kepegawaian'] = $dataProfil;
 
-            ]);  
-           
-            $dataProfil = json_decode($dataProfil->getBody());
+                $full_url = $sister_baseurl.'/data_pribadi/keluarga/'.$user->sister_id;
+                $dataProfil = $sisterClient->get($full_url, [
+                    
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
 
-            $results['keluarga'] = $dataProfil;
+                ]);  
+               
+                $dataProfil = json_decode($dataProfil->getBody());
 
-            $full_url = $sister_baseurl.'/data_pribadi/alamat/'.$user->sister_id;
-            $dataProfil = $sisterClient->get($full_url, [
-                
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer '.$sisterToken
-                ]
+                $results['keluarga'] = $dataProfil;
 
-            ]);  
-           
-            $dataProfil = json_decode($dataProfil->getBody());
+                $full_url = $sister_baseurl.'/data_pribadi/alamat/'.$user->sister_id;
+                $dataProfil = $sisterClient->get($full_url, [
+                    
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
 
-            $results['alamat'] = $dataProfil;
+                ]);  
+               
+                $dataProfil = json_decode($dataProfil->getBody());
+
+                $results['alamat'] = $dataProfil;
+            }
+
+            catch (\GuzzleHttp\Exception\ClientException $e) {
+                $response = $e->getResponse();
+                $responseBodyAsString = $response->getBody()->getContents();
+                // print_r($responseBodyAsString);exit;
+            }
+
+            catch(\Exception $e)
+            {
+                // print_r($e->getMessage());exit;
+            }
+
+            
 
             
         }

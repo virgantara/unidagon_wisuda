@@ -54,11 +54,12 @@ $listJenisPublikasi = ArrayHelper::map(\app\models\JenisPublikasi::find()->all()
 
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
-    <div class="form-group">
-        <label class="control-label col-md-3">Nama Kategori Kegiatan</label>
-        <div class="col-md-9">
-    <?= $form->field($model, 'nama_kategori_kegiatan',['options' => ['tag' => false]])->textInput($is_readonly)->label(false) ?>
-</div></div>
+    <?php
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+   
+    ?>
     <div class="form-group">
         <label class="control-label col-md-3">Kategori Kegiatan</label>
         <div class="col-md-9">
