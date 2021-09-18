@@ -347,7 +347,7 @@ $this->params['breadcrumbs'][] = $this->title;
                        <i class="fa fa-exclamation"></i> Utamakan mengupload dokumen dari SISTER
                     </div>
                 <p>
-                    <a id="btn-add-dokumen" href="<?=Url::to(['sister-files/create','parent_id' => $model->id]) ?>" class="btn btn-success"><i class="fa fa-plus"></i> Dokumen</a>
+                    <a id="btn-add-dokumen" href="<?=Url::to(['sister-files/create','parent_id' => $model->id,'redirect_uri' => 'publikasi/'.$model->id]) ?>" class="btn btn-success"><i class="fa fa-plus"></i> Dokumen</a>
 
                     
                 </p>
@@ -369,15 +369,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 <tbody>
 
                 <?php 
+                $counter = 0;
                 if(!empty($results->dokumen))
                 {
                     foreach($results->dokumen as $q=>$file)
                     {
+                        $counter++;
 
                 
                 ?>
                 <tr>
-                <td ><?=$q+1;?></td>
+                <td ><?=$counter;?></td>
                 <td><?=$file->nama;?></td>
                 <td><?=$file->nama_file;?></td>
                 <td><?=$file->jenis_file;?></td>
@@ -397,10 +399,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     foreach($docs as $q=>$file)
                     {
 
-                
+                        $counter++;
                 ?>
                 <tr>
-                <td ><?=$q+1;?></td>
+                <td ><?=$counter;?></td>
                 <td><?=$file->nama_dokumen;?></td>
                 <td><?=$file->nama_file;?></td>
                 <td><?=$file->jenis_file;?></td>
