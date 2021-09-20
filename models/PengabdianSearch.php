@@ -19,7 +19,7 @@ class PengabdianSearch extends Pengabdian
     {
         return [
             [['ID', 'durasi_kegiatan'], 'integer'],
-            [['NIY', 'judul_penelitian_pengabdian', 'nama_tahun_ajaran', 'nama_skim', 'jenis_penelitian_pengabdian', 'sister_id', 'updated_at', 'created_at'], 'safe'],
+            [['NIY', 'judul_penelitian_pengabdian', 'nama_tahun_ajaran', 'nama_skim', 'jenis_penelitian_pengabdian', 'sister_id', 'updated_at', 'created_at','jenis_sumber_dana','no_sk_tugas','tgl_sk_tugas'], 'safe'],
             [['nilai'], 'number'],
         ];
     }
@@ -67,6 +67,7 @@ class PengabdianSearch extends Pengabdian
             'nilai' => $this->nilai,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
+            'jenis_sumber_dana' => $this->jenis_sumber_dana,
         ]);
 
         $query->andFilterWhere(['like', 'NIY', $this->NIY])

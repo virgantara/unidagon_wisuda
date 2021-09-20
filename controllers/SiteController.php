@@ -3284,6 +3284,17 @@ class SiteController extends AppController
                     $model->tahun_kegiatan = $detail->tahun_kegiatan;
                     $model->tahun_dilaksanakan = $detail->tahun_pelaksanaan;
                     $model->tahun_pelaksanaan_ke = $detail->tahun_pelaksanaan_ke;
+                    
+                    if($detail->dana_dikti > 0 || $detail->dana_institusi_lain > 0)
+                    {
+                        $model->jenis_sumber_dana = 'dalam';   
+                    }
+
+                    else if($detail->dana_perguruan_tinggi > 0)
+                    {
+                        $model->jenis_sumber_dana = 'mandiri';   
+                    }
+
                     $model->dana_dikti = $detail->dana_dikti;
                     $model->skim_kegiatan_id = $detail->id_jenis_skim;
                     $model->dana_pt = $detail->dana_perguruan_tinggi;
@@ -3490,7 +3501,15 @@ class SiteController extends AppController
                 $model->tgl_sk_tugas = $detail->tanggal_sk_penugasan;
                 $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
                     // print_r($res);exit;
-                
+                if($detail->dana_dikti > 0 || $detail->dana_institusi_lain > 0)
+                {
+                    $model->jenis_sumber_dana = 'dalam';   
+                }
+
+                else if($detail->dana_perguruan_tinggi > 0)
+                {
+                    $model->jenis_sumber_dana = 'mandiri';   
+                }
 
                 if($model->save())
                 {

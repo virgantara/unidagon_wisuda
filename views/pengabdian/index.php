@@ -9,6 +9,9 @@ use kartik\grid\GridView;
 
 $this->title = 'Pengabdian';
 $this->params['breadcrumbs'][] = $this->title;
+
+$list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
+
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -48,6 +51,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'durasi_kegiatan',
             'no_sk_tugas',
             'tgl_sk_tugas',
+            [
+                'attribute' => 'jenis_sumber_dana',
+                'filter' => $list_jenis_sumber_dana,
+                'value' => function($data) use ($list_jenis_sumber_dana){
+                    return $list_jenis_sumber_dana[$data->jenis_sumber_dana];
+                }
+            ],
             // [
             //     'attribute' => 'jenis_penelitian_pengabdian',
             //     'value' => function($data){
