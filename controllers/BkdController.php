@@ -613,22 +613,54 @@ class BkdController extends AppController
 
         else
         {
-          $model->komponen_kegiatan_id = $komponen->id;
-          $model->nilai = $komponen->angka_kredit;
-          $model->is_claimed = $dataPost['is_claimed'];
-          if($model->save(false,['is_claimed','komponen_kegiatan_id','sks_bkd']))
+          $is_claimed = $dataPost['is_claimed'];
+          $bkd = BkdDosen::find()->where([
+            'tahun_id' => $dataPost['tahun_id'],
+            'dosen_id' => Yii::$app->user->identity->ID,
+            'komponen_id' => $komponen->id,
+            'kondisi' => (string)$model->ID
+          ])->one();
+
+          if($is_claimed == '1')
           {
-            $results = [
-              'code' => 200,
-              'message' => 'Data updated'
-            ];
+            if(empty($bkd))
+            {
+              $bkd = new BkdDosen;
+            }
+
+            $bkd->tahun_id = $dataPost['tahun_id'];
+            $bkd->dosen_id = Yii::$app->user->identity->ID;
+            $bkd->komponen_id = $komponen->id;
+            $bkd->deskripsi = $model->judul_penelitian_pengabdian;
+            $bkd->kondisi = (string)$model->ID;
+            $bkd->sks = $komponen->angka_kredit;
+            $bkd->sks_pak = $komponen->angka_kredit_pak;
+
+            if($bkd->save())
+            {
+              $results = [
+                'code' => 200,
+                'message' => 'Data claimed'
+              ];
+
+            }
+
+            else{
+              $results = [
+                'code' => 500,
+                'message' => \app\helpers\MyHelper::logError($bkd)
+              ];
+            }
           }
 
-          else
+          else if($is_claimed == '0')
           {
+            if(!empty($bkd))
+              $bkd->delete();
+
             $results = [
-              'code' => 500,
-              'message' => 'Oops, something wrong'
+              'code' => 200,
+              'message' => 'Data unclaimed'
             ];
           }
         }

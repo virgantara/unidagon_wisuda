@@ -208,7 +208,28 @@ class PengabdianController extends AppController
         }
 
         $query->andFilterWhere(['between','tgl_sk_tugas',$sd, $ed]);
-        $results = $query->asArray()->all();
+        $tmps = $query->all();
+
+        $tmps = $query->all();
+
+        $results = [];
+
+        foreach($tmps as $tmp)
+        {
+
+            $bkd = \app\models\BkdDosen::find()->where([
+                'tahun_id' => $tahun_id,
+                'dosen_id' => Yii::$app->user->identity->ID,
+                'komponen_id' => $tmp->komponen_kegiatan_id,
+                'kondisi' => (string)$tmp->ID
+            ])->one();
+
+            $results[] = [
+                'is_claimed' => !empty($bkd),
+                'item' => $tmp,
+                'sks_bkd' => !empty($tmp->komponenKegiatan) ? $tmp->komponenKegiatan->angka_kredit : null
+            ];
+        }
             
         echo \yii\helpers\Json::encode($results);
         die();

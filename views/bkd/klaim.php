@@ -393,6 +393,7 @@ $(document).on("click",".btn-claim-pengabdian",function(e){
 
     var obj = new Object
     obj.id = $(this).data("item")
+    obj.tahun_id = $(this).data("ta")
     obj.is_claimed = "0";
     if($(this).is(":checked"))
         obj.is_claimed = "1"
@@ -611,7 +612,7 @@ function getPengabdian(tahun){
                 counter++;
 
                 let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                
+                var obj = obj.item
                 row += "<tr>"
                 row += "<td>"+(counter)+"</td>"
                 row += "<td>"+obj.judul_penelitian_pengabdian+"</td>"
@@ -619,7 +620,7 @@ function getPengabdian(tahun){
                 row += "<td>"+obj.tahun_kegiatan+"</td>"
                 row += "<td>"+obj.tempat_kegiatan+"</td>"
                 row += "<td>"+obj.nilai+"</td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-item=\'"+obj.ID+"\' class=\'btn-claim-pengabdian\'/></td>"
+                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#ganti-periode").val()+"\' data-item=\'"+obj.ID+"\' class=\'btn-claim-pengabdian\'/></td>"
                 row += "</tr>"
 
             })
