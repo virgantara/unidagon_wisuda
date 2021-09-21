@@ -138,20 +138,34 @@ class MyHelper
 
 		    if($pos == 3)
 		    {
-		    	if($last3 % 100 == 0)
-			    {
+		    	$listKategori = \yii\helpers\ArrayHelper::map(\app\models\KategoriKegiatan::find()->where(['like','id',$prefix.'%',false])->orderBy(['id'=>SORT_ASC])->all(),'id',function($data){
+				    return $data->id;
+				});
+				
+				$results = [];
+				foreach($listKategori as $q=>$v)
+				{
+					$prefix = substr($prefix, 0,3);		  
+					
+				    $last3 = substr($v, -3,3);  
+				    if($last3 == '000') continue;
 
-			        for($i=0;$i<=50;$i++)
-			        {
-			            $id = $prefix.($last3 + $i);
+				    if($last3 % 100 == 0)
+				    {
+				        $induk = \app\models\KategoriKegiatan::findOne($prefix.$last3);
+				        if(empty($induk)) continue;
+				        for($i=0;$i<=50;$i++)
+				        {
+				            $id = $prefix.($last3 + $i);
 
-			            $m = \app\models\KategoriKegiatan::findOne($id);
-			            if(!empty($m)){
-			                $results[$v->nama][$id] = $m->nama;
-			            }
-			            
-			        }
-			    }   
+				            $m = \app\models\KategoriKegiatan::findOne($id);
+				            if(!empty($m)){
+				                $results[$induk->nama][$id] = $m->nama;
+				            }
+				            
+				        }
+				    }   
+				}  
 		    }
 
 		    else if($pos == 2)
