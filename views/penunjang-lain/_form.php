@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
+use kartik\file\FileInput;
 /* @var $this yii\web\View */
 /* @var $model app\models\Publikasi */
 /* @var $form yii\widgets\ActiveForm */
@@ -47,14 +48,19 @@ $listKegiatan5 = \app\helpers\MyHelper::convertKategoriKegiatan('1407');
 $listKegiatan6 = \app\helpers\MyHelper::convertKategoriKegiatan('1411');
 $listKegiatan = array_merge($listKegiatan1, $listKegiatan2, $listKegiatan3, $listKegiatan4, $listKegiatan5, $listKegiatan6);
 
-$listJenisPanitia = ArrayHelper::map($list_jenis,'id_jenis_panitia','nama_jenis_kegiatan_kepanitiaan');
+$listJenisPanitia = ArrayHelper::map($list_jenis,'id','nama');
 $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
 ?>
 <div class="penunjang-lain-form">
 
     <?php $form = ActiveForm::begin(); ?>
-
+     <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>    
+      <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
      <div class="form-group">
         <label class="control-label col-md-3">Kategori Kegiatan*</label>
         <div class="col-md-9">
@@ -164,7 +170,17 @@ $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama')
         )->label(false) ?>
         </div>
     </div>
-  
+    <div class="form-group">
+        <label class="control-label col-md-3">File Bukti</label>
+        <div class="col-md-9">
+          <?= $form->field($model, 'file_path')->widget(FileInput::classname(), [
+                'options' => ['accept' => ''],
+                'pluginOptions' => [
+                    'showUpload' => false,
+                ]
+            ])->label(false).'NB: File format is pdf and max size 1 MB<br><br>'  ?>
+        </div>
+    </div>
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

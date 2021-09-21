@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
+use app\helpers\MyHelper;
 $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 
 /* @var $this yii\web\View */
@@ -11,6 +12,16 @@ $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama')
 
 $this->title = 'Penghargaans';
 $this->params['breadcrumbs'][] = $this->title;
+
+
+$listKegiatan1 = MyHelper::convertKategoriKegiatan('1408');
+// print_r($listKegiatan1);exit;
+$listKegiatan2 = MyHelper::convertKategoriKegiatan('1410');
+
+$listKegiatan = array_merge($listKegiatan1, $listKegiatan2);
+
+$list_tingkat = ArrayHelper::map(\app\models\TingkatPenghargaan::find()->all(),'id','nama');
+$list_jenis = ArrayHelper::map(\app\models\JenisPenghargaan::find()->all(),'id','nama');
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -37,12 +48,24 @@ $this->params['breadcrumbs'][] = $this->title;
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
 
-            'jenis_penghargaan',
+            'bentuk',
+            'pemberi',
+            [
+                'attribute' => 'kategori_kegiatan_id',
+                'filter' => $listKegiatan,
+                'contentOptions' => ['width'=>'15%'],
+                'value' => function($data){
+                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
+                }
+            ],
             [
                 'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'tingkat_penghargaan',
+                'attribute' => 'id_tingkat_penghargaan',
                 'filter' => $list_tingkat,
                 'refreshGrid' => true,
+                'value' => function($data){
+                    return !empty($data->tingkatPenghargaan) ? $data->tingkatPenghargaan->nama : '-';
+                },
                 'editableOptions' => [
                     'data' => $list_tingkat,
                     'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
@@ -50,15 +73,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 
             ],
+            [
+                'attribute' => 'id_jenis_penghargaan',
+                'filter' => $list_jenis,
+                'contentOptions' => ['width'=>'15%'],
+                'value' => function($data){
+                    return !empty($data->jenisPenghargaan) ? $data->jenisPenghargaan->nama : '-';
+                }
+            ],
             'tahun',
-            'bentuk',
-            'pemberi',
-
-            'f_penghargaan',
-            //'ver',
-            //'sister_id',
-            //'updated_at',
-            'created_at',
+            'tanggal',
+            
+            
+            
     ['class' => 'yii\grid\ActionColumn']
 ];?>    
 <?= GridView::widget([

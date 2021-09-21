@@ -21,6 +21,8 @@ use app\models\BimbinganMahasiswaDosen;
 use app\models\BimbinganMahasiswaMahasiswa;
 use app\models\Buku;
 use app\models\Hki;
+use app\models\JenisPenghargaan;
+use app\models\TingkatPenghargaan;
 use app\models\Pembicara;
 use app\models\Penelitian;
 use app\models\Pengabdian;
@@ -619,10 +621,10 @@ class SiteController extends AppController
             return $this->redirect(Yii::$app->params['sso_login']);
         }
         $errors = '';
-        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+
         $sisterToken = \app\helpers\MyHelper::getSisterToken();
         if(!isset($sisterToken)){
-            $sisterToken = MyHelper::getSisterToken();
+            $sisterToken = \app\helperes\MyHelper::getSisterToken();
         }
 
         // print_r($sisterToken);exit;
@@ -636,11 +638,8 @@ class SiteController extends AppController
         $results = [];
         try     
         {
-            $full_url = $sister_baseurl.'/nilai_tes';
+            $full_url = $sister_baseurl.'/referensi/jenis_penghargaan';
             $response = $client->get($full_url, [
-                'query' => [
-                    'id_sdm' => $user->sister_id
-                ], 
                 'headers' => [
                     'Accept' => 'application/json',
                     'Authorization' => 'Bearer '.$sisterToken
@@ -650,7 +649,9 @@ class SiteController extends AppController
             
             $response = json_decode($response->getBody());
             
-            $results = $response;    
+            $results = $response;  
+
+            print_r($results);exit;  
         }
 
         catch(\Exception $e){

@@ -24,6 +24,8 @@ use Yii;
  * @property string|null $created_at
  *
  * @property User $nIY
+ * @property JenisPenghargaan $jenisPenghargaan
+ * @property TingkatPenghargaan $tingkatPenghargaan
  */
 class Penghargaan extends \yii\db\ActiveRecord
 {
@@ -41,7 +43,7 @@ class Penghargaan extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['NIY', 'tahun', 'bentuk', 'pemberi'], 'required'],
+            [['NIY', 'tahun', 'bentuk', 'pemberi','tanggal'], 'required'],
             [['tahun', 'id_tingkat_penghargaan', 'id_jenis_penghargaan'], 'integer'],
             [['ver'], 'string'],
             [['updated_at', 'created_at'], 'safe'],
@@ -51,7 +53,11 @@ class Penghargaan extends \yii\db\ActiveRecord
             [['f_penghargaan'], 'string', 'max' => 200],
             [['jenis_penghargaan'], 'string', 'max' => 255],
             [['kategori_kegiatan_id'], 'string', 'max' => 10],
+            [['f_penghargaan'], 'file', 'skipOnEmpty' => true, 'extensions' => 'pdf','maxSize' => 1024 * 1024],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
+            [['id_jenis_penghargaan'], 'exist', 'skipOnError' => true, 'targetClass' => JenisPenghargaan::className(), 'targetAttribute' => ['id_jenis_penghargaan' => 'id']],
+            [['id_tingkat_penghargaan'], 'exist', 'skipOnError' => true, 'targetClass' => TingkatPenghargaan::className(), 'targetAttribute' => ['id_tingkat_penghargaan' => 'id']],
+            [['kategori_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KategoriKegiatan::className(), 'targetAttribute' => ['kategori_kegiatan_id' => 'id']],
         ];
     }
 
@@ -62,18 +68,18 @@ class Penghargaan extends \yii\db\ActiveRecord
     {
         return [
             'ID' => 'ID',
-            'NIY' => 'Niy',
+            'NIY' => 'NIY',
             'tahun' => 'Tahun',
-            'bentuk' => 'Bentuk',
-            'pemberi' => 'Pemberi',
-            'f_penghargaan' => 'F Penghargaan',
+            'bentuk' => 'Nama Penghargaan',
+            'pemberi' => 'Instansi Pemberi',
+            'f_penghargaan' => 'Bukti Penghargaan',
             'ver' => 'Ver',
             'sister_id' => 'Sister ID',
             'tingkat_penghargaan' => 'Tingkat Penghargaan',
-            'id_tingkat_penghargaan' => 'Id Tingkat Penghargaan',
-            'id_jenis_penghargaan' => 'Id Jenis Penghargaan',
+            'id_tingkat_penghargaan' => 'Tingkat Penghargaan',
+            'id_jenis_penghargaan' => 'Jenis Penghargaan',
             'jenis_penghargaan' => 'Jenis Penghargaan',
-            'kategori_kegiatan_id' => 'Kategori Kegiatan ID',
+            'kategori_kegiatan_id' => 'Kategori Kegiatan',
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',
         ];
@@ -87,5 +93,30 @@ class Penghargaan extends \yii\db\ActiveRecord
     public function getNIY()
     {
         return $this->hasOne(User::className(), ['NIY' => 'NIY']);
+    }
+
+    /**
+     * Gets query for [[JenisPenghargaan]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJenisPenghargaan()
+    {
+        return $this->hasOne(JenisPenghargaan::className(), ['id' => 'id_jenis_penghargaan']);
+    }
+
+    /**
+     * Gets query for [[TingkatPenghargaan]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTingkatPenghargaan()
+    {
+        return $this->hasOne(TingkatPenghargaan::className(), ['id' => 'id_tingkat_penghargaan']);
+    }
+
+    public function getKategoriKegiatan()
+    {
+        return $this->hasOne(KategoriKegiatan::className(), ['id' => 'kategori_kegiatan_id']);
     }
 }

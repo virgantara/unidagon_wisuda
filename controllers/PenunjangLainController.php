@@ -10,6 +10,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\httpclient\Client;
+use yii\web\UploadedFile;
 
 /**
  * PenunjangLainController implements the CRUD actions for PenunjangLain model.
@@ -118,61 +119,77 @@ class PenunjangLainController extends AppController
     public function actionCreate()
     {
         $model = new PenunjangLain();
-        $model->NIY = Yii::$app->user->identity->NIY;
+        
         if(!parent::handleEmptyUser())
         {
             return $this->redirect(Yii::$app->params['sso_login']);
         }
-        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
-        $sisterToken = \app\helpers\MyHelper::getSisterToken();
-        $sister_baseurl = Yii::$app->params['sister_baseurl'];
-        $headers = ['content-type' => 'application/json'];
-        $client = new \GuzzleHttp\Client([
-            'timeout'  => 5.0,
-            'headers' => $headers,
        
-        ]);
-        $full_url = $sister_baseurl.'/PenunjangLain/jenis';
-        $response = $client->post($full_url, [
-            'body' => json_encode([
-                'id_token' => $sisterToken,
-                'id_dosen' => $user->sister_id,
-               
-            ]), 
-            'headers' => ['Content-type' => 'application/json']
+        $model->NIY = Yii::$app->user->identity->NIY;
 
-        ]); 
-        
-        $list_jenis = [];
-       
-        $response = json_decode($response->getBody());
-        if($response->error_code == 0){
-            $list_jenis = $response->data;
-            foreach($list_jenis as $q => $v)
+        $list_jenis = \app\models\JenisPanitia::find()->all();
+
+
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        $s3config = Yii::$app->params['s3'];
+
+        $s3 = new \Aws\S3\S3Client($s3config);
+        $errors = '';
+        try 
+        {
+            if ($model->load(Yii::$app->request->post())) 
             {
-                $m = \app\models\JenisPanitia::find()->where([
-                    'id' => $v->id_jenis_panitia
-                ])->one();
-
-                if(empty($m))
-                    $m = new \app\models\JenisPanitia;
-
-                $m->id = $v->id_jenis_panitia;
-                $m->nama = $v->nama_jenis_kegiatan_kepanitiaan;
-                if(!$m->save())
+                $komponen = \app\models\KomponenKegiatan::findOne($model->komponen_kegiatan_id);
+                if(empty($komponen))
                 {
-                    print_r($v);exit;
+                    $errors .= 'Komponen BKD wajib diisi';
+                    throw new \Exception;
                 }
+
+                $model->file_path = UploadedFile::getInstance($model,'file_path');
+                
+                if($model->file_path)
+                {
+                  $file_path = $model->file_path->tempName;
+                  $mime_type = $model->file_path->type;
+                  $file = 'PENUNJANG_LAIN_'.$model->NIY.'_'.$model->tanggal_mulai.'_'.date('YmdHis').'.'.$model->file_path->extension;
+                  $key = 'penunjang-lain/'.$file;
+                  $insert = $s3->putObject([
+                       'Bucket' => 'dosen',
+                       'Key'    => $key,
+                       'Body'   => 'This is the Body',
+                       'SourceFile' => $file_path,
+                       'ContentType' => $mime_type
+                  ]);
+                  
+                  $plainUrl = $s3->getObjectUrl('dosen', $key);
+                  $model->file_path = $plainUrl;
+
+                }
+
+                
+                $model->sks_bkd = $komponen->angka_kredit;
+               
+
+                if(!$model->save())
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                }
+
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', "Data tersimpan");
+                return $this->redirect(['penunjang-lain/view', 'id' => $model->id]);
             }
-        }
 
-
-        if ($model->load(Yii::$app->request->post())) {
-            $komponen = \app\models\KomponenKegiatan::findOne($model->komponen_kegaitan_id);
-            $model->sks_bkd = $komponen->angka_kredit;
-            $model->save();
-            Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['index']);
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            Yii::$app->session->setFlash('danger', $errors);
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            Yii::$app->session->setFlash('danger', $errors);
         }
 
         return $this->render('create', [
@@ -196,54 +213,71 @@ class PenunjangLainController extends AppController
         {
             return $this->redirect(Yii::$app->params['sso_login']);
         }
-        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
-        $sisterToken = \app\helpers\MyHelper::getSisterToken();
-        $sister_baseurl = Yii::$app->params['sister_baseurl'];
-        $headers = ['content-type' => 'application/json'];
-        $client = new \GuzzleHttp\Client([
-            'timeout'  => 5.0,
-            'headers' => $headers,
-       
-        ]);
-        $full_url = $sister_baseurl.'/PenunjangLain/jenis';
-        $response = $client->post($full_url, [
-            'body' => json_encode([
-                'id_token' => $sisterToken,
-                'id_dosen' => $user->sister_id,
-               
-            ]), 
-            'headers' => ['Content-type' => 'application/json']
+        $list_jenis = \app\models\JenisPanitia::find()->all();
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        $s3config = Yii::$app->params['s3'];
 
-        ]); 
-        
-        $list_jenis = [];
-       
-        $response = json_decode($response->getBody());
-        if($response->error_code == 0){
-            $list_jenis = $response->data;
-            foreach($list_jenis as $q => $v)
+        $file_path = $model->file_path;
+
+        $s3 = new \Aws\S3\S3Client($s3config);
+        $errors = '';
+        try 
+        {
+            if ($model->load(Yii::$app->request->post())) 
             {
-                $m = \app\models\JenisPanitia::find()->where([
-                    'id' => $q
-                ])->one();
+                $komponen = \app\models\KomponenKegiatan::findOne($model->komponen_kegiatan_id);
+                if(empty($komponen))
+                {
+                    $errors .= 'Komponen BKD wajib diisi';
+                    throw new \Exception;
+                }
 
-                if(empty($m))
-                    $m = new \app\models\JenisPanitia;
+                $model->file_path = UploadedFile::getInstance($model,'file_path');
+                
+                if($model->file_path)
+                {
+                  $file_path = $model->file_path->tempName;
+                  $mime_type = $model->file_path->type;
+                  $file = 'PENUNJANG_LAIN_'.$model->NIY.'_'.$model->tanggal_mulai.'_'.date('YmdHis').'.'.$model->file_path->extension;
+                  $key = 'penunjang-lain/'.$file;
+                  $insert = $s3->putObject([
+                       'Bucket' => 'dosen',
+                       'Key'    => $key,
+                       'Body'   => 'This is the Body',
+                       'SourceFile' => $file_path,
+                       'ContentType' => $mime_type
+                  ]);
+                  
+                  $plainUrl = $s3->getObjectUrl('dosen', $key);
+                  $model->file_path = $plainUrl;
 
-                $m->id = $q;
-                $m->nama = $v;
-                $m->save();
+                }
+                
+                $model->sks_bkd = $komponen->angka_kredit;
+                
+                if (empty($model->file_path)){
+                     $model->file_path = $file_path;
+                }
+
+                if(!$model->save())
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                }
+
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', "Data tersimpan");
+                return $this->redirect(['penunjang-lain/view', 'id' => $model->id]);
             }
-        }
 
-        
-        
-        if ($model->load(Yii::$app->request->post())) {
-            $komponen = $model->komponenKegiatan;
-            $model->sks_bkd = $komponen->angka_kredit;
-            $model->save();
-            Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['index']);
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            Yii::$app->session->setFlash('danger', $errors);
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            Yii::$app->session->setFlash('danger', $errors);
         }
 
         return $this->render('update', [

@@ -136,7 +136,7 @@ use yii\widgets\ActiveForm;
 <?php $form = ActiveForm::begin([
     'action' => ['bkd/ganti-periode'],
 ]); ?>
-    <?= Html::dropDownList('tahun','', $list_tahun, ['id' => 'ganti-periode','prompt'=>'- Pilih Periode -']) ?>
+    <?= Html::dropDownList('tahun',$tahun_id, $list_tahun, ['id' => 'ganti-periode','prompt'=>'- Pilih Periode -']) ?>
     <?= Html::submitButton('Update', ['class' => 'btn btn-primary']) ?>
  <?php ActiveForm::end(); ?>
  <?php 

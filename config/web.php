@@ -28,6 +28,12 @@ $config = [
     ],
     'timeZone' => 'Asia/Jakarta',
     'components' => [
+        'formatter' => [
+            'dateFormat' => 'php:d-m-Y',
+            'decimalSeparator' => ',',
+            'thousandSeparator' => ' ',
+            'currencyCode' => 'IDR',
+       ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
             // 'cache' => 'cache',

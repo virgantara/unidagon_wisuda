@@ -117,33 +117,69 @@ class MyHelper
     }
 
 	public static function convertKategoriKegiatan($prefix){
-		$listKategori = \yii\helpers\ArrayHelper::map(\app\models\KategoriKegiatan::find()->where(['like','id',$prefix.'%',false])->orderBy(['id'=>SORT_ASC])->all(),'id',function($data){
-		    return $data->id;
-		});
-		$results = [];
-		foreach($listKategori as $q=>$v)
-		{
-			$prefix = substr($prefix, 0,3);		  
-			
-		    $last3 = substr($v, -3,3);  
-		    if($last3 == '000') continue;
+		$listKategori = \app\models\KategoriKegiatan::find()->where(['like','id',$prefix.'%',false])->orderBy(['id'=>SORT_ASC])->one();
 
-		    if($last3 % 100 == 0)
+		// print_r($listKategori);exit;
+		$results = [];
+		$v = $listKategori;
+		// foreach($listKategori as $q=>$v)
+		// {
+			$strlen = strlen($prefix);
+			$prefix = substr($prefix, 0,$strlen);		  
+			
+			$pos = 6 - $strlen;
+		    $last3 = substr($v->id, -$pos,$pos);
+
+		    // if($pos == 3 && $last3 == '000')
+		    // 	continue;
+
+		    // else if($pos == 2 && $last3 == '00')
+		    // 	continue;
+
+		    if($pos == 3)
 		    {
-		        $induk = \app\models\KategoriKegiatan::findOne($prefix.$last3);
-		        if(empty($induk)) continue;
+		    	if($last3 % 100 == 0)
+			    {
+
+			        for($i=0;$i<=50;$i++)
+			        {
+			            $id = $prefix.($last3 + $i);
+
+			            $m = \app\models\KategoriKegiatan::findOne($id);
+			            if(!empty($m)){
+			                $results[$v->nama][$id] = $m->nama;
+			            }
+			            
+			        }
+			    }   
+		    }
+
+		    else if($pos == 2)
+		    {
+
+		    	// if($last3 % 100 == 0)
+			    // {
+		    	
+
 		        for($i=0;$i<=50;$i++)
 		        {
-		            $id = $prefix.($last3 + $i);
-
+		        	$suffix = MyHelper::appendZeros($i,2);
+		            $id = $prefix.$suffix;
+		            
 		            $m = \app\models\KategoriKegiatan::findOne($id);
 		            if(!empty($m)){
-		                $results[$induk->nama][$id] = $m->nama;
+		                $results[$v->nama][$id] = $m->nama;
 		            }
 		            
 		        }
-		    }   
-		}
+
+
+			    // }   
+		    }
+		    
+		// }
+
+		
 
 		$temps = [];
 
@@ -169,7 +205,7 @@ class MyHelper
 
 		    $temps[$q]=$tmp;
 		}
-
+		
 		return $temps;
 	}
 

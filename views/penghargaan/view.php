@@ -28,17 +28,45 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="panel-body ">
-        
+          <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
 <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'ID',
-            'NIY',
-            'tahun',
             'bentuk',
             'pemberi',
-            'f_penghargaan',
-            'ver',
+            [
+                'attribute' => 'kategori_kegiatan_id',
+                'value' => function($data){
+                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
+                }
+            ],
+            [
+                'attribute' => 'id_tingkat_penghargaan',
+                'value' => function($data){
+                    return !empty($data->tingkatPenghargaan) ? $data->tingkatPenghargaan->nama : '-';
+                }
+            ],
+            [
+                'attribute' => 'id_jenis_penghargaan',
+                'value' => function($data){
+                    return !empty($data->jenisPenghargaan) ? $data->jenisPenghargaan->nama : '-';
+                }
+            ],
+            'tahun',
+            'tanggal',
+            
+            [
+                'attribute' => 'f_penghargaan',
+                'format' => 'raw',
+                'value' => function($data){
+                    return !empty($data->f_penghargaan) ? Html::a('<i class="fa fa-external-link"></i> Bukti',$data->f_penghargaan,['target'=>'_blank']) : '-';
+                }
+            ],
+            
             'sister_id',
             'updated_at',
             'created_at',

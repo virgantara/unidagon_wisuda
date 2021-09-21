@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\PenunjangLain */
 
-$this->title = $model->id;
+$this->title = $model->nama_kegiatan;
 $this->params['breadcrumbs'][] = ['label' => 'Penunjang Lains', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -28,20 +28,50 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="panel-body ">
-        
+      <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
 <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
-            'kategori_kegiatan_id',
-            'komponen_kegiatan_id',
-            'jenis_panitia_id',
-            'tingkat_id',
+            [
+                'attribute' => 'kategori_kegiatan_id',
+                'value' => function($data){
+                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
+                }
+            ],
+            [
+                'attribute' => 'komponen_kegiatan_id',
+                'value' => function($data){
+                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama : '-';
+                }
+            ],
+            [
+                'attribute' => 'jenis_panitia_id',
+                'value' => function($data){
+                    return !empty($data->jenisPanitia) ? $data->jenisPanitia->nama : '-';
+                }
+            ],
+            [
+                'attribute' => 'tingkat_id',
+                'value' => function($data){
+                    return !empty($data->tingkat) ? $data->tingkat->nama : '-';
+                }
+            ],
             'nama_kegiatan',
             'instansi',
             'no_sk_tugas',
-            'tanggal_mulai',
-            'tanggal_selesai',
+            'tanggal_mulai:date',
+            'tanggal_selesai:date',
+            [
+                'attribute' => 'file_path',
+                'format' => 'raw',
+                'value' => function($data){
+                    return !empty($data->file_path) ? Html::a('<i class="fa fa-external-link"></i> Bukti',$data->file_path,['target'=>'_blank']) : '-';
+                }
+            ],
         ],
     ]) ?>
 

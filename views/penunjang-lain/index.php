@@ -1,5 +1,5 @@
 <?php
-
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 
@@ -9,6 +9,47 @@ use kartik\grid\GridView;
 
 $this->title = 'Penunjang Lains';
 $this->params['breadcrumbs'][] = $this->title;
+
+$listKegiatan1 = \app\helpers\MyHelper::convertKategoriKegiatan('1401');
+$listKegiatan2 = \app\helpers\MyHelper::convertKategoriKegiatan('1402');
+$listKegiatan3 = \app\helpers\MyHelper::convertKategoriKegiatan('1404');
+$listKegiatan4 = \app\helpers\MyHelper::convertKategoriKegiatan('1405');
+$listKegiatan5 = \app\helpers\MyHelper::convertKategoriKegiatan('1407');
+$listKegiatan6 = \app\helpers\MyHelper::convertKategoriKegiatan('1411');
+$listKegiatan = array_merge($listKegiatan1, $listKegiatan2, $listKegiatan3, $listKegiatan4, $listKegiatan5, $listKegiatan6);
+
+$list_jenis = \app\models\JenisPanitia::find()->all();
+$listJenisPanitia = ArrayHelper::map($list_jenis,'id','nama');
+$list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
+
+$query = \app\models\KomponenKegiatan::find();
+$query->alias('p');
+$query->select(['p.nama']);
+$query->joinWith(['unsur as u']);
+$query->where([
+  'u.kode' => 'PENUNJANG'
+]);
+$query->groupBy(['p.nama']);
+$query->orderBy(['p.nama'=>SORT_ASC]);
+
+$listKomponen = $query->all();
+// $listKomponen = ArrayHelper::map($listKomponen,'id',function($data){
+//     return $data->subunsur;
+// });
+$listKomponenKegiatan = [];
+
+foreach($listKomponen as $k)
+{
+    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
+   
+    $tmp = [];
+    foreach($list as $item)
+    {
+        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
+    }
+
+    $listKomponenKegiatan[$k->nama] = $tmp;
+}
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -36,6 +77,8 @@ $this->params['breadcrumbs'][] = $this->title;
     ],
             [
                 'attribute' => 'kategori_kegiatan_id',
+                'filter' => $listKegiatan,
+                'contentOptions' => ['width'=>'15%'],
                 'value' => function($data){
                     return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
                 }
@@ -44,6 +87,8 @@ $this->params['breadcrumbs'][] = $this->title;
            
             [
                 'attribute' => 'komponen_kegiatan_id',
+                'contentOptions' => ['width'=>'15%'],
+                'filter' => $listKomponenKegiatan,
                 'value' => function($data){
                     return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama : '-';
                 }
@@ -51,12 +96,16 @@ $this->params['breadcrumbs'][] = $this->title;
             
             [
                 'attribute' => 'jenis_panitia_id',
+                'contentOptions' => ['width'=>'15%'],
+                'filter' => $listJenisPanitia,
                 'value' => function($data){
                     return !empty($data->jenisPanitia) ? $data->jenisPanitia->nama : '-';
                 }
             ],
             [
                 'attribute' => 'tingkat_id',
+                'contentOptions' => ['width'=>'10%'],
+                'filter' => $list_tingkat,
                 'value' => function($data){
                     return !empty($data->tingkat) ? $data->tingkat->nama : '-';
                 }
@@ -64,8 +113,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'nama_kegiatan',
             'instansi',
             'no_sk_tugas',
-            'tanggal_mulai',
-            'tanggal_selesai',
+            'tanggal_mulai:date',
+            'tanggal_selesai:date',
     ['class' => 'yii\grid\ActionColumn']
 ];?>    
 <?= GridView::widget([

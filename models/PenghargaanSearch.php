@@ -19,7 +19,7 @@ class PenghargaanSearch extends Penghargaan
     {
         return [
             [['ID', 'tahun', 'id_tingkat_penghargaan', 'id_jenis_penghargaan'], 'integer'],
-            [['NIY', 'bentuk', 'pemberi', 'f_penghargaan', 'ver', 'sister_id', 'tingkat_penghargaan', 'jenis_penghargaan', 'kategori_kegiatan_id', 'updated_at', 'created_at'], 'safe'],
+            [['NIY', 'bentuk', 'pemberi', 'f_penghargaan', 'ver', 'sister_id', 'tingkat_penghargaan', 'jenis_penghargaan', 'kategori_kegiatan_id', 'updated_at', 'created_at','tanggal'], 'safe'],
         ];
     }
 
