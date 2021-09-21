@@ -336,8 +336,8 @@ class SiteController extends AppController
             $feeder_password = Yii::$app->params['feeder']['password'];
             
             $client = new \GuzzleHttp\Client([
-                'base_uri' => $feeder_baseurl
-                
+                'base_uri' => $feeder_baseurl,
+                'timeout' => 10.0       
             ]);
             $headers = ['Content-Type'=>'application/json'];
 
@@ -620,6 +620,8 @@ class SiteController extends AppController
         {
             return $this->redirect(Yii::$app->params['sso_login']);
         }
+
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
         $errors = '';
 
         $sisterToken = \app\helpers\MyHelper::getSisterToken();
@@ -638,8 +640,11 @@ class SiteController extends AppController
         $results = [];
         try     
         {
-            $full_url = $sister_baseurl.'/referensi/jenis_penghargaan';
+            $full_url = $sister_baseurl.'/nilai_tes';
             $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id
+                ], 
                 'headers' => [
                     'Accept' => 'application/json',
                     'Authorization' => 'Bearer '.$sisterToken
@@ -651,7 +656,6 @@ class SiteController extends AppController
             
             $results = $response;  
 
-            print_r($results);exit;  
         }
 
         catch(\Exception $e){
@@ -736,6 +740,7 @@ class SiteController extends AppController
 
     protected function importBimbinganMahasiswa()
     {
+        $errors ='';
         if(!parent::handleEmptyUser())
         {
             return $this->redirect(Yii::$app->params['sso_login']);
@@ -947,6 +952,7 @@ class SiteController extends AppController
             $sisterToken = MyHelper::getSisterToken();
         }
 
+        $errors ='';
         // print_r($sisterToken);exit;
         $sister_baseurl = Yii::$app->params['sister_baseurl'];
         $headers = ['content-type' => 'application/json'];
@@ -1094,6 +1100,8 @@ class SiteController extends AppController
 
     protected function importPenunjangLain()
     {
+
+        $errors ='';
         if(!parent::handleEmptyUser())
         {
             return $this->redirect(Yii::$app->params['sso_login']);
@@ -1146,7 +1154,7 @@ class SiteController extends AppController
 
         $results = $response;
         $counter = 0;
-        $errors ='';
+
             
         foreach($results as $item)
         {
@@ -1269,7 +1277,7 @@ class SiteController extends AppController
         if(!isset($sisterToken)){
             $sisterToken = MyHelper::getSisterToken();
         }
-
+        $errors ='';
         // print_r($sisterToken);exit;
         $sister_baseurl = Yii::$app->params['sister_baseurl'];
         $headers = ['content-type' => 'application/json'];
@@ -1315,7 +1323,7 @@ class SiteController extends AppController
        
         
         $counter = 0;
-        $errors ='';
+
         
         
         
@@ -1771,6 +1779,9 @@ class SiteController extends AppController
             $sisterToken = MyHelper::getSisterToken();
         }
 
+        $errors ='';
+
+
         // print_r($sisterToken);exit;
         $sister_baseurl = Yii::$app->params['sister_baseurl'];
         $headers = ['content-type' => 'application/json'];
@@ -2068,6 +2079,9 @@ class SiteController extends AppController
             $sisterToken = MyHelper::getSisterToken();
         }
 
+        $errors ='';
+
+
         // print_r($sisterToken);exit;
         $sister_baseurl = Yii::$app->params['sister_baseurl'];
         $headers = ['content-type' => 'application/json'];
@@ -2110,8 +2124,7 @@ class SiteController extends AppController
         
         
         $counter = 0;
-        $errors ='';
-
+        
         foreach($results as $item)
         {
            
@@ -2387,36 +2400,49 @@ class SiteController extends AppController
             'headers' => $headers,
             // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
         ]);
-        $full_url = $sister_baseurl.'/pengelola_jurnal';
+        
+
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
         $counter = 0;
         $errors ='';
         $results = [];
-        $response = $client->get($full_url, [
-            'query' => [
-                'id_sdm' => $user->sister_id
-            ], 
-            'headers' => [
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer '.$sisterToken
-            ]
-
-        ]); 
-        
-       
-       
-        $response = json_decode($response->getBody());
-     
-        $results = $response;
-        
         
         try     
         {
-            foreach($results as $item)
+            $full_url = $sister_baseurl.'/pengelola_jurnal';
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id
+                ], 
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+            
+            $response = json_decode($response->getBody());
+            
+            $results = $response;    
+        }
+        catch(\Exception $e){
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+
+            return $results;
+        }
+
+        foreach($results as $item)
+        {
+           
+            $full_url = $sister_baseurl.'/pengelola_jurnal/'.$item->id;
+    
+            try     
             {
-               
-                $full_url = $sister_baseurl.'/pengelola_jurnal/'.$item->id;
                 $resp = $client->get($full_url, [ 
                     'headers' => [
                         'Accept' => 'application/json',
@@ -2445,7 +2471,7 @@ class SiteController extends AppController
                 $model->tgl_sk_tugas = $detail->tanggal_mulai;
                 $model->tgl_sk_tugas_selesai = $detail->tanggal_selesai;
                 $model->id_media_publikasi = $detail->id_media_publikasi;
-                
+            
 
                 if($model->save())
                 {
@@ -2478,7 +2504,7 @@ class SiteController extends AppController
 
                     $counter++;
                     
-                    
+                    $transaction->commit();    
                 }
 
                 else
@@ -2487,25 +2513,24 @@ class SiteController extends AppController
                     throw new \Exception;
                 }
 
-                
+                    
             }
 
-            $transaction->commit();
-            $results = [
-                'code' => 200,
-                'message' => $counter.' data imported'
-                
-            ];
-        }
 
-        catch (\Exception $e) {
-            $transaction->rollBack();
-            $errors .= $e->getMessage();
-            $results = [
-                'code' => 500,
-                'message' => $errors
-            ];
-        } 
+            catch (\Exception $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                
+                MyHelper::createLogSync($user->NIY, 'Pengelola Jurnal '.$errors);
+                continue;
+            }
+        }
+                
+        $results = [
+            'code' => 200,
+            'message' => $counter.' data imported'
+            
+        ]; 
 
 
         return $results;
