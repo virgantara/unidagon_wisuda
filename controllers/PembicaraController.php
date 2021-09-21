@@ -32,7 +32,64 @@ class PembicaraController extends AppController
         ];
     }
 
-    
+    public function actionAjaxList()
+    {
+        // $dataPost = $_POST['dataPost'];
+        
+        $query = Pembicara::find();
+        $query->andWhere([
+          'NIY' => Yii::$app->user->identity->NIY,
+        ]);
+
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
+
+        $query->andWhere(['BETWEEN','tanggal_sk_penugasan',$sd,$ed]);  
+
+        $tmps = $query->all();
+
+        $results = [];
+
+        foreach($tmps as $tmp)
+        {
+
+            $bkd = \app\models\BkdDosen::find()->where([
+                'tahun_id' => $tahun_id,
+                'dosen_id' => Yii::$app->user->identity->ID,
+                'komponen_id' => $tmp->komponen_kegiatan_id,
+                'kondisi' => (string)$tmp->id
+            ])->one();
+
+            $results[] = [
+                'is_claimed' => !empty($bkd),
+                'id' => $tmp->id,
+                'peran_dalam_kegiatan' => !empty($tmp->kategoriPembicara) ? $tmp->kategoriPembicara->nama : null,
+                'nama_pertemuan_ilmiah' => $tmp->nama_pertemuan_ilmiah,
+                'penyelenggara_kegiatan' => $tmp->penyelenggara_kegiatan,
+                'tanggal' => date('d-m-Y',strtotime($tmp->tanggal_sk_penugasan)),
+                'sks_bkd' => !empty($tmp->komponenKegiatan) ? $tmp->komponenKegiatan->angka_kredit : null
+            ];
+        }
+        echo \yii\helpers\Json::encode($results);
+        die();
+    }
 
     /**
      * Lists all Pembicara models.

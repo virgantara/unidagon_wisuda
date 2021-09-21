@@ -89,6 +89,7 @@ class Pengabdian extends \yii\db\ActiveRecord
             [['skim_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => SkimKegiatan::className(), 'targetAttribute' => ['skim_kegiatan_id' => 'id']],
             [['tingkat'], 'exist', 'skipOnError' => true, 'targetClass' => Tingkat::className(), 'targetAttribute' => ['tingkat' => 'id']],
             [['jenis_kegiatan'], 'exist', 'skipOnError' => true, 'targetClass' => JenisKegiatan::className(), 'targetAttribute' => ['jenis_kegiatan' => 'id']],
+            [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
         ];
     }
 
@@ -235,5 +236,10 @@ class Pengabdian extends \yii\db\ActiveRecord
     public function getPengabdianMitras()
     {
         return $this->hasMany(PengabdianMitra::className(), ['pengabdian_id' => 'ID']);
+    }
+
+    public function getKomponenKegiatan()
+    {
+        return $this->hasOne(KomponenKegiatan::className(), ['id' => 'komponen_kegiatan_id']);
     }
 }

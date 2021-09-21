@@ -48,13 +48,15 @@ class Pembicara extends \yii\db\ActiveRecord
     {
         return [
             [['id_kategori_pembicara', 'id_kategori_capaian_luaran'], 'integer'],
-            [['tanggal_pelaksanaan', 'tanggal_sk_penugasan', 'updated_at', 'created_at'], 'safe'],
+            [['tanggal_pelaksanaan', 'tanggal_sk_penugasan', 'updated_at', 'created_at','komponen_kegiatan_id'], 'safe'],
             [['id_pembicara', 'nama_kategori_pencapaian', 'sister_id', 'no_sk_tugas', 'bahasa'], 'string', 'max' => 100],
             [['id_kategori_kegiatan', 'NIY'], 'string', 'max' => 15],
             [['nama_kategori_kegiatan', 'judul_makalah', 'nama_pertemuan_ilmiah', 'penyelenggara_kegiatan'], 'string', 'max' => 255],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
             [['id_kategori_kegiatan'], 'exist', 'skipOnError' => true, 'targetClass' => KategoriKegiatan::className(), 'targetAttribute' => ['id_kategori_kegiatan' => 'id']],
             [['id_kategori_capaian_luaran'], 'exist', 'skipOnError' => true, 'targetClass' => CapaianLuaran::className(), 'targetAttribute' => ['id_kategori_capaian_luaran' => 'id']],
+            [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
+            [['id_kategori_pembicara'], 'exist', 'skipOnError' => true, 'targetClass' => KategoriPembicara::className(), 'targetAttribute' => ['id_kategori_pembicara' => 'id']],
         ];
     }
 
@@ -69,6 +71,7 @@ class Pembicara extends \yii\db\ActiveRecord
             'id_kategori_pembicara' => 'Kategori Pembicara',
             'id_kategori_capaian_luaran' => 'Kategori Capaian Luaran',
             'id_kategori_kegiatan' => 'Kategori Kegiatan',
+            'komponen_kegiatan_id' => 'Komponen BKD',
             'nama_kategori_kegiatan' => 'Nama Kategori Kegiatan',
             'nama_kategori_pencapaian' => 'Nama Kategori Pencapaian',
             'judul_makalah' => 'Judul Makalah',
@@ -83,6 +86,16 @@ class Pembicara extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'NIY' => 'Niy',
         ];
+    }
+
+     /**
+     * Gets query for [[KategoriPembicara]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKategoriPembicara()
+    {
+        return $this->hasOne(KategoriPembicara::className(), ['id' => 'id_kategori_pembicara']);
     }
 
     /**
@@ -114,6 +127,17 @@ class Pembicara extends \yii\db\ActiveRecord
     {
         return $this->hasOne(CapaianLuaran::className(), ['id' => 'id_kategori_capaian_luaran']);
     }
+
+    /**
+     * Gets query for [[KomponenKegiatan]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKomponenKegiatan()
+    {
+        return $this->hasOne(KomponenKegiatan::className(), ['id' => 'komponen_kegiatan_id']);
+    }
+
 
     /**
      * Gets query for [[PembicaraFiles]].

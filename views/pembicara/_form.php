@@ -15,6 +15,33 @@ $list_kategori_pembicara = ArrayHelper::map(\app\models\KategoriPembicara::find(
 /* @var $this yii\web\View */
 /* @var $model app\models\Pembicara */
 /* @var $form yii\widgets\ActiveForm */
+
+
+$query = \app\models\KomponenKegiatan::find();
+$query->alias('p');
+$query->select(['p.nama']);
+$query->joinWith(['unsur as u']);
+$query->where([
+  'u.kode' => 'ABDIMAS'
+]);
+$query->groupBy(['p.nama']);
+$query->orderBy(['p.nama'=>SORT_ASC]);
+
+$listKomponen = $query->all();
+$listKomponenKegiatan = [];
+
+foreach($listKomponen as $k)
+{
+    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
+   
+    $tmp = [];
+    foreach($list as $item)
+    {
+        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
+    }
+
+    $listKomponenKegiatan[$k->nama] = $tmp;
+}
 ?>
 
 <div class="pembicara-form">
@@ -39,6 +66,15 @@ $list_kategori_pembicara = ArrayHelper::map(\app\models\KategoriPembicara::find(
                 'allowClear' => true,
             ],
         ])?>
+     <?= $form->field($model, 'komponen_kegiatan_id',['options' => ['tag' => false]])->widget(Select2::classname(), [
+            'data' => $listKomponenKegiatan,
+
+            'options'=>['placeholder'=>Yii::t('app','- Pilih Komponen Kegiatan -')],
+            'pluginOptions' => [
+                'allowClear' => true,
+            ],
+        ])?>
+       
     <?= $form->field($model, 'id_kategori_pembicara',['options' => ['tag' => false]])->widget(Select2::classname(), [
             'data' => $list_kategori_pembicara,
 
@@ -56,7 +92,18 @@ $list_kategori_pembicara = ArrayHelper::map(\app\models\KategoriPembicara::find(
 
     <?= $form->field($model, 'penyelenggara_kegiatan',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
 
-    <?= $form->field($model, 'tanggal_pelaksanaan',['options' => ['tag' => false]])->textInput() ?>
+    <?= $form->field($model, 'tanggal_pelaksanaan',['options' => ['tag' => false]])->widget(
+            DatePicker::className(),[
+                'name' => 'tanggal_pelaksanaan', 
+                'value' => date('Y-m-d', strtotime('0 days')),
+                'options' => ['placeholder' => 'Pilih tanggal  ...'],
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'yyyy-mm-dd',
+                    'todayHighlight' => true
+                ]
+            ]
+        );?>
      <?= $form->field($model, 'no_sk_tugas',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
      <?= $form->field($model, 'tanggal_sk_penugasan',['options' => ['tag' => false]])->widget(
             DatePicker::className(),[

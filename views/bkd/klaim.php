@@ -235,6 +235,44 @@ if(!doneTour) {
 
 }
 
+$(document).on("click",".btn-claim-pembicara",function(e){
+    e.preventDefault()
+
+    var obj = new Object
+    obj.id = $(this).data("item")
+    obj.is_claimed = "0";
+    obj.tahun_id = $(this).data("ta")
+    if($(this).is(":checked"))
+        obj.is_claimed = "1"
+
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['bkd/ajax-claim-pembicara']).'\',
+        async: true,
+        beforeSend : function(){
+
+        },
+        success: function(res){
+
+            var res = $.parseJSON(res);
+            if(res.code == 200)
+                $("#ganti-periode").trigger("change")
+            else{
+                Swal.fire({
+                  title: \'Oops!\',
+                  icon: \'error\',
+                  text: res.message
+                });
+            }
+        }
+
+    });
+
+})
+
 $(document).on("click",".btn-claim-pengelolaJurnal",function(e){
     e.preventDefault()
 
@@ -571,7 +609,9 @@ function getPengabdian(tahun){
             var total_sks = 0
             $.each(res, function(i,obj){
                 counter++;
+
                 let isClaimed = obj.is_claimed == 1 ? "checked" : "";
+                
                 row += "<tr>"
                 row += "<td>"+(counter)+"</td>"
                 row += "<td>"+obj.judul_penelitian_pengabdian+"</td>"
@@ -609,14 +649,54 @@ function getPengabdian(tahun){
 
                 let isClaimed = obj.is_claimed == 1 ? "checked" : "";
                 counter++;
+
+                var obj = obj.item
                 row += "<tr>"
                 row += "<td>"+(counter)+"</td>"
                 row += "<td>Menjadi "+obj.peran_dalam_kegiatan +" pada "+obj.nama_media_publikasi+"</td>"
                 row += "<td></td>"
-                row += "<td></td>"
+                row += "<td>"+obj.tgl_sk_tugas+" s/d "+obj.tgl_sk_tugas_selesai+"</td>"
                 row += "<td></td>"
                 row += "<td>"+obj.sks_bkd+"</td>"
                 row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#ganti-periode").val()+"\' data-sks=\'"+obj.sks_bkd+"\' data-item=\'"+obj.id+"\' class=\'btn-claim-pengelolaJurnal\'/></td>"
+                row += "</tr>"
+
+            })
+
+            $("#tabel-pengabdian > tbody").append(row)
+                
+        }
+
+    });
+
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['pembicara/ajax-list']).'\',
+        async: true,
+        beforeSend : function(){
+
+        },
+        success: function(res){
+            var res = $.parseJSON(res);
+            var row = ""
+            
+            var total_sks = 0
+            $.each(res, function(i,obj){
+
+                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
+                counter++;
+
+                row += "<tr>"
+                row += "<td>"+(counter)+"</td>"
+                row += "<td><b>"+obj.peran_dalam_kegiatan +"</b> dalam <b>"+obj.nama_pertemuan_ilmiah+"</b> oleh "+obj.penyelenggara_kegiatan+" tanggal "+obj.nama_pertemuan_ilmiah+"</td>"
+                row += "<td></td>"
+                row += "<td>"+obj.tanggal+"</td>"
+                row += "<td></td>"
+                row += "<td>"+obj.sks_bkd+"</td>"
+                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#ganti-periode").val()+"\' data-sks=\'"+obj.sks_bkd+"\' data-item=\'"+obj.id+"\' class=\'btn-claim-pembicara\'/></td>"
                 row += "</tr>"
 
             })

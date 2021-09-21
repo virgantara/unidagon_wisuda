@@ -9,7 +9,7 @@ $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama')
 /* @var $searchModel app\models\PengelolaJurnalSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Pengelola Jurnals';
+$this->title = 'Pengelola Jurnal';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -77,6 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             // 'apakah_masih_aktif',
             'tgl_sk_tugas',
+            'tgl_sk_tugas_selesai',
             [
                 'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'tingkat',

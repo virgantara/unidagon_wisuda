@@ -32,17 +32,32 @@ $this->params['breadcrumbs'][] = $this->title;
 <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
-            'id_pembicara',
-            'id_induk_katgiat',
-            'nama_kategori_kegiatan',
+            [
+                'attribute' => 'id_kategori_kegiatan',
+                'value' => function($data){
+                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : null;
+                }
+            ],
+            [
+                'attribute' => 'id_kategori_capaian_luaran',
+                'value' => function($data){
+                    return !empty($data->kategoriCapaianLuaran) ? $data->kategoriCapaianLuaran->nama : null;
+                }
+            ],
+            [
+                'attribute' => 'komponen_kegiatan_id',
+                'value' => function($data){
+                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama : null;
+                }
+            ],
             'judul_makalah',
             'nama_pertemuan_ilmiah',
             'penyelenggara_kegiatan',
-            'tanggal_pelaksanaan',
+            'tanggal_pelaksanaan:date',
+            'no_sk_tugas',
+            'tanggal_sk_penugasan:date',
             'updated_at',
             'created_at',
-            'NIY',
         ],
     ]) ?>
 

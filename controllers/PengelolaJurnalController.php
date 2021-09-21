@@ -33,13 +33,55 @@ class PengelolaJurnalController extends AppController
     public function actionAjaxList()
     {
         $dataPost = $_POST['dataPost'];
+        
         $query = PengelolaJurnal::find();
-        $query->where([
+        $query->andWhere([
           'NIY' => Yii::$app->user->identity->NIY,
         ]);
 
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
 
-        $results = $query->asArray()->all();
+        $query->andWhere('(tgl_sk_tugas BETWEEN "'.$sd.'" AND "'.$ed.'" OR 
+        tgl_sk_tugas_selesai BETWEEN "'.$sd.'" AND "'.$ed.'" OR 
+        "'.$sd.'" BETWEEN tgl_sk_tugas AND tgl_sk_tugas_selesai)');  
+
+        $tmps = $query->all();
+
+        $results = [];
+
+        foreach($tmps as $tmp)
+        {
+
+            $bkd = \app\models\BkdDosen::find()->where([
+                'tahun_id' => $tahun_id,
+                'dosen_id' => Yii::$app->user->identity->ID,
+                'komponen_id' => $tmp->komponen_kegiatan_id,
+                'kondisi' => (string)$tmp->id
+            ])->one();
+
+            $results[] = [
+                'is_claimed' => !empty($bkd),
+                'item' => $tmp
+            ];
+        }
         echo \yii\helpers\Json::encode($results);
         die();
     }

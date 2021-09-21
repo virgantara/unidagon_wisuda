@@ -1,5 +1,5 @@
 <?php
-
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 
@@ -9,6 +9,36 @@ use kartik\grid\GridView;
 
 $this->title = 'Pembicara';
 $this->params['breadcrumbs'][] = $this->title;
+
+$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('1303');
+$list_capaian_luaran = ArrayHelper::map(\app\models\CapaianLuaran::find()->all(),'id','nama');
+$list_kategori_pembicara = ArrayHelper::map(\app\models\KategoriPembicara::find()->all(),'id','nama');
+
+$query = \app\models\KomponenKegiatan::find();
+$query->alias('p');
+$query->select(['p.nama']);
+$query->joinWith(['unsur as u']);
+$query->where([
+  'u.kode' => 'ABDIMAS'
+]);
+$query->groupBy(['p.nama']);
+$query->orderBy(['p.nama'=>SORT_ASC]);
+
+$listKomponen = $query->all();
+$listKomponenKegiatan = [];
+
+foreach($listKomponen as $k)
+{
+    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
+   
+    $tmp = [];
+    foreach($list as $item)
+    {
+        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
+    }
+
+    $listKomponenKegiatan[$k->nama] = $tmp;
+}
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -45,15 +75,25 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'id_induk_katgiat',
             'judul_makalah',
             [
-                'attribute' => 'id_kategori_kegiatan',
+                'attribute' => 'id_kategori_pembicara',
+                'filter' => $list_kategori_pembicara,
+                'contentOptions' => ['width'=>'15%'],
                 'value' => function($data){
-                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';
+                    return !empty($data->kategoriPembicara) ? $data->kategoriPembicara->nama : null;
                 }
             ],
-            
+            [
+                'attribute' => 'komponen_kegiatan_id',
+                'filter' => $listKomponenKegiatan,
+                'contentOptions' => ['width'=>'15%'],
+                'value' => function($data){
+                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama : null;
+                }
+            ],
             'nama_pertemuan_ilmiah',
             'penyelenggara_kegiatan',
-            'tanggal_pelaksanaan',
+            'tanggal_pelaksanaan:date',
+            'tanggal_sk_penugasan:date',
             //'updated_at',
             //'created_at',
             //'NIY',

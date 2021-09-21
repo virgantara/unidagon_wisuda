@@ -19,7 +19,7 @@ class PembicaraSearch extends Pembicara
     {
         return [
             [['id', 'id_kategori_pembicara'], 'integer'],
-            [['id_pembicara', 'nama_kategori_kegiatan', 'judul_makalah', 'nama_pertemuan_ilmiah', 'penyelenggara_kegiatan', 'tanggal_pelaksanaan', 'sister_id', 'no_sk_tugas', 'updated_at', 'created_at', 'NIY','id_kategori_kegiatan'], 'safe'],
+            [['id_pembicara', 'nama_kategori_kegiatan', 'judul_makalah', 'nama_pertemuan_ilmiah', 'penyelenggara_kegiatan', 'tanggal_pelaksanaan', 'sister_id', 'no_sk_tugas', 'updated_at', 'created_at', 'NIY','id_kategori_kegiatan','id_kategori_capaian_luaran','komponen_kegiatan_id','tanggal_sk_penugasan'], 'safe'],
         ];
     }
 

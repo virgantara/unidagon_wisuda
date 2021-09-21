@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\Ewmp;
 use app\models\BkdPeriode;
 use app\models\BkdDosen;
 use app\models\TugasDosenBkd;
@@ -424,9 +425,7 @@ class BkdController extends AppController
       if(!empty($model))
       {
 
-        $komponen = KomponenKegiatan::find()->where([
-          'kondisi' => 'A'
-        ])->one();
+        $komponen = KomponenKegiatan::findOne($model->komponen_id);
         
         if(empty($komponen))
         {
@@ -441,6 +440,8 @@ class BkdController extends AppController
           $model->komponen_id = $komponen->id;
           $model->sks_bkd = $komponen->angka_kredit;
           $model->is_claimed = $dataPost['is_claimed'];
+
+        
           $bkd = BkdDosen::find()->where([
             'tahun_id' => $dataPost['tahun_id'],
             'dosen_id' => Yii::$app->user->identity->ID,
@@ -461,6 +462,7 @@ class BkdController extends AppController
             $bkd->deskripsi = 'Mengadakan perkuliahan '.$model->matkul.' kode mk '.$model->kode_mk.' kelas '.$model->kelas.' '.$model->sks.' sks';
             $bkd->kondisi = (string)$model->jadwal_id;
             $bkd->sks = $komponen->angka_kredit * $dataPost['sks'];
+            $bkd->sks_pak = $komponen->angka_kredit_pak * $dataPost['sks'];
 
             if(!$bkd->save())
             {
@@ -552,6 +554,7 @@ class BkdController extends AppController
             ])->one();
             $multiplier = !empty($publikasiAuthor) && $publikasiAuthor->urutan == 1 ? 0.6 : 0.4;
             $bkd->sks = $komponen->angka_kredit * $multiplier;
+            $bkd->sks_pak = $komponen->angka_kredit_pak * $multiplier;
 
             if(!$bkd->save())
             {
@@ -595,7 +598,7 @@ class BkdController extends AppController
     {
       $dataPost = $_POST['dataPost'];
       $model = Pengabdian::findOne($dataPost['id']);
-      $resutls = [];
+      $results = [];
       if(!empty($model))
       {
         $komponen = $model->komponenKegiatan;
@@ -637,7 +640,7 @@ class BkdController extends AppController
 
     public function actionAjaxClaimOrganisasi()
     {
-      $resutls = [];
+      $results = [];
       $dataPost = $_POST['dataPost'];
       $model = Organisasi::findOne($dataPost['id']);
       
@@ -677,6 +680,7 @@ class BkdController extends AppController
             $bkd->deskripsi = 'Menjadi '.$model->jabatan.' pada '.$model->organisasi;
             $bkd->kondisi = (string)$model->ID;
             $bkd->sks = $komponen->angka_kredit;
+            $bkd->sks_pak = $komponen->angka_kredit_pak;
 
             if(!$bkd->save())
             {
@@ -716,11 +720,90 @@ class BkdController extends AppController
       die();
     }
 
+    public function actionAjaxClaimPembicara()
+    {
+      $dataPost = $_POST['dataPost'];
+      $model = \app\models\Pembicara::findOne($dataPost['id']);
+      $results = [];
+      if(!empty($model))
+      {
+        $komponen = $model->komponenKegiatan;
+        
+        if(empty($komponen))
+        {
+          $results = [
+            'code' => 500,
+            'message' => 'Oops, KomponenKegiatan is empty'
+          ];
+        }
+
+        else
+        {
+          $is_claimed = $dataPost['is_claimed'];
+          $bkd = BkdDosen::find()->where([
+            'tahun_id' => $dataPost['tahun_id'],
+            'dosen_id' => Yii::$app->user->identity->ID,
+            'komponen_id' => $komponen->id,
+            'kondisi' => (string)$model->id
+          ])->one();
+
+          if($is_claimed == '1')
+          {
+            if(empty($bkd))
+            {
+              $bkd = new BkdDosen;
+            }
+
+            $bkd->tahun_id = $dataPost['tahun_id'];
+            $bkd->dosen_id = Yii::$app->user->identity->ID;
+            $bkd->komponen_id = $komponen->id;
+            $bkd->deskripsi = (!empty($tmp->kategoriPembicara) ? $tmp->kategoriPembicara->nama : null).' pada '.$model->nama_pertemuan_ilmiah.' oleh '.$model->penyelenggara_kegiatan;
+            $bkd->kondisi = (string)$model->id;
+            $bkd->sks = $komponen->angka_kredit;
+            $bkd->sks_pak = $komponen->angka_kredit_pak;
+
+            if($bkd->save())
+            {
+              $results = [
+                'code' => 200,
+                'message' => 'Data claimed'
+              ];
+
+            }
+
+            else{
+              $results = [
+                'code' => 500,
+                'message' => \app\helpers\MyHelper::logError($bkd)
+              ];
+            }
+          }
+
+          else if($is_claimed == '0')
+          {
+            if(!empty($bkd))
+              $bkd->delete();
+
+            $results = [
+              'code' => 200,
+              'message' => 'Data unclaimed'
+            ];
+          }
+
+          
+        }
+      }
+
+      echo json_encode($results);
+      die();
+    }
+
+
     public function actionAjaxClaimPengelolaJurnal()
     {
       $dataPost = $_POST['dataPost'];
       $model = PengelolaJurnal::findOne($dataPost['id']);
-      $resutls = [];
+      $results = [];
       if(!empty($model))
       {
         $komponen = $model->komponenKegiatan;
@@ -757,6 +840,7 @@ class BkdController extends AppController
             $bkd->deskripsi = 'Menjadi '.$model->peran_dalam_kegiatan.' di jurnal '.$model->nama_media_publikasi;
             $bkd->kondisi = (string)$model->id;
             $bkd->sks = $komponen->angka_kredit;
+            $bkd->sks_pak = $komponen->angka_kredit_pak;
 
             if(!$bkd->save())
             {
@@ -765,7 +849,6 @@ class BkdController extends AppController
                 'message' => \app\helpers\MyHelper::logError($bkd)
               ];
 
-              print_r($results);exit;
             }
           }
 
@@ -774,6 +857,7 @@ class BkdController extends AppController
             if(!empty($bkd))
               $bkd->delete();
           }
+
           if($model->save(false,['is_claimed','komponen_kegiatan_id','sks_bkd']))
           {
             $results = [
@@ -800,7 +884,7 @@ class BkdController extends AppController
     {
       $dataPost = $_POST['dataPost'];
       $model = \app\models\PenunjangLain::findOne($dataPost['id']);
-      $resutls = [];
+      $results = [];
       if(!empty($model))
       {
         $komponen = $model->komponenKegiatan;
@@ -837,6 +921,7 @@ class BkdController extends AppController
             $bkd->deskripsi = 'Menjadi '.$model->jenisPanitia->nama.' pada kegiatan '.$model->nama_kegiatan;
             $bkd->kondisi = (string)$model->id;
             $bkd->sks = $komponen->angka_kredit;
+            $bkd->sks_pak = $komponen->angka_kredit_pak;
 
             if(!$bkd->save())
             {
@@ -845,7 +930,6 @@ class BkdController extends AppController
                 'message' => \app\helpers\MyHelper::logError($bkd)
               ];
 
-              print_r($results);exit;
             }
           }
 
