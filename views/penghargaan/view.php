@@ -39,6 +39,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'bentuk',
             'pemberi',
             [
+                'attribute' => 'komponen_kegiatan_id',
+                'value' => function($data){
+                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama : null;
+                }
+            ],
+            [
                 'attribute' => 'kategori_kegiatan_id',
                 'value' => function($data){
                     return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama : '-';

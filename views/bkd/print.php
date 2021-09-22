@@ -229,8 +229,42 @@ else{
         <br>
         <br>
         <br>
-        <?=$user->dataDiri->nama;?><br>
+        <u><?=$user->dataDiri->nama;?></u><br>
         NIY: <?=$user->NIY;?>
+      </th>
+    </tr>
+    
+</table>
+<br><br>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">   
+    
+    <tr>
+      <th  style="text-align: center;" width="50%">
+        <br>
+        <br>
+        Asesor 1,
+        
+        <br>
+        <br>
+        <br>
+        <br>
+        
+        <u><?=$asesors['1']['nama'];?></u>
+        <br>
+        NIY: <?=$asesors['1']['niy'];?>
+      </th>
+      <th  style="text-align: center;" width="50%">
+        <br>
+        <br>
+        Asesor 2,
+        
+        <br>
+        <br>
+        <br>
+        <br>
+        <u><?=$asesors['2']['nama'];?></u>
+        <br>
+        NIY: <?=$asesors['2']['niy'];?>
       </th>
     </tr>
     

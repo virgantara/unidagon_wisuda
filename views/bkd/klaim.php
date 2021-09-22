@@ -425,6 +425,44 @@ $(document).on("click",".btn-claim-pengabdian",function(e){
 
 })
 
+$(document).on("click",".btn-claim-penghargaan",function(e){
+    e.preventDefault()
+
+    var obj = new Object
+    obj.id = $(this).data("item")
+    obj.is_claimed = "0";
+    if($(this).is(":checked"))
+        obj.is_claimed = "1"
+
+    obj.tahun_id = $(this).data("ta")
+
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['bkd/ajax-claim-penghargaan']).'\',
+        async: true,
+        beforeSend : function(){
+
+        },
+        success: function(res){
+            var res = $.parseJSON(res);
+            if(res.code == 200)
+                $("#ganti-periode").trigger("change")
+            else{
+                Swal.fire({
+                  title: \'Oops!\',
+                  icon: \'error\',
+                  text: res.message
+                });
+            }
+        }
+
+    });
+
+})
+
 $(document).on("click",".btn-claim-publikasi",function(e){
     e.preventDefault()
 
@@ -770,6 +808,41 @@ function getPenunjang(tahun){
                 row += "<td>Menjadi "+obj.peran+" pada kegiatan "+obj.nama_kegiatan+" dari tanggal "+obj.tanggal_mulai+" hingga tanggal "+obj.tanggal_selesai+"</td>"
                 row += "<td>"+obj.sks_bkd+"</td>"
                 row += "<td><input type=\'checkbox\' data-ta=\'"+$("#ganti-periode").val()+"\' "+isClaimed+" data-item=\'"+obj.id+"\' class=\'btn-claim-penunjang-lain\'/></td>"
+                row += "</tr>"
+
+            })
+
+            $("#tabel-penunjang > tbody").append(row)
+                
+        }
+
+    });
+
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['penghargaan/ajax-list']).'\',
+        async: true,
+        beforeSend : function(){
+
+        },
+        success: function(res){
+            var res = $.parseJSON(res);
+            var row = ""
+            var total_sks = 0
+            $.each(res, function(i,obj){
+                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
+                counter++;
+
+                var hsl = obj.item
+
+                row += "<tr>"
+                row += "<td>"+(counter)+"</td>"
+                row += "<td>Memperoleh "+hsl.bentuk+" tingkat "+obj.tingkat+" dari "+hsl.pemberi+" tanggal "+obj.tanggal+"</td>"
+                row += "<td>"+obj.sks_bkd+"</td>"
+                row += "<td><input type=\'checkbox\' data-ta=\'"+$("#ganti-periode").val()+"\' "+isClaimed+" data-item=\'"+hsl.ID+"\' class=\'btn-claim-penghargaan\'/></td>"
                 row += "</tr>"
 
             })

@@ -207,9 +207,57 @@ class BkdController extends AppController
 
     public function actionPrint()
     {
-        
+        if(Yii::$app->user->isGuest)
+        {
+          $session = Yii::$app->session;
+          $session->remove('token');
+          Yii::$app->user->logout();
+          $url = Yii::$app->params['sso_logout'];
+          return $this->redirect($url);
+        }
+
         $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
         
+        $asesor1 = '';
+        $asesor2 = '';
+        $niyAsesor1 = '';
+        $niyAsesor2 = '';
+
+        $asesors['1'] = [
+          'nama' => $asesor1,
+          'niy' => $niyAsesor1
+        ];
+
+        $asesors['2'] = [
+          'nama' => $asesor2,
+          'niy' => $niyAsesor2
+        ];
+
+        $loggedInAs = \app\models\MJabatan::find()->where(['nama'=>Yii::$app->user->identity->access_role])->one();
+
+        $jabatan = \app\models\Jabatan::find()->where([
+          'jabatan_id' => !empty($loggedInAs) ? $loggedInAs->id : '-',
+          'NIY' => Yii::$app->user->identity->NIY
+        ])->one();
+
+        if(!empty($jabatan))
+        {
+          $unker = $jabatan->unker;
+          $asesor1 = !empty($unker->parent) ? $unker->parent->pejabat->dataDiri->nama : '<span style="color:red">Pejabat belum diset</span>';
+          $niyAsesor1 = !empty($unker->parent) ? $unker->parent->pejabat->NIY : '-';
+          $asesors['1'] = [
+            'nama' => $asesor1,
+            'niy' => $niyAsesor1
+          ];
+
+          $asesor2 = !empty($unker) ? $unker->pejabat->dataDiri->nama : '<span style="color:red">Pejabat belum diset</span>';
+          $niyAsesor2 = !empty($unker) ? $unker->pejabat->NIY : '-';
+          $asesors['2'] = [
+            'nama' => $asesor2,
+            'niy' => $niyAsesor2
+          ];
+        }
+
         $session = Yii::$app->session;
         $tahun_id = '';
         $sd = '';
@@ -387,6 +435,7 @@ class BkdController extends AppController
                 'bkd_pub' => $bkd_pub,
                 'bkd_abdi' => $bkd_abdi,
                 'bkd_penunjang' => $bkd_penunjang,
+                'asesors' => $asesors
             ]);
 
             $data = ob_get_clean();
@@ -415,6 +464,84 @@ class BkdController extends AppController
         return $this->render('klaim',[
           'list_bkd_periode' => $list_bkd_periode
         ]);
+    }
+
+    public function actionAjaxClaimPenghargaan()
+    {
+      $dataPost = $_POST['dataPost'];
+      $model = \app\models\Penghargaan::findOne($dataPost['id']);
+      $results = [];
+      if(!empty($model))
+      {
+        $komponen = $model->komponenKegiatan;
+        
+        if(empty($komponen))
+        {
+          $results = [
+            'code' => 500,
+            'message' => 'Oops, KomponenKegiatan is empty'
+          ];
+        }
+
+        else
+        {
+          $is_claimed = $dataPost['is_claimed'];
+          $bkd = BkdDosen::find()->where([
+            'tahun_id' => $dataPost['tahun_id'],
+            'dosen_id' => Yii::$app->user->identity->ID,
+            'komponen_id' => $komponen->id,
+            'kondisi' => (string)$model->ID
+          ])->one();
+
+          if($is_claimed == '1')
+          {
+            if(empty($bkd))
+            {
+              $bkd = new BkdDosen;
+            }
+
+            $bkd->tahun_id = $dataPost['tahun_id'];
+            $bkd->dosen_id = Yii::$app->user->identity->ID;
+            $bkd->komponen_id = $komponen->id;
+            $bkd->deskripsi = 'Memperoleh penghargaan '.$model->bentuk.' '.(!empty($model->tingkatPenghargaan) ? $model->tingkatPenghargaan->nama : '-');
+            $bkd->kondisi = (string)$model->ID;
+            $bkd->sks = $komponen->angka_kredit;
+            $bkd->sks_pak = $komponen->angka_kredit_pak;
+
+            if($bkd->save())
+            {
+              $results = [
+                'code' => 200,
+                'message' => 'Data claimed'
+              ];
+
+            }
+
+            else{
+              $results = [
+                'code' => 500,
+                'message' => \app\helpers\MyHelper::logError($bkd)
+              ];
+            }
+          }
+
+          else if($is_claimed == '0')
+          {
+            if(!empty($bkd))
+              $bkd->delete();
+
+            $results = [
+              'code' => 200,
+              'message' => 'Data unclaimed'
+            ];
+          }
+
+          
+        }
+      }
+
+      echo json_encode($results);
+      die();
     }
 
     public function actionAjaxClaim()

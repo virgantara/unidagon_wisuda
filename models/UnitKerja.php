@@ -35,6 +35,8 @@ class UnitKerja extends \yii\db\ActiveRecord
             [['pejabat_id'], 'integer'],
             [['nama'], 'string', 'max' => 100],
             [['pejabat_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['pejabat_id' => 'ID']],
+            [['jabatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => MJabatan::className(), 'targetAttribute' => ['jabatan_id' => 'id']],
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => UnitKerja::className(), 'targetAttribute' => ['parent_id' => 'id']],
         ];
     }
 
@@ -45,7 +47,13 @@ class UnitKerja extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'jenis' => 'Jenis',
             'nama' => 'Nama',
+            'singkatan' => 'Singkatan',
+            'surat' => 'Surat',
+            'kode_prodi' => 'Kode Prodi',
+            'parent_id' => 'Parent ID',
+            'jabatan_id' => 'Jabatan ID',
             'pejabat_id' => 'Pejabat ID',
         ];
     }
@@ -86,5 +94,25 @@ class UnitKerja extends \yii\db\ActiveRecord
     public function getPejabat()
     {
         return $this->hasOne(User::className(), ['ID' => 'pejabat_id']);
+    }
+
+    /**
+     * Gets query for [[Parent]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParent()
+    {
+        return $this->hasOne(UnitKerja::className(), ['id' => 'parent_id']);
+    }
+
+    /**
+     * Gets query for [[UnitKerjas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUnitKerjas()
+    {
+        return $this->hasMany(UnitKerja::className(), ['parent_id' => 'id']);
     }
 }

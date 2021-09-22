@@ -19,6 +19,32 @@ $listKegiatan = array_merge($listKegiatan1, $listKegiatan2);
 
 $list_tingkat = ArrayHelper::map(\app\models\TingkatPenghargaan::find()->all(),'id','nama');
 $list_jenis = ArrayHelper::map(\app\models\JenisPenghargaan::find()->all(),'id','nama');
+
+$query = \app\models\KomponenKegiatan::find();
+$query->alias('p');
+$query->select(['p.nama']);
+$query->joinWith(['unsur as u']);
+$query->where([
+  'u.kode' => 'PENUNJANG'
+]);
+$query->groupBy(['p.nama']);
+$query->orderBy(['p.nama'=>SORT_ASC]);
+
+$listKomponen = $query->all();
+$listKomponenKegiatan = [];
+
+foreach($listKomponen as $k)
+{
+    $list = \app\models\KomponenKegiatan::find()->where(['nama'=>$k->nama])->all();
+   
+    $tmp = [];
+    foreach($list as $item)
+    {
+        $tmp[$item->id] = $item->subunsur.' - AK: '.$item->angka_kredit;
+    }
+
+    $listKomponenKegiatan[$k->nama] = $tmp;
+}
 ?>
 
 <div class="penghargaan-form">
@@ -30,6 +56,14 @@ $list_jenis = ArrayHelper::map(\app\models\JenisPenghargaan::find()->all(),'id',
       echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
     }
     ?>
+    <?= $form->field($model, 'komponen_kegiatan_id',['options' => ['tag' => false]])->widget(Select2::classname(), [
+            'data' => $listKomponenKegiatan,
+
+            'options'=>['placeholder'=>Yii::t('app','- Pilih Komponen Kegiatan -')],
+            'pluginOptions' => [
+                'allowClear' => true,
+            ],
+        ])?>
      <?= $form->field($model, 'kategori_kegiatan_id',['options' => ['tag' => false]])->widget(Select2::classname(), [
             'data' => $listKegiatan,
 

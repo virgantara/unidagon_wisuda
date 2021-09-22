@@ -58,6 +58,7 @@ class Penghargaan extends \yii\db\ActiveRecord
             [['id_jenis_penghargaan'], 'exist', 'skipOnError' => true, 'targetClass' => JenisPenghargaan::className(), 'targetAttribute' => ['id_jenis_penghargaan' => 'id']],
             [['id_tingkat_penghargaan'], 'exist', 'skipOnError' => true, 'targetClass' => TingkatPenghargaan::className(), 'targetAttribute' => ['id_tingkat_penghargaan' => 'id']],
             [['kategori_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KategoriKegiatan::className(), 'targetAttribute' => ['kategori_kegiatan_id' => 'id']],
+             [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
         ];
     }
 
@@ -80,6 +81,7 @@ class Penghargaan extends \yii\db\ActiveRecord
             'id_jenis_penghargaan' => 'Jenis Penghargaan',
             'jenis_penghargaan' => 'Jenis Penghargaan',
             'kategori_kegiatan_id' => 'Kategori Kegiatan',
+            'komponen_kegiatan_id' => 'Komponen BKD',
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',
         ];
@@ -118,5 +120,15 @@ class Penghargaan extends \yii\db\ActiveRecord
     public function getKategoriKegiatan()
     {
         return $this->hasOne(KategoriKegiatan::className(), ['id' => 'kategori_kegiatan_id']);
+    }
+
+    /**
+     * Gets query for [[KomponenKegiatan]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKomponenKegiatan()
+    {
+        return $this->hasOne(KomponenKegiatan::className(), ['id' => 'komponen_kegiatan_id']);
     }
 }
