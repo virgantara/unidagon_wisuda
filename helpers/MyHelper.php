@@ -8,6 +8,25 @@ use Yii;
  */
 class MyHelper
 {	
+
+	public static function statusSkp()
+	{
+		return [
+			'1' => [
+				'label' => 'warning',
+				'nama' => 'Diajukan'
+			],
+			'2' => [
+				'label' => 'success',
+				'nama' => 'Disetujui'
+			], 
+			'3' => [
+				'label' => 'danger',
+				'nama' => 'Ditolak'
+			]
+		];
+	}
+
 	public static function listJenisSumberDana(){
 		return ['mandiri'=>'Mandiri/PT','dalam' => 'Institusi Dalam Negeri','luar' => 'Institusi Luar Negeri'];
 	} 

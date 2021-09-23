@@ -161,6 +161,19 @@ class MenuHelper
 	      //   ];
 
 	        $menuItems[] = [
+	    		'label' => '<i class="lnr lnr-list"></i><span>SKP</span><i class="icon-submenu lnr lnr-chevron-left"></i>', 
+		        'url' => '#',
+		        'submenuTemplate' => "\n<div id='pages_skp' class='collapse'><ul class='nav'>\n{items}\n</ul></div>\n",
+		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_skp">{label}</a>',
+		        'items'=>[
+		        	['label' => 'Form SKP', 'url' => ['/skp/create']],
+		           	['label' => 'Pengukuran', 'url' => ['/skp/index']],
+		           	['label' => 'Perilaku Kerja', 'url' => ['/skp/index']],
+		           	['label' => 'Penilaian', 'url' => ['/skp/index']],
+		        ]
+	        ];
+
+	        $menuItems[] = [
 	    		'label' => '<i class="lnr lnr-list"></i><span>Layanan BKD</span><i class="icon-submenu lnr lnr-chevron-left"></i>', 
 		        'url' => '#',
 		        'submenuTemplate' => "\n<div id='pages_bkd' class='collapse'><ul class='nav'>\n{items}\n</ul></div>\n",

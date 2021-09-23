@@ -10,9 +10,13 @@ use Yii;
  * @property int $id
  * @property string $nama
  * @property string|null $access_role
+ * @property int|null $parent_id
  *
  * @property Jabatan[] $jabatans
  * @property AuthItem $accessRole
+ * @property MJabatan $parent
+ * @property MJabatan[] $mJabatans
+ * @property UnitKerja[] $unitKerjas
  */
 class MJabatan extends \yii\db\ActiveRecord
 {
@@ -31,9 +35,11 @@ class MJabatan extends \yii\db\ActiveRecord
     {
         return [
             [['nama'], 'required'],
+            [['parent_id'], 'integer'],
             [['nama'], 'string', 'max' => 255],
             [['access_role'], 'string', 'max' => 64],
-            [['access_role'], 'exist', 'skipOnError' => true, 'targetClass' => \app\rbac\models\AuthItem::className(), 'targetAttribute' => ['access_role' => 'name']],
+            [['access_role'], 'exist', 'skipOnError' => true, 'targetClass' => AuthItem::className(), 'targetAttribute' => ['access_role' => 'name']],
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => MJabatan::className(), 'targetAttribute' => ['parent_id' => 'id']],
         ];
     }
 
@@ -46,6 +52,7 @@ class MJabatan extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nama' => 'Nama',
             'access_role' => 'Access Role',
+            'parent_id' => 'Parent ID',
         ];
     }
 
@@ -67,5 +74,35 @@ class MJabatan extends \yii\db\ActiveRecord
     public function getAccessRole()
     {
         return $this->hasOne(AuthItem::className(), ['name' => 'access_role']);
+    }
+
+    /**
+     * Gets query for [[Parent]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParent()
+    {
+        return $this->hasOne(MJabatan::className(), ['id' => 'parent_id']);
+    }
+
+    /**
+     * Gets query for [[MJabatans]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMJabatans()
+    {
+        return $this->hasMany(MJabatan::className(), ['parent_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[UnitKerjas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUnitKerjas()
+    {
+        return $this->hasMany(UnitKerja::className(), ['jabatan_id' => 'id']);
     }
 }
