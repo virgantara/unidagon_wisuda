@@ -42,6 +42,8 @@ class SkpSearch extends Skp
     public function search($params)
     {
         $query = Skp::find();
+        $query->alias('t');
+        $query->where(['pegawai_dinilai'=>Yii::$app->user->identity->NIY]);
 
         // add conditions that should always apply here
 

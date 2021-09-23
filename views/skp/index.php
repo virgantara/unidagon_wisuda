@@ -1,5 +1,5 @@
 <?php
-
+use app\helpers\MyHelper;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 
@@ -9,6 +9,9 @@ use kartik\grid\GridView;
 
 $this->title = 'Skps';
 $this->params['breadcrumbs'][] = $this->title;
+
+$list_status_skp = MyHelper::statusSkp();
+
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -34,11 +37,27 @@ $this->params['breadcrumbs'][] = $this->title;
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
-            'id',
-            'pejabat_penilai',
-            'pegawai_dinilai',
+            [
+                'attribute' => 'pejabat_penilai',
+                'value' => function($data){
+                    return !empty($data->pejabatPenilai) ? $data->pejabatPenilai->dataDiri->gelar_depan.' '.$data->pejabatPenilai->dataDiri->nama.' '.$data->pejabatPenilai->dataDiri->gelar_belakang : null;
+                }
+            ],
+            [
+                'attribute' => 'pegawai_dinilai',
+                'value' => function($data){
+                    return !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                }
+            ],
             'periode_id',
-            'status_skp',
+            [
+                'attribute' => 'status_skp',
+                'format' => 'raw',
+                'filter' => ['1'=>'Diajukan','2'=>'Disetujui','3'=>'Ditolak'],
+                'value' => function($data) use ($list_status_skp){
+                    return '<span class="label label-'.$list_status_skp[$data->status_skp]['label'].'">'.$list_status_skp[$data->status_skp]['nama'].'</span>';
+                }
+            ],
             //'updated_at',
             //'created_at',
     ['class' => 'yii\grid\ActionColumn']
