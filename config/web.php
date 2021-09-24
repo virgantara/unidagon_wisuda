@@ -31,8 +31,8 @@ $config = [
         'formatter' => [
             'dateFormat' => 'php:d-m-Y',
             'decimalSeparator' => ',',
-            'thousandSeparator' => ' ',
-            'currencyCode' => 'IDR',
+            'thousandSeparator' => '.',
+            'currencyCode' => 'Rp',
        ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',

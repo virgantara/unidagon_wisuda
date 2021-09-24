@@ -14,15 +14,15 @@ class MyHelper
 		return [
 			'1' => [
 				'label' => 'warning',
-				'nama' => 'Diajukan'
+				'nama' => 'Menunggu persetujuan atasan'
 			],
 			'2' => [
 				'label' => 'success',
-				'nama' => 'Disetujui'
+				'nama' => 'Disetujui atasan'
 			], 
 			'3' => [
 				'label' => 'danger',
-				'nama' => 'Ditolak'
+				'nama' => 'Dikembalikan'
 			]
 		];
 	}

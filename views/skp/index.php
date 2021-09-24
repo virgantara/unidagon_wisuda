@@ -1,6 +1,7 @@
 <?php
 use app\helpers\MyHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use kartik\grid\GridView;
 
 /* @var $this yii\web\View */
@@ -24,7 +25,7 @@ $list_status_skp = MyHelper::statusSkp();
 <div class="panel-body ">
 
     <p>
-        <?= Html::a('Create Skp', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<i class="fa fa-plus"></i> SKP', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?php
     $gridColumns = [
@@ -37,10 +38,16 @@ $list_status_skp = MyHelper::statusSkp();
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
+            // [
+            //     'attribute' => 'pejabat_penilai',
+            //     'value' => function($data){
+            //         return !empty($data->pejabatPenilai) ? $data->pejabatPenilai->dataDiri->gelar_depan.' '.$data->pejabatPenilai->dataDiri->nama.' '.$data->pejabatPenilai->dataDiri->gelar_belakang : null;
+            //     }
+            // ],
             [
-                'attribute' => 'pejabat_penilai',
+                'header' => 'NIY',
                 'value' => function($data){
-                    return !empty($data->pejabatPenilai) ? $data->pejabatPenilai->dataDiri->gelar_depan.' '.$data->pejabatPenilai->dataDiri->nama.' '.$data->pejabatPenilai->dataDiri->gelar_belakang : null;
+                    return !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->NIY : null;
                 }
             ],
             [
@@ -53,14 +60,23 @@ $list_status_skp = MyHelper::statusSkp();
             [
                 'attribute' => 'status_skp',
                 'format' => 'raw',
-                'filter' => ['1'=>'Diajukan','2'=>'Disetujui','3'=>'Ditolak'],
+                'filter' => ['1'=>'Diajukan','2'=>'Disetujui','3'=>'Dikembalikan'],
                 'value' => function($data) use ($list_status_skp){
                     return '<span class="label label-'.$list_status_skp[$data->status_skp]['label'].'">'.$list_status_skp[$data->status_skp]['nama'].'</span>';
                 }
             ],
             //'updated_at',
             //'created_at',
-    ['class' => 'yii\grid\ActionColumn']
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update}',
+                'urlCreator' => function ($action, $model, $key, $index) {
+                    if($action == 'update')
+                    {
+                        return Url::to(['skp/pengukuran','id'=>$model->id]); 
+                    }
+                }
+            ]
 ];?>    
 <?= GridView::widget([
         'dataProvider' => $dataProvider,

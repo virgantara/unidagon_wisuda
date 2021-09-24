@@ -10,6 +10,7 @@ use Yii;
  * @property string $id
  * @property string|null $skp_id
  * @property int|null $komponen_kegiatan_id
+ * @property string|null $nama
  * @property float|null $target_ak
  * @property float|null $target_qty
  * @property string|null $target_satuan
@@ -46,10 +47,11 @@ class SkpItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'], 'required'],
+            [['id','nama','komponen_kegiatan_id'], 'required'],
             [['komponen_kegiatan_id'], 'integer'],
             [['target_ak', 'target_qty', 'target_mutu', 'target_waktu', 'target_biaya', 'realisasi_ak', 'realisasi_qty', 'realisasi_waktu', 'realisasi_biaya', 'capaian', 'capaian_skp'], 'number'],
             [['id', 'skp_id', 'target_satuan', 'target_waktu_satuan', 'realisasi_satuan', 'realisasi_mutu', 'realisasi_waktu_satuan'], 'string', 'max' => 50],
+            [['nama'], 'string', 'max' => 255],
             [['id'], 'unique'],
             [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
             [['skp_id'], 'exist', 'skipOnError' => true, 'targetClass' => Skp::className(), 'targetAttribute' => ['skp_id' => 'id']],
@@ -63,16 +65,17 @@ class SkpItem extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'skp_id' => 'Skp ID',
-            'komponen_kegiatan_id' => 'Kegiatan',
-            'target_ak' => 'Angka Kredit',
-            'target_qty' => 'Kuant/Output',
-            'target_satuan' => 'Satuan',
-            'target_mutu' => 'Kual/Mutu',
-            'target_waktu' => 'Waktu',
-            'target_waktu_satuan' => 'Waktu Satuan',
-            'target_biaya' => 'Biaya',
-            'realisasi_ak' => 'Realisasi Ak',
+            'skp_id' => 'SKP',
+            'komponen_kegiatan_id' => 'Komponen Kegiatan',
+            'nama' => 'Nama Kegiatan',
+            'target_ak' => 'Target AK',
+            'target_qty' => 'Target Qty',
+            'target_satuan' => 'Target Satuan',
+            'target_mutu' => 'Target Mutu',
+            'target_waktu' => 'Target Waktu',
+            'target_waktu_satuan' => 'Target Waktu Satuan',
+            'target_biaya' => 'Target Biaya',
+            'realisasi_ak' => 'Realisasi AK',
             'realisasi_qty' => 'Realisasi Qty',
             'realisasi_satuan' => 'Realisasi Satuan',
             'realisasi_mutu' => 'Realisasi Mutu',
@@ -102,5 +105,34 @@ class SkpItem extends \yii\db\ActiveRecord
     public function getSkp()
     {
         return $this->hasOne(Skp::className(), ['id' => 'skp_id']);
+    }
+
+    public function hitungSkp()
+    {
+        $aspek_kuantitas = $this->realisasi_qty / $this->target_qty * 100;
+        $aspek_kualitas = $this->realisasi_mutu / $this->target_mutu * 100;
+        
+        $ew = 100 - ($this->realisasi_waktu / $this->target_waktu * 100);
+
+        $aspek_waktu = 0;
+        $aspek_biaya = 0;
+
+        $nilai_tertimbang = 1.76;
+        // print_r($ew);exit;
+        // if($ew >= 24)
+        // {
+        $aspek_waktu = ($nilai_tertimbang * $this->target_waktu - $this->realisasi_waktu) / $this->target_waktu * 100;
+        // } 
+
+        
+        $aspek_biaya = ($nilai_tertimbang * $this->target_biaya - $this->realisasi_biaya) / $this->target_biaya * 100;
+        
+
+        $penghitungan = $aspek_kuantitas + $aspek_kualitas + $aspek_waktu + $aspek_biaya;
+
+        $this->capaian = $penghitungan;
+        $this->capaian_skp = $penghitungan / 4;
+        $this->save();
+
     }
 }

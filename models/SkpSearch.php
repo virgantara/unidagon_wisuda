@@ -73,4 +73,39 @@ class SkpSearch extends Skp
 
         return $dataProvider;
     }
+
+    public function searchApproval($params)
+    {
+        $query = Skp::find();
+        $query->alias('t');
+        $query->where(['pejabat_penilai'=>Yii::$app->user->identity->NIY]);
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'periode_id' => $this->periode_id,
+            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at,
+        ]);
+
+        $query->andFilterWhere(['like', 'id', $this->id])
+            ->andFilterWhere(['like', 'pejabat_penilai', $this->pejabat_penilai])
+            ->andFilterWhere(['like', 'pegawai_dinilai', $this->pegawai_dinilai])
+            ->andFilterWhere(['like', 'status_skp', $this->status_skp]);
+
+        return $dataProvider;
+    }
 }

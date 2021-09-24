@@ -66,7 +66,7 @@ class Skp extends \yii\db\ActiveRecord
             'pegawai_dinilai' => 'Pegawai Dinilai',
             'jabatan_penilai_id' => 'Jabatan Penilai',
             'jabatan_pegawai_id' => 'Jabatan Pegawai',
-            'periode_id' => 'Periode ID',
+            'periode_id' => 'Periode',
             'status_skp' => 'Status SKP',
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',

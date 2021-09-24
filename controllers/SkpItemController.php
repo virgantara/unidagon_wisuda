@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\helpers\MyHelper;
 use app\models\SkpItem;
+use app\models\KomponenKegiatan;
 use app\models\SkpItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -58,6 +59,22 @@ class SkpItemController extends Controller
                 }
                 
                 $model->attributes = $dataPost;
+                
+                $komponen = KomponenKegiatan::findOne($model->komponen_kegiatan_id);
+                if(!empty($komponen) && in_array($komponen->kode,['B1','B2']))
+                {
+                    $total_sks = $model->target_qty;
+                    $ak = $total_sks * $komponen->angka_kredit_pak;
+                    if($total_sks > 10){
+                        $ak = 10 * $komponen->angka_kredit_pak;
+                        $sisa = $total_sks - 10;
+
+                        $ak = $ak + ($sisa * ($komponen->angka_kredit_pak / 2));
+                    }
+
+                    $model->target_ak = $ak;
+                    $model->realisasi_ak = $ak;
+                }
 
                 if(!$model->save())
                 {

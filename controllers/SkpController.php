@@ -35,6 +35,133 @@ class SkpController extends Controller
         ];
     }
 
+    public function actionList()
+    {
+
+        if(Yii::$app->user->isGuest)
+        {
+            $session = Yii::$app->session;
+            $session->remove('token');
+            Yii::$app->user->logout();
+            $url = Yii::$app->params['sso_logout'];
+            return $this->redirect($url);
+        }
+
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $loggedInAs = MJabatan::find()->where(['nama'=>Yii::$app->user->identity->access_role])->one();
+
+        $jabatan = Jabatan::find()->where([
+          'jabatan_id' => !empty($loggedInAs) ? $loggedInAs->id : '-',
+          'NIY' => Yii::$app->user->identity->NIY
+        ])->one();
+
+        $pejabatPenilai = null;
+        $pegawaiDinilai = $user;
+        $jabatanPenilai = null;
+        $jabatanPegawai = null;
+
+        $access_role = Yii::$app->user->identity->access_role;
+
+        if(!empty($jabatan))
+        {
+            $unker = $jabatan->unker;
+
+            if($access_role == 'Kaprodi' && !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat) ? $unker->parent->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->parent->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+
+            else if($access_role == 'Dosen' && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+            
+
+            $jabatanPegawai = !empty($jabatan) ? $jabatan : null;
+        }
+
+        $searchModel = new SkpSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $searchModelApproval = new SkpSearch();
+        $dataProviderApproval = $searchModelApproval->searchApproval(Yii::$app->request->queryParams);
+
+        return $this->render('list',[
+            'pejabatPenilai' => $pejabatPenilai,
+            'pegawaiDinilai' => $pegawaiDinilai,
+            'jabatanPegawai' => $jabatanPegawai,
+            'jabatanPenilai' => $jabatanPenilai,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'searchModelApproval' => $searchModelApproval,
+            'dataProviderApproval' => $dataProviderApproval,
+        ]);
+
+    }
+
+    public function actionPengukuran($id)
+    {
+        $model = $this->findModel($id);
+        $searchModel = new SkpItemSearch();
+        $searchModel->skp_id = $id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        if (Yii::$app->request->post('hasEditable')) {
+            // instantiate your book model for saving
+            $id = Yii::$app->request->post('editableKey');
+            $model = SkpItem::findOne($id);
+
+            // store a default json response as desired by editable
+            $out = json_encode(['output'=>'', 'message'=>'']);
+
+            
+            // $posted = $_POST['Skp'];
+            $post = ['SkpItem' => $_POST];
+            
+            // load model like any single model validation
+            if ($model->load($post)) {
+            // can save model or do something before saving model
+                // print_r($post);exit;
+                if($model->save())
+                {
+                    $model->hitungSkp();
+                    $out = json_encode(['output'=>'', 'message'=>'']);
+                }
+
+                else
+                {
+                    $error = \app\helpers\MyHelper::logError($model);
+                    $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                }
+
+                
+            }
+            // return ajax json encoded response and exit
+            echo $out;
+            return;
+        }
+       
+        return $this->render('pengukuran', [
+            'model' => $model,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider            
+        ]);
+    }
+
     /**
      * Lists all Skp models.
      * @return mixed
@@ -63,6 +190,39 @@ class SkpController extends Controller
         $searchModel->skp_id = $id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        if (Yii::$app->request->post('hasEditable')) {
+            // instantiate your book model for saving
+            $id = Yii::$app->request->post('editableKey');
+            $model = Skp::findOne($id);
+
+            // store a default json response as desired by editable
+            $out = json_encode(['output'=>'', 'message'=>'']);
+
+            
+            $posted = $_POST['Skp'];
+            $post = ['Skp' => $posted];
+
+            // load model like any single model validation
+            if ($model->load($post)) {
+            // can save model or do something before saving model
+                // print_r($post);exit;
+                if($model->save())
+                {
+                    $out = json_encode(['output'=>'', 'message'=>'']);
+                }
+
+                else
+                {
+                    $error = \app\helpers\MyHelper::logError($model);
+                    $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                }
+
+                
+            }
+            // return ajax json encoded response and exit
+            echo $out;
+            return;
+        }
        
         return $this->render('view', [
             'model' => $model,

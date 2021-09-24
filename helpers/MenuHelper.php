@@ -166,7 +166,7 @@ class MenuHelper
 		        'submenuTemplate' => "\n<div id='pages_skp' class='collapse'><ul class='nav'>\n{items}\n</ul></div>\n",
 		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_skp">{label}</a>',
 		        'items'=>[
-		        	['label' => 'Form SKP', 'url' => ['/skp/create']],
+		        	['label' => 'Form SKP', 'url' => ['/skp/list']],
 		           	['label' => 'Pengukuran', 'url' => ['/skp/index']],
 		           	['label' => 'Perilaku Kerja', 'url' => ['/skp/index']],
 		           	['label' => 'Penilaian', 'url' => ['/skp/index']],

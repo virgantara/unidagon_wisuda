@@ -10,6 +10,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
+use yii\helpers\Json;
+
 /**
  * KomponenKegiatanController implements the CRUD actions for KomponenKegiatan model.
  */
@@ -28,6 +30,53 @@ class KomponenKegiatanController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionAjaxGet()
+    {
+        $id = $_POST['dataPost']['id'];
+
+        $results = [];
+        $model = KomponenKegiatan::findOne($id);
+        if(!empty($model))
+            $results = $model->attributes;
+        
+
+        echo json_encode($results);
+        exit;
+    }
+
+    private function getListKomponen($id)
+    {
+        $list = KomponenKegiatan::find()->where(['unsur_id'=>$id])->orderBy(['nama'=>SORT_ASC])->all();
+
+        $result = [];
+        foreach($list as $item)
+        {
+            $result[] = [
+                'id' => $item->id,
+                'name' => $item->nama.' - '.$item->subunsur
+            ];
+        }
+
+        return $result;
+    }
+
+    public function actionSubkomponen()
+    {
+        $out = [];
+        if (isset($_POST['depdrop_parents'])) {
+            $parents = $_POST['depdrop_parents'];
+            if ($parents != null) {
+                $cat_id = $parents[0];
+                $out = self::getListKomponen($cat_id); 
+               
+                echo Json::encode(['output'=>$out, 'selected'=>'']);
+                exit;
+            }
+        }
+        echo Json::encode(['output'=>'', 'selected'=>'']);
+        exit;
     }
 
     public function actionAjaxCari()

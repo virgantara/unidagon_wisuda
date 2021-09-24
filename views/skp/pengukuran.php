@@ -40,15 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
    <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
-                <?= Html::a('<i class="fa fa-edit"></i> Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-                <?= Html::a('<i class="fa fa-trash"></i> Delete', ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-danger',
-                    'data' => [
-                        'confirm' => 'Are you sure you want to delete this item?',
-                        'method' => 'post',
-                    ],
-                ]) ?>
 
                 <?= Html::a('<i class="fa fa-print"></i> Print', ['print', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
             </div>
@@ -94,25 +86,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         <th>Status SKP</th>
                         <th>: 
                             <?php 
-                            echo Editable::widget([
-                                'model' => $model,
-                                'attribute' => 'status_skp',
-                                'beforeInput' => Html::hiddenInput('editableKey',$model->id),
-                                'asPopover' => false,
-                                'disabled' => $model->pejabat_penilai != Yii::$app->user->identity->NIY,
-                                // 'format' => 'raw',
-                                'value' => $model->status_skp,
-                                // 'displayValue' => 'oke',
-                                'displayValueConfig'=> [
-                                    '1' => '<span class="label label-warning">Menunggu persetujuan atasan</span>',
-                                    '2' => '<span class="label label-success">Disetujui atasan</span>',
-                                    '3' => '<span class="label label-danger">Dikembalikan</span>',
-                                ],
-                                'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                                'data' => ['1'=>'Menunggu persetujuan atasan','2'=>'Disetujui atasan','3'=>'Dikembalikan'],
-                                'size'=>'md',
-                                'options' => ['class'=>'form-control']
-                            ]);
+                            echo '<span class="label label-'.$list_status_skp[$model->status_skp]['label'].'">'.$list_status_skp[$model->status_skp]['nama'].'</span>';
+                            
                              ?>
                         </th>
                         <th></th>
@@ -135,109 +110,172 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="panel-heading">
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
-<div class="panel-body ">
+            <div class="panel-body ">
 
-    <p>
-        <?= Html::a('<i class="fa fa-plus"></i> Item', '#', ['class' => 'btn btn-success','id'=>'btn-add']) ?>
-    </p>
-    <?php
-    $gridColumns = [
-    [
-        'class'=>'kartik\grid\SerialColumn',
-        'contentOptions'=>['class'=>'kartik-sheet-style'],
-        'width'=>'36px',
-        'pageSummary'=>'Total',
-        'pageSummaryOptions' => ['colspan' => 6],
-        'header'=>'',
-        'headerOptions'=>['class'=>'kartik-sheet-style']
-    ],
-            [
-                'attribute' => 'komponen_kegiatan_id',
-                'contentOptions' => ['width' => '50%'],
-                'value' => function($data){
-                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - '.$data->komponenKegiatan->subunsur : null;
-                }
-            ],
-            'target_ak',
-            'target_qty',
-            'target_satuan',
-            'target_mutu',
-            'target_waktu',
-            //'target_waktu_satuan',
-            'target_biaya:currency',
-            //'realisasi_ak',
-            //'realisasi_qty',
-            //'realisasi_satuan',
-            //'realisasi_mutu',
-            //'realisasi_waktu',
-            //'realisasi_waktu_satuan',
-            //'realisasi_biaya',
-            //'capaian',
-            //'capaian_skp',
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => '{delete}',
-                'urlCreator' => function ($action, $model, $key, $index) {
-                    if($action == 'delete')
-                    {
-                        return Url::to(['skp-item/delete','id'=>$model->id]); 
-                    }
-                }
-            ]
-];?>    
-<?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        // 'filterModel' => $searchModel,
-        'columns' => $gridColumns,
-        'containerOptions' => ['style' => 'overflow: auto'], 
-        'headerRowOptions' => ['class' => 'kartik-sheet-style'],
-        'filterRowOptions' => ['class' => 'kartik-sheet-style'],
-        'containerOptions' => ['style'=>'overflow: auto'], 
-        'beforeHeader'=>[
-            [
-                'columns'=>[
-                    ['content'=> $this->title, 'options'=>['colspan'=>14, 'class'=>'text-center warning']], //cuma satu 
-                ], 
-                'options'=>['class'=>'skip-export'] 
-            ]
-        ],
-        'exportConfig' => [
-              GridView::PDF => ['label' => 'Save as PDF'],
-              GridView::EXCEL => ['label' => 'Save as EXCEL'], //untuk menghidupkan button export ke Excell
-              GridView::HTML => ['label' => 'Save as HTML'], //untuk menghidupkan button export ke HTML
-              GridView::CSV => ['label' => 'Save as CSV'], //untuk menghidupkan button export ke CVS
-          ],
-          
-        'toolbar' =>  [
-            '{export}', 
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="text-center" width="3%">No</th>
+                            <th rowspan="2" class="text-center" width="32%">Kegiatan</th>
+                            <th rowspan="2" class="text-center" width="5%">AK</th>
+                            <th colspan="4" class="text-center" width="20%">Target</th>
+                            <th rowspan="2" class="text-center" width="5%">AK</th>
+                            <th colspan="4" class="text-center" width="20%">Realisasi</th>
+                            <th rowspan="2" class="text-center" width="5%">Penghitungan</th>
+                            <th rowspan="2" class="text-center" width="5%">Nilai Capaian SKP</th>
+                        </tr>
+                        <tr>
+                            <th width="5%">Kuant/Output</th>
+                            <th width="5%">Kual/Mutu</th>
+                            <th width="5%">Waktu</th>
+                            <th width="5%">Biaya</th>
+                            <th width="5%">Kuant/Output</th>
+                            <th width="5%">Kual/Mutu</th>
+                            <th width="5%">Waktu</th>
+                            <th width="5%">Biaya</th>
+                        </tr>
+                        <tr>
+                            <?php 
+                            for($i=1;$i<=14;$i++)
+                                echo '<th class="text-center" style="font-size:12px">'.$i.'</th>';
+                             ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $capaian_total = 0;
+                        $counter=0;
+                        foreach($model->skpItems as $q => $item)
+                        {
+                            $counter++;
 
-           '{toggleData}' //uncoment untuk menghidupkan button menampilkan semua data..
-        ],
-        'toggleDataContainer' => ['class' => 'btn-group mr-2'],
-    // set export properties
-        'export' => [
-            'fontAwesome' => true
-        ],
-        'pjax' => true,
-        'pjaxSettings' =>[
-            'neverTimeout'=>true,
-            'options'=>[
-                'id'=>'pjax-container',
-            ]
-        ], 
-        'bordered' => true,
-        'striped' => true,
-        // 'condensed' => false,
-        // 'responsive' => false,
-        'hover' => true,
-        // 'floatHeader' => true,
-        // 'showPageSummary' => true, //true untuk menjumlahkan nilai di suatu kolom, kebetulan pada contoh tidak ada angka.
-        'panel' => [
-            'type' => GridView::TYPE_PRIMARY
-        ],
-    ]); ?>
+                            $item->hitungSkp();
+                            $penghitungan = $item->capaian;
+                            $capaian_skp = $item->capaian_skp;
+                            $capaian_total += $capaian_skp;
 
-</div>
+
+                         ?>
+                        
+                        <tr>
+                            <td><?=$q+1;?></td>
+                            <td><?=$item->komponenKegiatan->nama.' - '.$item->komponenKegiatan->subunsur;?></td>
+                            <td class="text-center"><?=$item->target_ak;?></td>
+                            <td class="text-center"><?=$item->target_qty;?> <?=$item->target_satuan;?></td>
+                            <td class="text-center"><?=$item->target_mutu;?></td>
+                            <td class="text-center"><?=$item->target_waktu;?> <?=$item->target_waktu_satuan;?></td>
+                            
+                            <td class="text-right"><?=MyHelper::formatRupiah($item->target_biaya);?></td>
+                        
+                            <td class="text-center">
+                                <?php 
+                                echo Editable::widget([
+                                    'name' => 'realisasi_ak',
+                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                    'asPopover' => false,
+                                    // 'format' => 'raw',
+                                    'value' => $item->realisasi_ak,
+                                    // 'displayValue' => 'oke',
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control']
+                                ]);
+                                 ?>
+                            </td>
+                            <td class="text-center">
+                                <?php 
+                                echo Editable::widget([
+                                    'name' => 'realisasi_qty',
+                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                    'asPopover' => false,
+                                    // 'format' => 'raw',
+                                    'value' => $item->realisasi_qty,
+                                    // 'displayValue' => 'oke',
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control']
+                                ]);
+                                 ?> <?=$item->realisasi_satuan;?>
+                                    
+                            </td>
+                            <td class="text-center">
+                                <?php 
+                                echo Editable::widget([
+                                    'name' => 'realisasi_mutu',
+                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                    'asPopover' => false,
+                                    // 'format' => 'raw',
+                                    'value' => $item->realisasi_mutu,
+                                    // 'displayValue' => 'oke',
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control']
+                                ]);
+                                 ?> 
+                            </td>
+                            <td class="text-center">
+                                <?php 
+                                echo Editable::widget([
+                                    'name' => 'realisasi_waktu',
+                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                    'asPopover' => false,
+                                    // 'format' => 'raw',
+                                    'value' => $item->realisasi_waktu,
+                                    // 'displayValue' => 'oke',
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control']
+                                ]);
+                                 ?> 
+                                <?=$item->realisasi_waktu_satuan;?></td>
+                            
+                            <td class="text-right">
+                                <?php 
+                                echo Editable::widget([
+                                    'name' => 'realisasi_biaya',
+                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                    'asPopover' => false,
+                                    // 'format' => 'raw',
+                                    'value' => MyHelper::formatRupiah($item->realisasi_biaya),
+                                    // 'displayValue' => 'oke',
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control']
+                                ]);
+                                 ?>
+
+                            </td>
+                            <td class="text-center"><?=round($penghitungan,2);?></td>
+                            <td class="text-center"><?=round($capaian_skp,2);?></td>
+                            
+                        </tr>
+                    <?php 
+
+                    } 
+
+                    $avg_capaian_skp = $capaian_total / $counter;
+                    $kesimpulan = '';
+
+                    if($avg_capaian_skp <= 50)
+                        $kesimpulan = 'Buruk';
+                    else if($avg_capaian_skp <= 60)
+                        $kesimpulan = 'Sedang';
+                    else if($avg_capaian_skp <= 75)
+                        $kesimpulan = 'Cukup';
+                    else if($avg_capaian_skp <= 90.99)
+                        $kesimpulan = 'Baik';
+                    else
+                        $kesimpulan = 'Baik Sekali';
+                    ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="13" class="text-right">Nilai Capaian SKP</td>
+                            <td class="text-center">
+                                <?=round($avg_capaian_skp,2);?>
+                                (<b><?=$kesimpulan;?></b>)
+                            </td>
+                            
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
         </div>
     </div>
 
@@ -297,14 +335,10 @@ yii\bootstrap\Modal::begin([
                     </td>
                 </tr>
                 <tr>
-                    <td>Nama Kegiatan*</td>
-                    <td colspan="3"><?= Html::textInput('nama','',['class'=>'form-control','id'=>'nama']) ?>
-                        
-                        <?= Html::hiddenInput('target_ak','',['class'=>'form-control','id'=>'target_ak']) ?>
-                    </td>
+                    <td>Angka Kredit*</td>
+                    <td colspan="3"><?= Html::textInput('target_ak','',['class'=>'form-control','id'=>'target_ak']) ?></td>
                     
                 </tr>
-                
                 <tr>
                     <td>Kuantitas/Output*</td>
                     <td><?= Html::textInput('target_qty','',['class'=>'form-control']) ?></td>
