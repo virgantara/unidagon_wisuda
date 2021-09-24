@@ -109,29 +109,63 @@ class SkpItem extends \yii\db\ActiveRecord
 
     public function hitungSkp()
     {
-        $aspek_kuantitas = $this->realisasi_qty / $this->target_qty * 100;
-        $aspek_kualitas = $this->realisasi_mutu / $this->target_mutu * 100;
-        
-        $ew = 100 - ($this->realisasi_waktu / $this->target_waktu * 100);
 
+        $aspek_kuantitas = 0;
+        $aspek_kualitas = 0;
         $aspek_waktu = 0;
         $aspek_biaya = 0;
-
         $nilai_tertimbang = 1.76;
-        // print_r($ew);exit;
-        // if($ew >= 24)
-        // {
-        $aspek_waktu = ($nilai_tertimbang * $this->target_waktu - $this->realisasi_waktu) / $this->target_waktu * 100;
-        // } 
+
+        $pembagi = 2;
+
+        if($this->target_qty > 0)
+            $aspek_kuantitas = $this->realisasi_qty / $this->target_qty * 100;
 
         
-        $aspek_biaya = ($nilai_tertimbang * $this->target_biaya - $this->realisasi_biaya) / $this->target_biaya * 100;
+        if($this->target_mutu > 0)
+            $aspek_kualitas = $this->realisasi_mutu / $this->target_mutu * 100;
+
+        if($this->target_waktu > 0)
+        {
+            $ew = 100 - ($this->realisasi_waktu / $this->target_waktu * 100);
+
+            if($ew > 24)
+            {
+                $aspek_waktu = 76-(((($nilai_tertimbang * $this->target_waktu - $this->realisasi_waktu) / $this->target_waktu)*100)-100);
+            }
+
+            else
+            {
+                $aspek_waktu = ($nilai_tertimbang * $this->target_waktu - $this->realisasi_waktu) / $this->target_waktu * 100;
+            }
+
+            $pembagi++;
+            
+        }
+        
+        if($this->target_biaya > 0)
+        {
+            $eb = 100 - ($this->realisasi_biaya / $this->target_biaya * 100);
+
+            if($eb > 24)
+            {
+                $aspek_biaya = 76-(((($nilai_tertimbang * $this->target_biaya - $this->realisasi_biaya) / $this->target_biaya)*100)-100);
+            }
+
+            else
+            {
+                $aspek_biaya = ($nilai_tertimbang * $this->target_biaya - $this->realisasi_biaya) / $this->target_biaya * 100;
+            }
+
+            $pembagi++;
+            
+        }
         
 
         $penghitungan = $aspek_kuantitas + $aspek_kualitas + $aspek_waktu + $aspek_biaya;
 
         $this->capaian = $penghitungan;
-        $this->capaian_skp = $penghitungan / 4;
+        $this->capaian_skp = $penghitungan / $pembagi;
         $this->save();
 
     }
