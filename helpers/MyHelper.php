@@ -14,6 +14,7 @@ class MyHelper
 		$list_staf = ['Staf','Staf TU','Tendik','Staf Biro','Staf UPT'];
 		return $list_staf;
 	}
+	
 	public static function kesimpulan($val)
 	{
 		$kesimpulan = '';

@@ -4219,8 +4219,10 @@ class SiteController extends AppController
           $sd = $bkd_periode->tanggal_bkd_awal;
           $ed = $bkd_periode->tanggal_bkd_akhir;
         }
+
+        $list_staf = \app\helpers\MyHelper::listRoleStaf();
         
-        if($user->access_role == 'Staf')
+        if(in_array($user->access_role,$list_staf))
         {
 
             if(empty($user->tendik))
