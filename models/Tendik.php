@@ -7,6 +7,7 @@ use Yii;
 /**
  * This is the model class for table "tendik".
  *
+ * @property int $id
  * @property string $NIY
  * @property string|null $nama
  * @property string|null $gender
@@ -62,7 +63,6 @@ class Tendik extends \yii\db\ActiveRecord
             [['agama'], 'string', 'max' => 20],
             [['jenjang_kode'], 'string', 'max' => 5],
             [['jenis_tendik_id'], 'string', 'max' => 3],
-            [['NIY'], 'unique'],
             [['jenjang_kode'], 'exist', 'skipOnError' => true, 'targetClass' => MJenjangPendidikan::className(), 'targetAttribute' => ['jenjang_kode' => 'kode']],
             [['jenis_tendik_id'], 'exist', 'skipOnError' => true, 'targetClass' => JenisTendik::className(), 'targetAttribute' => ['jenis_tendik_id' => 'kode']],
             [['jabatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => MJabatanTendik::className(), 'targetAttribute' => ['jabatan_id' => 'id']],
@@ -77,6 +77,7 @@ class Tendik extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'NIY' => 'Niy',
             'nama' => 'Nama',
             'gender' => 'Gender',
@@ -100,27 +101,6 @@ class Tendik extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
         ];
     }
-
-    // public function beforeSave($insert)
-    // {
-    //     if (parent::beforeSave($insert)) {
-
-    //         $this->tanggal_lahir = date('Y-m-d',strtotime($this->tanggal_lahir));
-
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-
-        
-    // }
-
-    // public function afterFind(){
-    //     parent::afterFind();
-
-    //     $this->tanggal_lahir = date('d-m-Y',strtotime($this->tanggal_lahir));
-    // }
-
 
     /**
      * Gets query for [[JenjangKode]].
