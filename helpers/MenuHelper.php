@@ -168,8 +168,8 @@ class MenuHelper
 		        'items'=>[
 		        	['label' => 'Form SKP', 'url' => ['/skp/list']],
 		           	['label' => 'Pengukuran', 'url' => ['/skp/index']],
-		           	['label' => 'Perilaku Kerja', 'url' => ['/skp/index']],
-		           	['label' => 'Penilaian', 'url' => ['/skp/index']],
+		           	// ['label' => 'Perilaku Kerja', 'url' => ['/skp/penilaian']],
+		           	['label' => 'Penilaian', 'url' => ['/skp/list-penilaian']],
 		        ]
 	        ];
 

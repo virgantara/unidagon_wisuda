@@ -1,15 +1,7 @@
 <?php
 use app\helpers\MyHelper;
-use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use yii\widgets\DetailView;
-use kartik\grid\GridView;
-use kartik\depdrop\DepDrop;
-use yii\jui\AutoComplete;
-use yii\web\JsExpression;
-use kartik\select2\Select2;
-use kartik\editable\Editable;
 
 $list_status_skp = MyHelper::statusSkp();
 /* @var $this yii\web\View */
@@ -25,11 +17,8 @@ $list_status_skp = MyHelper::statusSkp();
   <tr>
     
     <td style="text-align: center;">
+      <span style="font-size: 1.15em">FORMULIR SASARAN KINERJA PEGAWAI</span><br>
       <span style="font-size: 1.15em">UNIVERSITAS DARUSSALAM GONTOR</span><br>
-      <span style="font-size: 1em">Terakreditasi APT<br>
-        Nomor: 1035/SK/BAN-PT/Akred/PT/XII/2020 <br> Kualifikasi BAIK SEKALI</span><br>
-      <span style="font-size: 1em">Website: https://unida.gontor.ac.id</span>
- 
     </td>
   </tr>
 </table>

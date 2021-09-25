@@ -50,9 +50,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ]) ?>
 
-                <?= Html::a('<i class="fa fa-print"></i> Print Formulir', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                <?= Html::a('<i class="fa fa-print"></i> Print', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
 
-                <?= Html::a('<i class="fa fa-print"></i> Print Pencapaian', ['print-pencapaian', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                
             </div>
 
             <div class="panel-body ">

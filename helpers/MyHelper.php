@@ -8,7 +8,22 @@ use Yii;
  */
 class MyHelper
 {	
+	public static function kesimpulan($val)
+	{
+		$kesimpulan = '';
+		if($val <= 50)
+	        $kesimpulan = 'Buruk';
+	    else if($val <= 60)
+	        $kesimpulan = 'Sedang';
+	    else if($val <= 75)
+	        $kesimpulan = 'Cukup';
+	    else if($val <= 90.99)
+	        $kesimpulan = 'Baik';
+	    else
+	        $kesimpulan = 'Baik Sekali';
 
+	    return $kesimpulan;
+	}
 	public static function statusSkp()
 	{
 		return [
