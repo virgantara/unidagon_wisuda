@@ -17,19 +17,20 @@ use yii\helpers\ArrayHelper;
 <table border="0" width="100%" cellpadding="1" cellspacing="0">   
     <tr>
       <th width="40%" ><strong>Nama Dosen</strong></th>
-      <th width="60%" >: <?=$user->dataDiri->nama;?></th>
+      <th width="60%" >: <?=$user->nama;?></th>
     </tr>
     <tr>
-      <th width="40%" ><strong>NIDN/NIY</strong></th>
-      <th width="60%" >: <?=$user->dataDiri->NIDN;?> / <?=$user->dataDiri->NIY;?></th>
+      <th width="40%" ><strong>NIY</strong></th>
+      <th width="60%" >: <?=$user->NIY;?></th>
+    </tr>
+    
+    <tr>
+      <th width="40%" ><strong>Jabatan</strong></th>
+      <th width="60%" >: <?=!empty($model->jabatanPegawai) && !empty($model->jabatanPegawai->jabatan) ? $model->jabatanPegawai->jabatan->nama: '';?></th>
     </tr>
     <tr>
-      <th width="40%" ><strong>Jurusan/Prodi</strong></th>
-      <th width="60%" >: <?=$user->prodiUser->nama;?></th>
-    </tr>
-    <tr>
-      <th width="40%" ><strong>Fakutlas</strong></th>
-      <th width="60%" >: <?=$user->prodiUser->fakultasProdi->nama;?></th>
+      <th width="40%" ><strong>Unit Kerja</strong></th>
+      <th width="60%" >: <?=!empty($model->jabatanPegawai) && !empty($model->jabatanPegawai->unker) ? $model->jabatanPegawai->unker->nama: '';?></th>
     </tr>
     <tr>
       <th width="40%" ><strong>Tahun Laporan</strong></th>

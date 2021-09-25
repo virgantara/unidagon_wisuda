@@ -4,14 +4,18 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 $list_status_skp = MyHelper::statusSkp();
-/* @var $this yii\web\View */
-/* @var $model app\models\Skp */
 
-// $list_unsur = ArrayHelper::map(\app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all(),'id','nama');
+$list_staf = MyHelper::listRoleStaf();
+$nama_pegawai = '';
+if(in_array($model->pegawaiDinilai->access_role, $list_staf))
+{
+    $nama_pegawai = $model->pegawaiDinilai->tendik->nama;
+}
 
-// $this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
-// $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
-// $this->params['breadcrumbs'][] = $this->title;
+else
+{
+    $nama_pegawai = !empty($model->pegawaiDinilai) ? $model->pegawaiDinilai->nama : '-';
+}
 ?>
 <table width="100%">
   <tr>
@@ -28,7 +32,7 @@ $list_status_skp = MyHelper::statusSkp();
         
         <tr>
             <th width="30%">Nama</th>
-            <th width="70%">: <?=$model->pegawaiDinilai->dataDiri->gelar_depan;?> <?=$model->pegawaiDinilai->dataDiri->nama;?> <?=$model->pegawaiDinilai->dataDiri->gelar_belakang;?></th>
+            <th width="70%">: <?=$nama_pegawai;?></th>
         </tr>
         <tr>
             <th width="30%">NIY</th>
@@ -161,7 +165,7 @@ $list_status_skp = MyHelper::statusSkp();
         <br>
         <br>
         <br>
-        <u><?=$model->pegawaiDinilai->dataDiri->gelar_depan;?> <?=$model->pegawaiDinilai->dataDiri->nama;?> <?=$model->pegawaiDinilai->dataDiri->gelar_belakang;?></u>
+        <u><?=$nama_pegawai;?></u>
         <br>
         NIY: <?=$model->pegawaiDinilai->NIY;?>
       </th>

@@ -3,6 +3,8 @@ use app\helpers\MyHelper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
+
+
 $list_status_skp = MyHelper::statusSkp();
 /* @var $this yii\web\View */
 /* @var $model app\models\Skp */
@@ -12,6 +14,18 @@ $list_status_skp = MyHelper::statusSkp();
 // $this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
 // $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
 // $this->params['breadcrumbs'][] = $this->title;
+$list_staf = MyHelper::listRoleStaf();
+$nama_pegawai = '';
+if(in_array($model->pegawaiDinilai->access_role, $list_staf))
+{
+    $nama_pegawai = $model->pegawaiDinilai->tendik->nama;
+}
+
+else
+{
+    $nama_pegawai = !empty($model->pegawaiDinilai) ? $model->pegawaiDinilai->nama : '-';
+}
+
 ?>
 <table width="100%">
   <tr>
@@ -33,7 +47,7 @@ $list_status_skp = MyHelper::statusSkp();
             <th width="10%">Nama</th>
             <th width="40%">: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->gelar_depan.' '.$model->pejabatPenilai->dataDiri->nama.' '.$model->pejabatPenilai->dataDiri->gelar_belakang : '-'?></th>
             <th width="10%">Nama</th>
-            <th width="40%">: <?=$model->pegawaiDinilai->dataDiri->gelar_depan;?> <?=$model->pegawaiDinilai->dataDiri->nama;?> <?=$model->pegawaiDinilai->dataDiri->gelar_belakang;?></th>
+            <th width="40%">: <?=$nama_pegawai;?></th>
         </tr>
         <tr>
             <th>NIY</th>
@@ -45,13 +59,27 @@ $list_status_skp = MyHelper::statusSkp();
             <th>Pangkat</th>
             <th>: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->namaPangkat : '-'?></th>
             <th>Pangkat</th>
-            <th>: <?=$model->pegawaiDinilai->dataDiri->namaPangkat;?></th>
+            <th>: 
+                <?php 
+                    if(!in_array($model->pegawaiDinilai->access_role, $list_staf))
+                    {
+                    ?>
+                <?=$model->pegawaiDinilai->dataDiri->namaPangkat;?>
+                <?php } ?>
+            </th>
         </tr>
         <tr>
             <th>Jabatan</th>
             <th>: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->namaJabfung : '-'?></th>
             <th>Jabatan</th>
-            <th>: <?=$model->pegawaiDinilai->dataDiri->namaJabfung;?></th>
+            <th>: 
+                <?php 
+                    if(!in_array($model->pegawaiDinilai->access_role, $list_staf))
+                    {
+                    ?>
+                <?=$model->pegawaiDinilai->dataDiri->namaJabfung;?>
+                    <?php } ?>
+                </th>
         </tr>
         <tr>
             <th>Unit Kerja</th>
@@ -150,7 +178,7 @@ $list_status_skp = MyHelper::statusSkp();
         <br>
         <br>
         <br>
-        <u><?=$model->pegawaiDinilai->dataDiri->gelar_depan;?> <?=$model->pegawaiDinilai->dataDiri->nama;?> <?=$model->pegawaiDinilai->dataDiri->gelar_belakang;?></u>
+        <u><?=$nama_pegawai;?></u>
         <br>
         NIY: <?=$model->pegawaiDinilai->NIY;?>
       </th>

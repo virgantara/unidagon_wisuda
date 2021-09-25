@@ -27,7 +27,7 @@ use yii\helpers\ArrayHelper;
       <th width="60%" >: <?=$user->prodiUser->nama;?></th>
     </tr>
     <tr>
-      <th width="40%" ><strong>Fakutlas</strong></th>
+      <th width="40%" ><strong>Fakultas</strong></th>
       <th width="60%" >: <?=$user->prodiUser->fakultasProdi->nama;?></th>
     </tr>
     <tr>

@@ -71,7 +71,9 @@ SweetalertAsset::register($this);
         <div class="sidebar-scroll">
             <nav>
                 <?php 
-                    $menuItems = \app\helpers\MenuHelper::getMenuItems();              
+
+
+                    $menuItems = \app\helpers\MenuHelper::getMenus();              
 
                     echo Menu::widget([
                         'options'=>array('class'=>'nav'),

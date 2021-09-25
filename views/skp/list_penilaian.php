@@ -15,6 +15,21 @@ $list_status_skp = MyHelper::statusSkp();
 /* @var $model app\models\Skp */
 
 
+$nama_pegawai = '';
+// $nama_pejabat_penilai = 
+
+$list_staf = MyHelper::listRoleStaf();
+
+if(in_array($pegawaiDinilai->access_role, $list_staf))
+{
+    $nama_pegawai = $pegawaiDinilai->tendik->nama;
+}
+
+else
+{
+    $nama_pegawai = !empty($pegawaiDinilai) ? $pegawaiDinilai->nama : '-';
+}
+
 $this->title = 'Form SKP Periode ';
 $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -50,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                        
                         <th width="20%">Nama</th>
-                        <th width="80%">: <?=$pegawaiDinilai->dataDiri->gelar_depan;?> <?=$pegawaiDinilai->dataDiri->nama;?> <?=$pegawaiDinilai->dataDiri->gelar_belakang;?></th>
+                        <th width="80%">: <?=$nama_pegawai;?></th>
                     </tr>
                     <tr>
                         <th>NIY</th>
@@ -59,12 +74,26 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                       
                         <th>Pangkat</th>
-                        <th>: <?=$pegawaiDinilai->dataDiri->namaPangkat;?></th>
+                        <th>: 
+                             <?php 
+                            if(!(in_array($pegawaiDinilai->access_role, $list_staf)))
+                            {
+                            ?>
+                            <?=$pegawaiDinilai->dataDiri->namaPangkat;?>
+                                <?php } ?>
+                            </th>
                     </tr>
                     <tr>
                        
                         <th>Jabatan</th>
-                        <th>: <?=$pegawaiDinilai->dataDiri->namaJabfung;?></th>
+                        <th>: 
+                             <?php 
+                            if(!(in_array($pegawaiDinilai->access_role, $list_staf)))
+                            {
+                            ?>
+                            <?=$pegawaiDinilai->dataDiri->namaJabfung;?>
+                                <?php } ?>
+                            </th>
                     </tr>
                     <tr>
                
@@ -160,8 +189,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'pegawai_dinilai',
-                'value' => function($data){
-                    return !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                'value' => function($data) use ($list_staf){
+                    $nama_pegawai = '';
+                    // $nama_pejabat_penilai = 
+
+                    if(in_array($data->pegawaiDinilai->access_role, $list_staf))
+                    {
+                        $nama_pegawai = $data->pegawaiDinilai->tendik->nama;
+                    }
+
+                    else
+                    {
+                        $nama_pegawai = !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                    }
+                    return $nama_pegawai;
                 }
             ],
             [

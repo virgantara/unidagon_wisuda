@@ -51,6 +51,7 @@ class SkpItemController extends Controller
                 $model = SkpItem::find()->where([
                     'skp_id' => $dataPost['skp_id'],
                     'komponen_kegiatan_id' => $dataPost['komponen_kegiatan_id'],
+                    'nama' => $dataPost['nama']
                 ])->one();
 
                 if(empty($model)){

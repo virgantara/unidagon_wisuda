@@ -65,7 +65,7 @@ class SkpController extends Controller
         $jabatanAtasanPenilai = null;
 
         $access_role = Yii::$app->user->identity->access_role;
-
+        $list_staf = MyHelper::listRoleStaf();
         if(!empty($jabatan))
         {
             $unker = $jabatan->unker;
@@ -94,6 +94,18 @@ class SkpController extends Controller
                 $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();
 
 
+            }
+
+            else if(in_array($access_role, $list_staf) && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
             }
 
             if(!empty($unker->parent) && !empty($unker->parent->pejabat))
@@ -282,6 +294,7 @@ class SkpController extends Controller
             ob_start();
             echo $this->renderPartial('cover', [
                 'user' => $model->pegawaiDinilai,
+                'model' => $model,
                 'bkd_periode' =>   $bkd_periode,
             ]);
 
@@ -347,8 +360,8 @@ class SkpController extends Controller
             // $pdf->Image($imgdata,10,10,15);
             $pdf->writeHTML($data);
 
-            $nama = !empty($model->pegawaiDinilai->dataDiri) ? strtolower($model->pegawaiDinilai->dataDiri->nama) : '-';
-            $pdf->Output('skp_'.$nama.'_'.rand(1,100).'.pdf','I');
+            $nama = $model->pegawai_dinilai;
+            $pdf->Output('skp_'.$nama.''.rand(1,100).'.pdf','I');
         }
         catch(\HTML2PDF_exception $e) {
             echo $e;
@@ -383,9 +396,11 @@ class SkpController extends Controller
         $jabatanPegawai = null;
 
         $access_role = Yii::$app->user->identity->access_role;
-
+        $list_staf = MyHelper::listRoleStaf();
         if(!empty($jabatan))
         {
+            
+
             $unker = $jabatan->unker;
 
             if($access_role == 'Kaprodi' && !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat))
@@ -401,6 +416,18 @@ class SkpController extends Controller
             }
 
             else if($access_role == 'Dosen' && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+
+            else if(in_array(Yii::$app->user->identity->access_role, $list_staf) && !empty($unker) && !empty($unker->pejabat))
             {
                 $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
 
@@ -490,10 +517,81 @@ class SkpController extends Controller
      */
     public function actionIndex()
     {
+        if(Yii::$app->user->isGuest)
+        {
+            $session = Yii::$app->session;
+            $session->remove('token');
+            Yii::$app->user->logout();
+            $url = Yii::$app->params['sso_logout'];
+            return $this->redirect($url);
+        }
+
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $loggedInAs = MJabatan::find()->where(['nama'=>Yii::$app->user->identity->access_role])->one();
+
+        $jabatan = Jabatan::find()->where([
+          'jabatan_id' => !empty($loggedInAs) ? $loggedInAs->id : '-',
+          'NIY' => Yii::$app->user->identity->NIY
+        ])->one();
+
+        $pejabatPenilai = null;
+        $pegawaiDinilai = $user;
+        $jabatanPenilai = null;
+        $jabatanPegawai = null;
+
+        $access_role = Yii::$app->user->identity->access_role;
+        $list_staf = MyHelper::listRoleStaf();
+        if(!empty($jabatan))
+        {
+            $unker = $jabatan->unker;
+
+            if($access_role == 'Kaprodi' && !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat) ? $unker->parent->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->parent->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+
+            else if($access_role == 'Dosen' && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+
+            else if(in_array($access_role, $list_staf) && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+            
+
+            $jabatanPegawai = !empty($jabatan) ? $jabatan : null;
+        }
         $searchModel = new SkpSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'pejabatPenilai' => $pejabatPenilai,
+            'pegawaiDinilai' => $pegawaiDinilai,
+            'jabatanPegawai' => $jabatanPegawai,
+            'jabatanPenilai' => $jabatanPenilai,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -573,7 +671,7 @@ class SkpController extends Controller
         ])->one();
 
         $access_role = Yii::$app->user->identity->access_role;
-
+        $list_staf = MyHelper::listRoleStaf();
         if(!empty($jabatan))
         {
             $unker = $jabatan->unker;
@@ -593,6 +691,35 @@ class SkpController extends Controller
             }
 
             else if($access_role == 'Dosen' && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();  
+                $model->pejabat_penilai = $niyAsesor;            
+                
+                $model->jabatan_penilai_id = !empty($jabatanPenilai) ? $jabatanPenilai->ID : null;  
+
+                if(!empty($unker->parent) && !empty($unker->parent->pejabat))
+                {
+                    $niyAtasanAsesor = $unker->parent->pejabat->NIY;
+
+                    $jabatanAtasanPenilai = Jabatan::find()->where([
+                        'jabatan_id' => $unker->parent->jabatan_id,
+                        'NIY' => $niyAtasanAsesor
+                    ])->one();
+
+                    $atasanPejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAtasanAsesor])->one();
+                    $model->jabatan_atasan_penilai_id = !empty($jabatanAtasanPenilai) ? $jabatanAtasanPenilai->ID : null;
+                    $model->atasan_pejabat_penilai = $niyAtasanAsesor;    
+                }
+            }
+
+            else if(in_array($access_role, $list_staf) && !empty($unker) && !empty($unker->pejabat))
             {
                 $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
 
@@ -645,7 +772,94 @@ class SkpController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $loggedInAs = MJabatan::find()->where(['nama'=>Yii::$app->user->identity->access_role])->one();
 
+        $jabatan = Jabatan::find()->where([
+          'jabatan_id' => !empty($loggedInAs) ? $loggedInAs->id : '-',
+          'NIY' => $model->pegawai_dinilai
+        ])->one();
+
+        $access_role = Yii::$app->user->identity->access_role;
+        $list_staf = MyHelper::listRoleStaf();
+        if(!empty($jabatan))
+        {
+            $unker = $jabatan->unker;
+
+            if($access_role == 'Kaprodi' && !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat) ? $unker->parent->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->parent->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();
+                $model->jabatan_penilai_id = !empty($jabatanPenilai) ? $jabatanPenilai->ID : null;
+                $model->pejabat_penilai = $niyAsesor;    
+            }
+
+            else if($access_role == 'Dosen' && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();  
+                $model->pejabat_penilai = $niyAsesor;            
+                
+                $model->jabatan_penilai_id = !empty($jabatanPenilai) ? $jabatanPenilai->ID : null;  
+
+                if(!empty($unker->parent) && !empty($unker->parent->pejabat))
+                {
+                    $niyAtasanAsesor = $unker->parent->pejabat->NIY;
+
+                    $jabatanAtasanPenilai = Jabatan::find()->where([
+                        'jabatan_id' => $unker->parent->jabatan_id,
+                        'NIY' => $niyAtasanAsesor
+                    ])->one();
+
+                    $atasanPejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAtasanAsesor])->one();
+                    $model->jabatan_atasan_penilai_id = !empty($jabatanAtasanPenilai) ? $jabatanAtasanPenilai->ID : null;
+                    $model->atasan_pejabat_penilai = $niyAtasanAsesor;    
+                }
+            }
+
+            else if(in_array($access_role, $list_staf) && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();  
+                $model->pejabat_penilai = $niyAsesor;            
+                
+                $model->jabatan_penilai_id = !empty($jabatanPenilai) ? $jabatanPenilai->ID : null;  
+
+                if(!empty($unker->parent) && !empty($unker->parent->pejabat))
+                {
+                    $niyAtasanAsesor = $unker->parent->pejabat->NIY;
+
+                    $jabatanAtasanPenilai = Jabatan::find()->where([
+                        'jabatan_id' => $unker->parent->jabatan_id,
+                        'NIY' => $niyAtasanAsesor
+                    ])->one();
+
+                    $atasanPejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAtasanAsesor])->one();
+                    $model->jabatan_atasan_penilai_id = !empty($jabatanAtasanPenilai) ? $jabatanAtasanPenilai->ID : null;
+                    $model->atasan_pejabat_penilai = $niyAtasanAsesor;    
+                }
+            }
+            
+
+            $model->jabatan_pegawai_id = !empty($jabatan) ? $jabatan->ID : null;
+        }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', "Data tersimpan");
             return $this->redirect(['view', 'id' => $model->id]);

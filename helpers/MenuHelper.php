@@ -8,6 +8,45 @@ use yii\helpers\Url;
  */
 class MenuHelper
 {
+
+	public static function getMenus()
+	{
+		if(!Yii::$app->user->isGuest)
+		{
+			$list_staf = MyHelper::listRoleStaf();
+
+			if(in_array(Yii::$app->user->identity->access_role, $list_staf))
+			{
+				return MenuHelper::getStafMenuItems();
+			}
+
+			else
+			{
+				return MenuHelper::getMenuItems();
+			}
+		}
+	}
+
+	public static function getStafMenuItems()
+	{
+		$menuItems = [];
+
+		$menuItems[] = [
+	    		'label' => '<i class="lnr lnr-list"></i><span>SKP</span><i class="icon-submenu lnr lnr-chevron-left"></i>', 
+		        'url' => '#',
+		        'submenuTemplate' => "\n<div id='pages_skp' class='collapse'><ul class='nav'>\n{items}\n</ul></div>\n",
+		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_skp">{label}</a>',
+		        'items'=>[
+		        	['label' => 'Form SKP', 'url' => ['/skp/list']],
+		           	['label' => 'Pengukuran', 'url' => ['/skp/index']],
+		           	// ['label' => 'Perilaku Kerja', 'url' => ['/skp/penilaian']],
+		           	['label' => 'Penilaian', 'url' => ['/skp/list-penilaian']],
+		        ]
+	        ];
+
+	    return $menuItems;
+	}
+
     public static function getMenuItems()
     {
 
@@ -254,6 +293,7 @@ class MenuHelper
 		        
 		    }
         }
+
     	if(!Yii::$app->user->isGuest)
     	{	
 			
@@ -291,12 +331,20 @@ class MenuHelper
 	         		[
 	         			'template' => '<a href="{url}">{label}</a>',
 		        		'label' => 'My Profile', 
-	         			'url' => ['data-diri/create']
+	         			'url' => ['data-diri/create'],
+	         			'visible' => !(Yii::$app->user->identity->access_role == 'Staf' || Yii::$app->user->identity->access_role == 'Tendik')
+	         		],
+	         		[
+	         			'template' => '<a href="{url}">{label}</a>',
+		        		'label' => 'My Profile', 
+	         			'url' => ['tendik/view'],
+	         			'visible' => (Yii::$app->user->identity->access_role == 'Staf' || Yii::$app->user->identity->access_role == 'Tendik')
 	         		],
 	         		[
 	         			'template' => '<a href="{url}">{label}</a>',
 		        		'label' => 'Change Role', 
-	         			'url' => ['site/change']
+	         			'url' => ['site/change'],
+	         			'visible' => !(Yii::$app->user->identity->access_role == 'Staf' || Yii::$app->user->identity->access_role == 'Tendik')
 	         		],
 	         		[
 	         			'template' => '<a href="{url}" data-method="POST">{label}</a>',

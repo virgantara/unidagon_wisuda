@@ -20,6 +20,21 @@ $list_unsur = ArrayHelper::map(\app\models\UnsurUtama::find()->orderBy(['urutan'
 $this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
 $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+$nama_pegawai = '';
+// $nama_pejabat_penilai = 
+
+$list_staf = MyHelper::listRoleStaf();
+
+if(in_array($model->pegawaiDinilai->access_role, $list_staf))
+{
+    $nama_pegawai = $model->pegawaiDinilai->tendik->nama;
+}
+
+else
+{
+    $nama_pegawai = !empty($model->pegawaiDinilai) ? $model->pegawaiDinilai->nama : '-';
+}
 ?>
 <style type="text/css">
   .ui-autocomplete { z-index:2147483647; }
@@ -66,7 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <th width="10%">Nama</th>
                         <th width="40%">: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->gelar_depan.' '.$model->pejabatPenilai->dataDiri->nama.' '.$model->pejabatPenilai->dataDiri->gelar_belakang : '-'?></th>
                         <th width="10%">Nama</th>
-                        <th width="40%">: <?=$model->pegawaiDinilai->dataDiri->gelar_depan;?> <?=$model->pegawaiDinilai->dataDiri->nama;?> <?=$model->pegawaiDinilai->dataDiri->gelar_belakang;?></th>
+                        <th width="40%">: <?=$nama_pegawai;?></th>
                     </tr>
                     <tr>
                         <th>NIY</th>
@@ -74,18 +89,34 @@ $this->params['breadcrumbs'][] = $this->title;
                         <th>NIY</th>
                         <th>: <?=$model->pegawaiDinilai->NIY;?></th>
                     </tr>
+                    
                     <tr>
                         <th>Pangkat</th>
                         <th>: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->namaPangkat : '-'?></th>
                         <th>Pangkat</th>
-                        <th>: <?=$model->pegawaiDinilai->dataDiri->namaPangkat;?></th>
+                        <th>: 
+                             <?php 
+                    if(!in_array($model->pegawaiDinilai->access_role, $list_staf))
+                    {
+                    ?>
+                            <?=$model->pegawaiDinilai->dataDiri->namaPangkat;?>
+                            <?php } ?>          
+                            </th>
                     </tr>
                     <tr>
                         <th>Jabatan</th>
                         <th>: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->namaJabfung : '-'?></th>
                         <th>Jabatan</th>
-                        <th>: <?=$model->pegawaiDinilai->dataDiri->namaJabfung;?></th>
+                        <th>: 
+                             <?php 
+                    if(!in_array($model->pegawaiDinilai->access_role, $list_staf))
+                    {
+                    ?>
+                            <?=$model->pegawaiDinilai->dataDiri->namaJabfung;?>
+                            <?php } ?>          
+                            </th>
                     </tr>
+                    
                     <tr>
                         <th>Unit Kerja</th>
                         <th>: <?=!empty($model->jabatanPenilai) && !empty($model->jabatanPenilai->unker) ? $model->jabatanPenilai->unker->nama : '-'?></th>
@@ -155,11 +186,12 @@ $this->params['breadcrumbs'][] = $this->title;
     ],
             [
                 'attribute' => 'komponen_kegiatan_id',
-                'contentOptions' => ['width' => '50%'],
+                'contentOptions' => ['width' => '30%'],
                 'value' => function($data){
                     return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - '.$data->komponenKegiatan->subunsur : null;
                 }
             ],
+            'nama',
             'target_ak',
             'target_qty',
             'target_satuan',

@@ -17,7 +17,23 @@ $list_status_skp = MyHelper::statusSkp();
 
 $list_unsur = ArrayHelper::map(\app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all(),'id','nama');
 
-$this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
+
+$nama_pegawai = '';
+// $nama_pejabat_penilai = 
+
+$list_staf = MyHelper::listRoleStaf();
+
+// if(in_array($pegawaiDinilai->access_role, $list_staf))
+// {
+//     $nama_pegawai = $pegawaiDinilai->tendik->nama;
+// }
+
+// else
+// {
+//     $nama_pegawai = !empty($pegawaiDinilai) ? $pegawaiDinilai->nama : '-';
+// }
+
+$this->title = 'Penilaian Perilaku Pegawai Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
 $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -41,8 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel">
             <div class="panel-heading">
 
-
-                <?= Html::a('<i class="fa fa-print"></i> Print', ['print', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                <h3 class="panel-title"><?=$this->title;?></h3>
             </div>
 
             <div class="panel-body ">
@@ -54,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                        
                         <th width="20%">Nama</th>
-                        <th width="80%" colspan="3">: <?=$pegawaiDinilai->dataDiri->gelar_depan;?> <?=$pegawaiDinilai->dataDiri->nama;?> <?=$pegawaiDinilai->dataDiri->gelar_belakang;?></th>
+                        <th width="80%" colspan="3">: <?=$pegawaiDinilai->nama;?></th>
                     </tr>
                     <tr>
                         <th>NIY</th>
@@ -63,12 +78,27 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                       
                         <th>Pangkat</th>
-                        <th colspan="3">: <?=$pegawaiDinilai->dataDiri->namaPangkat;?></th>
+                        <th colspan="3">: 
+                            <?php 
+                            if(!in_array($pegawaiDinilai->access_role, $list_staf))
+                            {
+                             ?>
+                            
+                            <?=$pegawaiDinilai->dataDiri->namaPangkat;?>
+                            <?php } ?>    
+                            </th>
                     </tr>
                     <tr>
                        
                         <th>Jabatan</th>
-                        <th colspan="3">: <?=$pegawaiDinilai->dataDiri->namaJabfung;?></th>
+                        <th colspan="3">:
+                         <?php 
+                            if(!in_array($pegawaiDinilai->access_role, $list_staf))
+                            {
+                             ?> 
+                            <?=$pegawaiDinilai->dataDiri->namaJabfung;?>
+                               <?php } ?> 
+                            </th>
                     </tr>
                     <tr>
                

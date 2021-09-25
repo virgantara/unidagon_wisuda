@@ -8,14 +8,95 @@ use kartik\grid\GridView;
 /* @var $searchModel app\models\SkpSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Sasaran Kinerja Pegawai';
+$this->title = 'Pengukuran Sasaran Kinerja Pegawai';
 $this->params['breadcrumbs'][] = $this->title;
 
 $list_status_skp = MyHelper::statusSkp();
 
+$nama_pegawai = '';
+$list_staf = MyHelper::listRoleStaf();
+
+if(in_array(Yii::$app->user->identity->access_role, $list_staf))
+{
+    $nama_pegawai = $pegawaiDinilai->tendik->nama;
+
+}
+
+else
+{
+    $nama_pegawai = $pegawaiDinilai->dataDiri->gelar_depan.' '.$pegawaiDinilai->dataDiri->nama.' '.$pegawaiDinilai->dataDiri->gelar_belakang;
+}
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
+<div class="row">
+   <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+              
+            </div>
+
+            <div class="panel-body ">
+            <table class="table table-hover">
+                <tbody>
+                    <tr>
+                        <th colspan="3"><h3>I. Pejabat Penilai</h3></th>
+                        <th colspan="3"><h3>II. Pegawai Dinilai</h3></th>
+                    </tr>
+                    <tr>
+                        <th width="10%">Nama</th>
+                        <th width="40%">: <?=!empty($pejabatPenilai->dataDiri) ? $pejabatPenilai->dataDiri->gelar_depan.' '.$pejabatPenilai->dataDiri->nama.' '.$pejabatPenilai->dataDiri->gelar_belakang : '-'?></th>
+                        <th width="10%">Nama</th>
+                        <th width="40%">: <?=$nama_pegawai;?></th>
+                    </tr>
+                    <tr>
+                        <th>NIY</th>
+                        <th>: <?=!empty($pejabatPenilai) ? $pejabatPenilai->NIY : '-'?></th>
+                        <th>NIY</th>
+                        <th>: <?=$pegawaiDinilai->NIY;?></th>
+                    </tr>
+                    
+                    <tr>
+                        <th>Pangkat</th>
+                        <th>: <?=!empty($pejabatPenilai->dataDiri) ? $pejabatPenilai->dataDiri->namaPangkat : '-'?></th>
+                        <th>Pangkat</th>
+                        <th>: 
+                             <?php 
+                            if(!(in_array(Yii::$app->user->identity->access_role, $list_staf)))
+                            {
+                            ?>
+                            <?=$pegawaiDinilai->dataDiri->namaPangkat;?>
+                        <?php } ?>          
+                            </th>
+                    </tr>
+
+                    <tr>
+                        <th>Jabatan</th>
+                        <th>: <?=!empty($pejabatPenilai->dataDiri) ? $pejabatPenilai->dataDiri->namaJabfung : '-'?></th>
+                        <th>Jabatan</th>
+                        <th>: 
+                            <?php 
+                            if(!in_array(Yii::$app->user->identity->access_role, $list_staf))
+                            {
+                            ?>
+                            <?=$pegawaiDinilai->dataDiri->namaJabfung;?>
+                              <?php } ?>  
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Unit Kerja</th>
+                        <th>: <?=!empty($jabatanPenilai) && !empty($jabatanPenilai->unker) ? $jabatanPenilai->unker->nama : '-'?></th>
+                        <th>Unit Kerja</th>
+                        <th>: <?=!empty($jabatanPegawai) && !empty($jabatanPegawai->unker) ? $jabatanPegawai->unker->nama : '-'?></th>
+                    </tr>
+                </tbody>
+            </table>
+
+            </div>
+        </div>
+
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12">
         <div class="panel">
@@ -24,9 +105,7 @@ $list_status_skp = MyHelper::statusSkp();
             </div>
 <div class="panel-body ">
 
-    <p>
-        <?= Html::a('<i class="fa fa-plus"></i> SKP', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    
     <?php
     $gridColumns = [
     [
@@ -44,16 +123,24 @@ $list_status_skp = MyHelper::statusSkp();
             //         return !empty($data->pejabatPenilai) ? $data->pejabatPenilai->dataDiri->gelar_depan.' '.$data->pejabatPenilai->dataDiri->nama.' '.$data->pejabatPenilai->dataDiri->gelar_belakang : null;
             //     }
             // ],
-            [
-                'header' => 'NIY',
-                'value' => function($data){
-                    return !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->NIY : null;
-                }
-            ],
+            'pegawai_dinilai',
             [
                 'attribute' => 'pegawai_dinilai',
-                'value' => function($data){
-                    return !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                'value' => function($data) use ($list_staf){
+
+                    $nama_pegawai = '';
+                    // $nama_pejabat_penilai = 
+
+                    if(in_array(Yii::$app->user->identity->access_role, $list_staf))
+                    {
+                        $nama_pegawai = $data->pegawaiDinilai->tendik->nama;
+                    }
+
+                    else
+                    {
+                        $nama_pegawai = !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                    }
+                    return $nama_pegawai;
                 }
             ],
             'periode_id',
@@ -73,7 +160,7 @@ $list_status_skp = MyHelper::statusSkp();
                 'urlCreator' => function ($action, $model, $key, $index) {
                     if($action == 'update')
                     {
-                        return Url::to(['skp/pengukuran','id'=>$model->id]); 
+                        return Url::to(['skp/pengukuran','id'=>$model->id,['title'=>'Pengukuran']]); 
                     }
                 }
             ]

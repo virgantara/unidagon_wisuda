@@ -14,6 +14,20 @@ $list_status_skp = MyHelper::statusSkp();
 /* @var $this yii\web\View */
 /* @var $model app\models\Skp */
 
+$nama_pegawai = '';
+// $nama_pejabat_penilai = 
+
+$list_staf = MyHelper::listRoleStaf();
+
+if(in_array(Yii::$app->user->identity->access_role, $list_staf))
+{
+    $nama_pegawai = $pegawaiDinilai->tendik->nama;
+}
+
+else
+{
+    $nama_pegawai = $pegawaiDinilai->dataDiri->gelar_depan.' '.$pegawaiDinilai->dataDiri->nama.' '.$pegawaiDinilai->dataDiri->gelar_belakang;
+}
 
 $this->title = 'Form SKP Periode ';
 $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
@@ -52,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <th width="10%">Nama</th>
                         <th width="40%">: <?=!empty($pejabatPenilai->dataDiri) ? $pejabatPenilai->dataDiri->gelar_depan.' '.$pejabatPenilai->dataDiri->nama.' '.$pejabatPenilai->dataDiri->gelar_belakang : '-'?></th>
                         <th width="10%">Nama</th>
-                        <th width="40%">: <?=$pegawaiDinilai->dataDiri->gelar_depan;?> <?=$pegawaiDinilai->dataDiri->nama;?> <?=$pegawaiDinilai->dataDiri->gelar_belakang;?></th>
+                        <th width="40%">: <?=$nama_pegawai;?></th>
                     </tr>
                     <tr>
                         <th>NIY</th>
@@ -60,17 +74,33 @@ $this->params['breadcrumbs'][] = $this->title;
                         <th>NIY</th>
                         <th>: <?=$pegawaiDinilai->NIY;?></th>
                     </tr>
+                    
                     <tr>
                         <th>Pangkat</th>
                         <th>: <?=!empty($pejabatPenilai->dataDiri) ? $pejabatPenilai->dataDiri->namaPangkat : '-'?></th>
                         <th>Pangkat</th>
-                        <th>: <?=$pegawaiDinilai->dataDiri->namaPangkat;?></th>
+                        <th>: 
+                             <?php 
+                            if(!in_array(Yii::$app->user->identity->access_role, $list_staf))
+                            {
+                            ?>
+                            <?=$pegawaiDinilai->dataDiri->namaPangkat;?>
+                        <?php } ?>          
+                            </th>
                     </tr>
+
                     <tr>
                         <th>Jabatan</th>
                         <th>: <?=!empty($pejabatPenilai->dataDiri) ? $pejabatPenilai->dataDiri->namaJabfung : '-'?></th>
                         <th>Jabatan</th>
-                        <th>: <?=$pegawaiDinilai->dataDiri->namaJabfung;?></th>
+                        <th>: 
+                            <?php 
+                            if(!in_array(Yii::$app->user->identity->access_role, $list_staf))
+                            {
+                            ?>
+                            <?=$pegawaiDinilai->dataDiri->namaJabfung;?>
+                              <?php } ?>  
+                        </th>
                     </tr>
                     <tr>
                         <th>Unit Kerja</th>
@@ -118,8 +148,20 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'pegawai_dinilai',
-                'value' => function($data){
-                    return !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                'value' => function($data) use ($list_staf){
+
+                    $nama_pegawai = '';
+                    
+                    if(in_array(Yii::$app->user->identity->access_role, $list_staf))
+                    {
+                        $nama_pegawai = $data->pegawaiDinilai->tendik->nama;
+                    }
+
+                    else
+                    {
+                        !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                    }
+                    return $nama_pegawai;
                 }
             ],
             [
@@ -217,8 +259,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'pegawai_dinilai',
-                'value' => function($data){
-                    return !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                'value' => function($data) use ($list_staf){
+                    $nama_pegawai = '';
+                    // $nama_pejabat_penilai = 
+
+                    $nama_pegawai = !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->nama : '-';
+                    // }
+
+                    return $nama_pegawai;
                 }
             ],
             [

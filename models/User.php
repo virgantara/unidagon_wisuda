@@ -72,10 +72,12 @@ class User extends UserIdentity
             ['password', 'required', 'on' => 'create'],
             // use passwordStrengthRule() method to determine password strength
             $this->passwordStrengthRule(),
-            [['fakultas', 'prodi','kampus','display_name','nim','username','uuid','is_accept_term','level','class','rank','stars'], 'safe'],
+            [['foto_path','fakultas', 'prodi','kampus','display_name','nim','username','uuid','is_accept_term','level','class','rank','stars'], 'safe'],
             ['status', 'required'],
             ['item_name', 'string', 'min' => 3, 'max' => 64],
             ['access_role', 'string', 'min' => 3, 'max' => 64],
+            [['foto_path'], 'string', 'max' => 200],
+            [['foto_path'], 'file', 'extensions' => 'png,jpg,jpeg','maxSize' => 1024 * 1024],
             
         ];
     }
@@ -652,5 +654,10 @@ class User extends UserIdentity
     public function getLogSyncs()
     {
         return $this->hasMany(LogSync::className(), ['NIY' => 'NIY']);
+    }
+
+    public function getTendik()
+    {
+        return $this->hasOne(Tendik::className(), ['NIY' => 'NIY']);
     }
 }

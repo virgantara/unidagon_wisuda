@@ -24,7 +24,13 @@ $listDataJenisTendik = \app\models\JenisTendik::getList();
 <div class="tendik-form">
 
     <?php $form = ActiveForm::begin(); ?>
-
+    <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?> 
+    <?php
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+   
+    ?>
 <div class="col-lg-6">
     <?= $form->field($model, 'NIY')->textInput(['maxlength' => true]) ?>
 
@@ -33,6 +39,7 @@ $listDataJenisTendik = \app\models\JenisTendik::getList();
     <?= $form->field($model, 'jenis_tendik_id')->dropDownList($listDataJenisTendik, ['prompt'=>'..Pilih Jenis Tendik..']); ?>   
     <?= $form->field($model, 'jenjang_kode')->dropDownList($listDataJenjang, ['prompt' => '-Pilih Jenjang-']) ?>
     <?= $form->field($model, 'jabatan_id')->dropDownList($listData, ['prompt'=>'..Pilih Jabatan..']); ?>
+    <?= $form->field($user, 'foto_path')->fileInput().'NB: File format is png, jpeg, jpg and maxsize 1 MB<br><br>' ?>
 </div>
 <div class="col-lg-6">
     <?= $form->field($model, 'gender')->dropDownList([ 'Laki-laki' => 'Laki-laki', 'Perempuan' => 'Perempuan', ], ['prompt' => '']) ?>
@@ -45,7 +52,8 @@ $listDataJenisTendik = \app\models\JenisTendik::getList();
             'value' => date('d-m-Y', strtotime('0 days')),
             'options' => ['placeholder' => 'Pilih tanggal lahir ...'],
             'pluginOptions' => [
-                'format' => 'dd-mm-yyyy',
+                'autoclose'=>true,
+                'format' => 'yyyy-mm-dd',
                 'todayHighlight' => true
             ]
         ]

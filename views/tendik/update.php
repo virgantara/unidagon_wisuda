@@ -10,12 +10,18 @@ $this->params['breadcrumbs'][] = ['label' => 'Tenaga Kependidikan', 'url' => ['i
 $this->params['breadcrumbs'][] = ['label' => $model->NIY, 'url' => ['view', 'id' => $model->NIY]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="tendik-update">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
+            </div>
+            <div class="panel-body">
+                <?= $this->render('_form', [
+                    'model' => $model,
+                    'user' => $user
+                ]) ?>        
+            </div>
+        </div>
+    </div>
 </div>

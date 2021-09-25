@@ -3821,7 +3821,6 @@ class SiteController extends AppController
             $session = Yii::$app->session;
             $session->set('token',$token);
             
-
             
             // $exp = $total_bkd * 1000;
             // $exp += $totalCatatanHarian;
@@ -4197,11 +4196,8 @@ class SiteController extends AppController
         {
             return $this->redirect(Yii::$app->params['sso_login']);
         }
+        
         $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
-        if(empty($user->dataDiri))
-        {
-            return $this->redirect(Yii::$app->params['sso_login']);
-        }
         $results = [];
         
         $session = Yii::$app->session;
@@ -4223,114 +4219,142 @@ class SiteController extends AppController
           $sd = $bkd_periode->tanggal_bkd_awal;
           $ed = $bkd_periode->tanggal_bkd_akhir;
         }
-
-        $pengajaran = Pengajaran::find()->where([
-            'NIY' => Yii::$app->user->identity->NIY,
-            // 'is_claimed' => 1,
-            'tahun_akademik' => $bkd_periode->tahun_id
-        ])->all();
-
-        // print_r($tahun_akademik);exit;
-
-        $query = Publikasi::find()->where([
-            'NIY' => Yii::$app->user->identity->NIY,
-            'is_claimed' => 1,
-        ]);
-
-        $query->andWhere(['not',['kegiatan_id' => null]]);
-
-        $sd = $bkd_periode->tanggal_bkd_awal;
-        $ed = $bkd_periode->tanggal_bkd_akhir;
-
-        $totalCatatanHarian = $this->sumPoinCatatanHarian($sd, $ed, Yii::$app->user->identity->ID);
-
-        $query->andFilterWhere(['between','tanggal_terbit',$sd, $ed]);
-        $query->orderBy(['tanggal_terbit'=>SORT_ASC]);
-
-        $publikasi = $query->all();
-
-        $query = Pengabdian::find()->where([
-            'NIY' => Yii::$app->user->identity->NIY,
-            'is_claimed' => 1,
-        ]);
-
-        // $sd = $tahun_akademik['kuliah_mulai'];
-        // $ed = $tahun_akademik['nilai_selesai'];
-
-        // $query->andFilterWhere(['between','tahun_kegiatan',$sd, $ed]);
-        $query->orderBy(['tahun_kegiatan'=>SORT_ASC]);
-
-        $pengabdian = $query->all();
-
-        $query = Organisasi::find()->where([
-            'NIY' => Yii::$app->user->identity->NIY,
-            'is_claimed' => 1,
-        ]);
-
-        $organisasi = $query->all();
-
-        $query = PengelolaJurnal::find()->where([
-            'NIY' => Yii::$app->user->identity->NIY,
-            'is_claimed' => 1,
-        ]);
-
-        $pengelolaJurnal = $query->all();
-
-        $query = TugasDosenBkd::find();
-        $query->joinWith(['unsur as u']);
-        $query->where([
-          'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
-          'u.kode' => 'AJAR'
-        ]);
-
-        $bkd_ajar = $query->one();
-
-        $query = TugasDosenBkd::find();
-        $query->joinWith(['unsur as u']);
-        $query->where([
-          'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
-          'u.kode' => 'RISET'
-        ]);
-
-        $bkd_pub = $query->one();
-
-        $query = TugasDosenBkd::find();
-        $query->joinWith(['unsur as u']);
-        $query->where([
-          'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
-          'u.kode' => 'ABDIMAS'
-        ]);
-
-        $bkd_abdi = $query->one();
-
-        $query = TugasDosenBkd::find();
-        $query->joinWith(['unsur as u']);
-        $query->where([
-          'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
-          'u.kode' => 'PENUNJANG'
-        ]);
-
-        $bkd_penunjang = $query->one();
-
-        $listColumns = Yii::$app->db->createCommand('SHOW COLUMNS FROM data_diri')->queryAll();
-
-        $countNotEmpty = 0;
-        foreach($listColumns as $col)
+        
+        if($user->access_role == 'Staf')
         {
-            $tmp = Yii::$app->db->createCommand('SELECT '.$col['Field'].' FROM data_diri WHERE '.$col['Field'].' IS NOT NULL AND NIY = "'.Yii::$app->user->identity->NIY.'" ')->queryOne();
 
-            if(isset($tmp))
-                $countNotEmpty++;
-            
+            if(empty($user->tendik))
+            {
+                return $this->redirect(Yii::$app->params['sso_login']);
+            }
 
+            return $this->render('index_tendik',[
+
+            ]);            
         }
 
-        $persentaseProfil = round($countNotEmpty / count($listColumns) * 100,2);
-        // print_r($countNotEmpty);exit;
-        $results = [
-            'totalCatatanHarian' => $totalCatatanHarian,
-            'persentaseProfil' => $persentaseProfil
-        ];
+        else
+        {
+
+            if(empty($user->dataDiri))
+            {
+                return $this->redirect(Yii::$app->params['sso_login']);
+            }
+
+            $pengajaran = Pengajaran::find()->where([
+                'NIY' => Yii::$app->user->identity->NIY,
+                // 'is_claimed' => 1,
+                'tahun_akademik' => $bkd_periode->tahun_id
+            ])->all();
+
+            // print_r($tahun_akademik);exit;
+
+            $query = Publikasi::find()->where([
+                'NIY' => Yii::$app->user->identity->NIY,
+                'is_claimed' => 1,
+            ]);
+
+            $query->andWhere(['not',['kegiatan_id' => null]]);
+
+            $sd = $bkd_periode->tanggal_bkd_awal;
+            $ed = $bkd_periode->tanggal_bkd_akhir;
+
+            $totalCatatanHarian = $this->sumPoinCatatanHarian($sd, $ed, Yii::$app->user->identity->ID);
+
+            $query->andFilterWhere(['between','tanggal_terbit',$sd, $ed]);
+            $query->orderBy(['tanggal_terbit'=>SORT_ASC]);
+
+            $publikasi = $query->all();
+
+            $query = Pengabdian::find()->where([
+                'NIY' => Yii::$app->user->identity->NIY,
+                'is_claimed' => 1,
+            ]);
+
+            // $sd = $tahun_akademik['kuliah_mulai'];
+            // $ed = $tahun_akademik['nilai_selesai'];
+
+            // $query->andFilterWhere(['between','tahun_kegiatan',$sd, $ed]);
+            $query->orderBy(['tahun_kegiatan'=>SORT_ASC]);
+
+            $pengabdian = $query->all();
+
+            $query = Organisasi::find()->where([
+                'NIY' => Yii::$app->user->identity->NIY,
+                'is_claimed' => 1,
+            ]);
+
+            $organisasi = $query->all();
+
+            $query = PengelolaJurnal::find()->where([
+                'NIY' => Yii::$app->user->identity->NIY,
+                'is_claimed' => 1,
+            ]);
+
+            $pengelolaJurnal = $query->all();
+
+            $query = TugasDosenBkd::find();
+            $query->joinWith(['unsur as u']);
+            $query->where([
+              'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
+              'u.kode' => 'AJAR'
+            ]);
+
+            $bkd_ajar = $query->one();
+
+            $query = TugasDosenBkd::find();
+            $query->joinWith(['unsur as u']);
+            $query->where([
+              'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
+              'u.kode' => 'RISET'
+            ]);
+
+            $bkd_pub = $query->one();
+
+            $query = TugasDosenBkd::find();
+            $query->joinWith(['unsur as u']);
+            $query->where([
+              'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
+              'u.kode' => 'ABDIMAS'
+            ]);
+
+            $bkd_abdi = $query->one();
+
+            $query = TugasDosenBkd::find();
+            $query->joinWith(['unsur as u']);
+            $query->where([
+              'tugas_dosen_id'=>$user->dataDiri->tugas_dosen_id,
+              'u.kode' => 'PENUNJANG'
+            ]);
+
+            $bkd_penunjang = $query->one();
+
+            $listColumns = Yii::$app->db->createCommand('SHOW COLUMNS FROM data_diri')->queryAll();
+
+            $countNotEmpty = 0;
+            foreach($listColumns as $col)
+            {
+                $tmp = Yii::$app->db->createCommand('SELECT '.$col['Field'].' FROM data_diri WHERE '.$col['Field'].' IS NOT NULL AND NIY = "'.Yii::$app->user->identity->NIY.'" ')->queryOne();
+
+                if(isset($tmp))
+                    $countNotEmpty++;
+                
+
+            }
+
+            $persentaseProfil = round($countNotEmpty / count($listColumns) * 100,2);
+            // print_r($countNotEmpty);exit;
+            $results = [
+                'totalCatatanHarian' => $totalCatatanHarian,
+                'persentaseProfil' => $persentaseProfil
+            ];
+        }
+
+
+        
+
+        
+
         return $this->render('index',[
             'pengajaran' => $pengajaran,
             'results' => $results,
