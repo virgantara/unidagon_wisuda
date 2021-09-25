@@ -17,7 +17,7 @@ $list_status_skp = MyHelper::statusSkp();
 
 $list_unsur = ArrayHelper::map(\app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all(),'id','nama');
 
-$this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
+$this->title = 'Pengukuran SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
 $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -41,8 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel">
             <div class="panel-heading">
 
-
-                <?= Html::a('<i class="fa fa-print"></i> Print', ['print', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
 
             <div class="panel-body ">

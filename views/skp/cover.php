@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
     
     <td style="text-align: center;">
       <span style="font-size: 1.15em">SASARAN KINERJA PEGAWAI</span><br>
+      <span style="font-size: 1.15em">DAN PENILAIAN PERILAKU</span>
      
  
     </td>

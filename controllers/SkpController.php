@@ -136,10 +136,7 @@ class SkpController extends Controller
         $model = $this->findModel($id);
 
         $skpPerilaku = $model->skpPerilaku;
-        $searchModel = new SkpItemSearch();
-        $searchModel->skp_id = $id;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+       
         $pegawaiDinilai = $model->pegawaiDinilai;
         $pejabatPenilai = $model->pejabatPenilai;
         $atasanPejabatPenilai = $model->atasanPejabatPenilai;
@@ -246,6 +243,33 @@ class SkpController extends Controller
                 $sd = $bkd_periode->tanggal_bkd_awal;
                 $ed = $bkd_periode->tanggal_bkd_akhir;
             }
+
+            $skpPerilaku = $model->skpPerilaku;
+       
+            $pegawaiDinilai = $model->pegawaiDinilai;
+            $pejabatPenilai = $model->pejabatPenilai;
+            $atasanPejabatPenilai = $model->atasanPejabatPenilai;
+
+            $capaian_total = 0;
+            $avg_capaian_skp = 0;
+            $counter=0;
+            foreach($model->skpItems as $q => $item)
+            {
+                $counter++;
+
+                $item->hitungSkp();
+                $penghitungan = $item->capaian;
+                $tmp = $item->capaian_skp;
+                $capaian_total += $tmp;
+            }
+
+            if($counter > 0)
+                $avg_capaian_skp = $capaian_total / $counter;
+
+            $bobot_capaian_skp = $avg_capaian_skp * 0.6;
+            $bobot_avg_perilaku = !empty($skpPerilaku) ? $skpPerilaku->rata_rata * 0.4 : 0;
+
+            $total_prestasi = $bobot_capaian_skp + $bobot_avg_perilaku;
        
             $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);  
             $pdf->SetPrintHeader(false);
@@ -298,7 +322,33 @@ class SkpController extends Controller
             // $imgdata = Yii::getAlias('@webroot').'/klorofil/assets/img/logo-ori.png';
             // $pdf->Image($imgdata,10,10,15);
             $pdf->writeHTML($data);
-            $pdf->Output('skp_'.rand(1,100).'.pdf','I');
+
+            ob_start();
+            echo $this->renderPartial('print_perilaku', [
+                'model' => $model,
+                'pegawaiDinilai' => $pegawaiDinilai,
+                'pejabatPenilai' => $pejabatPenilai,
+                'atasanPejabatPenilai' => $atasanPejabatPenilai,    
+                'skpPerilaku' => $skpPerilaku,
+                'avg_capaian_skp' => $avg_capaian_skp,
+                'bobot_capaian_skp' => $bobot_capaian_skp,
+                'bobot_avg_perilaku' => $bobot_avg_perilaku,
+                'total_prestasi' => $total_prestasi,
+                'bkd_periode' =>   $bkd_periode,
+            ]);
+
+            $data = ob_get_clean();
+            ob_start();
+            
+            
+            $pdf->SetFont($fontreg, '', 9);
+            $pdf->AddPage('P');
+            // $imgdata = Yii::getAlias('@webroot').'/klorofil/assets/img/logo-ori.png';
+            // $pdf->Image($imgdata,10,10,15);
+            $pdf->writeHTML($data);
+
+            $nama = !empty($model->pegawaiDinilai->dataDiri) ? strtolower($model->pegawaiDinilai->dataDiri->nama) : '-';
+            $pdf->Output('skp_'.$nama.'_'.rand(1,100).'.pdf','I');
         }
         catch(\HTML2PDF_exception $e) {
             echo $e;

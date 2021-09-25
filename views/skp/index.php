@@ -8,7 +8,7 @@ use kartik\grid\GridView;
 /* @var $searchModel app\models\SkpSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Skps';
+$this->title = 'Sasaran Kinerja Pegawai';
 $this->params['breadcrumbs'][] = $this->title;
 
 $list_status_skp = MyHelper::statusSkp();
