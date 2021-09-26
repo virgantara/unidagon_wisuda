@@ -317,7 +317,12 @@ yii\bootstrap\Modal::begin([
                             'name' => 'komponen_kegiatan_id',
                             'type'=>DepDrop::TYPE_SELECT2,
                             'options'=>['id'=>'komponen_kegiatan_id'],
-                            'select2Options'=>['pluginOptions'=>['allowClear'=>true]],
+                            'select2Options'=>[
+                                'pluginOptions'=>[
+                                    'allowClear'=>true,
+                                    'dropdownParent' => '#modal'
+                                ]
+                            ],
                             'pluginOptions'=>[
                                 'depends'=>['unsur_utama'],
                                 'initialize' => true,
