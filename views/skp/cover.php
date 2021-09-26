@@ -1,6 +1,16 @@
 <?php 
-use yii\helpers\ArrayHelper;
 
+$list_staf = \app\helpers\MyHelper::listRoleStaf();
+$nama_pegawai = '';
+if(in_array($model->pegawaiDinilai->access_role, $list_staf))
+{
+    $nama_pegawai = $model->pegawaiDinilai->tendik->nama;
+}
+
+else
+{
+    $nama_pegawai = !empty($model->pegawaiDinilai) && !empty($model->pegawaiDinilai->dataDiri) ? $model->pegawaiDinilai->dataDiri->gelar_depan.' '.$model->pegawaiDinilai->dataDiri->nama.' '.$model->pegawaiDinilai->dataDiri->gelar_belakang : '-';
+}
 ?>
 <table width="100%">
   <tr>
@@ -17,11 +27,11 @@ use yii\helpers\ArrayHelper;
 <table border="0" width="100%" cellpadding="1" cellspacing="0">   
     <tr>
       <th width="40%" ><strong>Nama Dosen</strong></th>
-      <th width="60%" >: <?=$user->nama;?></th>
+      <th width="60%" >: <?=$nama_pegawai;?></th>
     </tr>
     <tr>
       <th width="40%" ><strong>NIY</strong></th>
-      <th width="60%" >: <?=$user->NIY;?></th>
+      <th width="60%" >: <?=$model->pegawai_dinilai;?></th>
     </tr>
     
     <tr>

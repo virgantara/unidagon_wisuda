@@ -152,14 +152,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     $nama_pegawai = '';
                     
-                    if(in_array(Yii::$app->user->identity->access_role, $list_staf))
+                    if(in_array($data->pegawaiDinilai->access_role, $list_staf))
                     {
                         $nama_pegawai = $data->pegawaiDinilai->tendik->nama;
                     }
 
                     else
                     {
-                        !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
+                        $nama_pegawai = !empty($data->pegawaiDinilai) ? $data->pegawaiDinilai->dataDiri->gelar_depan.' '.$data->pegawaiDinilai->dataDiri->nama.' '.$data->pegawaiDinilai->dataDiri->gelar_belakang : null;
                     }
                     return $nama_pegawai;
                 }
