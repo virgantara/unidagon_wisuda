@@ -51,6 +51,11 @@ else
 <div class="block-header">
     <h2><?= Html::encode($this->title) ?></h2>
 </div>
+ <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
 <div class="row">
    <div class="col-md-12">
         <div class="panel">

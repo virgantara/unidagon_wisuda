@@ -198,74 +198,115 @@ else
                         
                             <td class="text-center">
                                 <?php 
-                                echo Editable::widget([
-                                    'name' => 'realisasi_ak',
-                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
-                                    'asPopover' => false,
-                                    // 'format' => 'raw',
-                                    'value' => $item->realisasi_ak,
-                                    // 'displayValue' => 'oke',
-                                    'size'=>'md',
-                                    'options' => ['class'=>'form-control']
-                                ]);
+                                if($model->status_skp == 2)
+                                {
+                                    echo Editable::widget([
+                                        'name' => 'realisasi_ak',
+                                        'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                        'asPopover' => false,
+                                        // 'format' => 'raw',
+
+                                        'value' => $item->realisasi_ak,
+                                        // 'displayValue' => 'oke',
+                                        'size'=>'md',
+                                        'options' => ['class'=>'form-control']
+                                    ]);
+                                }
+
+                                else
+                                {
+                                    echo $item->realisasi_ak;
+                                }
                                  ?>
                             </td>
                             <td class="text-center">
                                 <?php 
-                                echo Editable::widget([
-                                    'name' => 'realisasi_qty',
-                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
-                                    'asPopover' => false,
-                                    // 'format' => 'raw',
-                                    'value' => $item->realisasi_qty,
-                                    // 'displayValue' => 'oke',
-                                    'size'=>'md',
-                                    'options' => ['class'=>'form-control']
-                                ]);
+                                if($model->status_skp == 2)
+                                {
+                                    echo Editable::widget([
+                                        'name' => 'realisasi_qty',
+                                        'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                        'asPopover' => false,
+                                        // 'format' => 'raw',
+                                        'value' => $item->realisasi_qty,
+                                        // 'displayValue' => 'oke',
+                                        'size'=>'md',
+                                        'options' => ['class'=>'form-control']
+                                    ]);
+                                }
+
+                                else
+                                {
+                                    echo $item->realisasi_qty;
+                                }
                                  ?> <?=$item->realisasi_satuan;?>
                                     
                             </td>
                             <td class="text-center">
                                 <?php 
-                                echo Editable::widget([
-                                    'name' => 'realisasi_mutu',
-                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
-                                    'asPopover' => false,
-                                    // 'format' => 'raw',
-                                    'value' => $item->realisasi_mutu,
-                                    // 'displayValue' => 'oke',
-                                    'size'=>'md',
-                                    'options' => ['class'=>'form-control']
-                                ]);
+                                if($model->status_skp == 2)
+                                {
+                                    echo Editable::widget([
+                                        'name' => 'realisasi_mutu',
+                                        'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                        'asPopover' => false,
+                                        // 'format' => 'raw',
+                                        'value' => $item->realisasi_mutu,
+                                        // 'displayValue' => 'oke',
+                                        'size'=>'md',
+                                        'options' => ['class'=>'form-control']
+                                    ]);
+                                }
+
+                                else
+                                {
+                                    echo $item->realisasi_mutu;
+                                }
                                  ?> 
                             </td>
                             <td class="text-center">
                                 <?php 
-                                echo Editable::widget([
-                                    'name' => 'realisasi_waktu',
-                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
-                                    'asPopover' => false,
-                                    // 'format' => 'raw',
-                                    'value' => $item->realisasi_waktu,
-                                    // 'displayValue' => 'oke',
-                                    'size'=>'md',
-                                    'options' => ['class'=>'form-control']
-                                ]);
+                                if($model->status_skp == 2)
+                                {
+                                    echo Editable::widget([
+                                        'name' => 'realisasi_waktu',
+                                        'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                        'asPopover' => false,
+                                        // 'format' => 'raw',
+                                        'value' => $item->realisasi_waktu,
+                                        // 'displayValue' => 'oke',
+                                        'size'=>'md',
+                                        'options' => ['class'=>'form-control']
+                                    ]);
+                                }
+
+                                else
+                                {
+                                    echo $item->realisasi_waktu;
+                                }
                                  ?> 
                                 <?=$item->realisasi_waktu_satuan;?></td>
                             
                             <td class="text-right">
                                 <?php 
-                                echo Editable::widget([
-                                    'name' => 'realisasi_biaya',
-                                    'beforeInput' => Html::hiddenInput('editableKey',$item->id),
-                                    'asPopover' => false,
-                                    // 'format' => 'raw',
-                                    'value' => MyHelper::formatRupiah($item->realisasi_biaya),
-                                    // 'displayValue' => 'oke',
-                                    'size'=>'md',
-                                    'options' => ['class'=>'form-control']
-                                ]);
+                                if($model->status_skp == 2)
+                                {
+                                    echo Editable::widget([
+                                        'name' => 'realisasi_biaya',
+                                        'beforeInput' => Html::hiddenInput('editableKey',$item->id),
+                                        'asPopover' => false,
+                                        // 'format' => 'raw',
+                                        'value' => MyHelper::formatRupiah($item->realisasi_biaya),
+                                        // 'displayValue' => 'oke',
+                                        'size'=>'md',
+                                        'options' => ['class'=>'form-control']
+                                    ]);
+                                }
+
+                                else
+                                {
+                                    echo $item->realisasi_biaya;
+                                }
                                  ?>
 
                             </td>

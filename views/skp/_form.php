@@ -14,7 +14,11 @@ $list_periode = ArrayHelper::map(\app\models\BkdPeriode::find()->orderBy(['tahun
 
     <?php $form = ActiveForm::begin(); ?>
 
-
+     <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    }
+    ?>
     <?= $form->field($model, 'periode_id',['options' => ['tag' => false]])->widget(Select2::classname(), [
             'data' => $list_periode,
 

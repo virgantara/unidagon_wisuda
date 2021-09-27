@@ -5,11 +5,14 @@ namespace app\controllers;
 use Yii;
 use app\helpers\MyHelper;
 use app\models\Skp;
+use app\models\KomponenKegiatan;
+use app\models\DataDiri;
 use app\models\SkpPerilaku;
 use app\models\MJabatan;
 use app\models\Jabatan;
 use app\models\BkdPeriode;
 use app\models\SkpItem;
+use app\models\Pengajaran;
 use app\models\SkpSearch;
 use app\models\SkpItemSearch;
 use yii\web\Controller;
@@ -658,6 +661,26 @@ class SkpController extends Controller
      */
     public function actionCreate()
     {
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
+
         $model = new Skp();
         $model->id = MyHelper::gen_uuid();
         $model->status_skp = '1';
@@ -752,9 +775,112 @@ class SkpController extends Controller
             $model->jabatan_pegawai_id = !empty($jabatan) ? $jabatan->ID : null;
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) 
+        {
+
+            $errors = '';
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            
+            try 
+            {
+
+                if($model->save())
+                {
+                    if($access_role == 'Dosen')
+                    {
+                        
+                        $dataDiri = DataDiri::findOne(['NIY'=>$model->pegawai_dinilai]);
+                        $kode_komponen = '-';
+
+                        if(!empty($dataDiri))
+                        {
+                            $jabfung = !empty($dataDiri->jabatanFungsional) ? $dataDiri->jabatanFungsional->kode : '-';
+
+                            if(in_array($jabfung,['AA','TT']))
+                            {
+                                $kode_komponen = 'B1';
+                            }
+
+                            else if(in_array($jabfung,['L','LK','GB']))
+                            {
+                                $kode_komponen = 'B2';
+                            }
+                        }
+
+                        $komponen = KomponenKegiatan::find()->where(['kode' => $kode_komponen])->one();
+                        if(!empty($komponen))
+                        {
+                            $pengajaran = Pengajaran::find()->where([
+                                'tahun_akademik' => $bkd_periode->tahun_id,
+                                'NIY' => $model->pegawai_dinilai
+                            ])->all();
+
+                            $total_sks = 0;
+                            foreach($pengajaran as $p)
+                            {
+                                $total_sks += $p->sks;
+                            }
+
+                            $item = SkpItem::find()->where([
+                                'skp_id' => $model->id,
+                                'komponen_kegiatan_id' => $komponen->id,
+                                'nama' => 'Melaksanaan perkuliahan '.$total_sks.' sks'
+                            ])->one();
+
+                            if(empty($item)){
+                                $item = new SkpItem;
+                                $item->id = MyHelper::gen_uuid();
+                            }
+                            
+                            $item->komponen_kegiatan_id = $komponen->id;
+                            $item->nama = 'Melaksanaan perkuliahan '.$total_sks.' sks';
+                            $item->skp_id = $model->id;
+                            
+                            $ak = $total_sks * $komponen->angka_kredit_pak;
+                            if($total_sks > 10)
+                            {
+                                $ak = 10 * $komponen->angka_kredit_pak;
+                                $sisa = $total_sks - 10;
+
+                                $ak = $ak + ($sisa * ($komponen->angka_kredit_pak / 2));
+                            }
+
+                            $item->target_ak = $ak;
+                            $item->realisasi_ak = $ak;
+                            $item->target_qty = $total_sks;
+                            $item->target_satuan = 'sks';
+                            $item->target_mutu = $total_sks;
+                            $item->target_waktu = 14;
+                            $item->target_waktu_satuan = 'pekan';
+
+
+                            if(!$item->save())
+                            {
+                                $errors .= MyHelper::logError($item);
+                                throw new \Exception;
+                            }
+                        }    
+                    }
+                    
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Data tersimpan");
+                    return $this->redirect(['view', 'id' => $model->id]);    
+                }
+            }   
+
+            catch (\Exception $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                Yii::$app->session->setFlash('danger', $errors);
+                
+                
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                Yii::$app->session->setFlash('danger', $errors);
+                
+            }     
         }
 
         return $this->render('create', [
