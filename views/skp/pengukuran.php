@@ -32,7 +32,7 @@ if(in_array(Yii::$app->user->identity->access_role, $list_staf))
 
 else
 {
-    $nama_pegawai = $model->pegawaiDinilai->dataDiri->gelar_depan;?> <?=$model->pegawaiDinilai->dataDiri->nama;?> <?=$model->pegawaiDinilai->dataDiri->gelar_belakang;
+    $nama_pegawai = $model->pegawaiDinilai->dataDiri->gelar_depan.' '.$model->pegawaiDinilai->dataDiri->nama.' '.$model->pegawaiDinilai->dataDiri->gelar_belakang;
 }
 ?>
 <style type="text/css">
@@ -188,7 +188,7 @@ else
                         
                         <tr>
                             <td><?=$q+1;?></td>
-                            <td><?=$item->komponenKegiatan->nama.' - '.$item->komponenKegiatan->subunsur;?></td>
+                            <td><?=$item->nama;?></td>
                             <td class="text-center"><?=$item->target_ak;?></td>
                             <td class="text-center"><?=$item->target_qty;?> <?=$item->target_satuan;?></td>
                             <td class="text-center"><?=$item->target_mutu;?></td>
@@ -335,12 +335,15 @@ else
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="13" class="text-right">Nilai Capaian SKP</td>
+                            <td rowspan="2" colspan="13" class="text-right">Nilai Capaian SKP</td>
                             <td class="text-center">
                                 <?=round($avg_capaian_skp,2);?>
-                                (<b><?=$kesimpulan;?></b>)
+                               
                             </td>
                             
+                        </tr>
+                        <tr>
+                            <td> (<b><?=$kesimpulan;?></b>)</td>
                         </tr>
                     </tfoot>
                 </table>

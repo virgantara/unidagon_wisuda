@@ -413,11 +413,11 @@ $this->params['breadcrumbs'][] = $this->title;
                        
                     </tr>
                     <tr>
-                        <th colspan="2">c. Keberatan dari Pejabata Penilai (apabila ada)</th>
+                        <th colspan="2">c. Keberatan dari Pejabat Penilai (apabila ada)</th>
                         <th colspan="3">
                             <?php 
                             echo Editable::widget([
-                                'name' => 'keberatan_pejabat_penilai ',
+                                'name' => 'keberatan_pejabat_penilai',
                                 'beforeInput' => Html::hiddenInput('editableKey',$model->id),
                                 'asPopover' => false,
                                 'inputType' => Editable::INPUT_TEXTAREA,

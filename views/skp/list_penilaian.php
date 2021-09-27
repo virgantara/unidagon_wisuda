@@ -162,9 +162,159 @@ $this->params['breadcrumbs'][] = $this->title;
 
     </div>
 </div>
+<?php 
+if(Yii::$app->user->identity->NIY == $pegawaiDinilai->NIY)
+{
+ ?>
+
+<div class="row">
+   <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+
+
+                UNSUR YANG DINILAI
+            </div>
+
+            <div class="panel-body ">
+            <table class="table table-hover table-striped table-bordered">
+                <tbody>
+            
+                    <tr>
+                        <th width="20%">a. Sasaran Kerja Pegawai (SKP)</th>
+                        <th width="20%"></th>
+                        <th width="20%" class="text-center"><?=round($avg_capaian_skp,2);?></th>
+                        <th width="20%" class="text-center">x 60 %</th>
+                        <th width="20%" class="text-center"><?=round($bobot_capaian_skp,2);?></th>
+                    </tr>
+                    <tr>
+                        <th>b. Perilaku Kerja</th>
+                        <th>1. Orientasi Pelayanan</th>
+                        <th class="text-center">
+                             <?=!empty($skpPerilaku) ? $skpPerilaku->orientasi : null ?>
+                        </th>
+                        <th class="text-center">
+                        <?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->orientasi : 0)?>
+                             
+                         </th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>2. Integritas</th>
+                        <th class="text-center">
+                          
+                            <?=!empty($skpPerilaku) ? $skpPerilaku->integritas : null?>
+                        </th>
+                        <th class="text-center"><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->integritas : 0)?></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>3. Komitmen</th>
+                        <th class="text-center">
+                             <?=!empty($skpPerilaku) ? $skpPerilaku->komitmen : null?>
+                        </th>
+                        <th class="text-center"><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->komitmen : 0)?></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>4. Disiplin</th>
+                        <th class="text-center"><?=!empty($skpPerilaku) ? $skpPerilaku->disiplin : null?></th>
+                        <th class="text-center"><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->disiplin : 0)?></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>5. Kerjasama</th>
+                        <th class="text-center"><?=!empty($skpPerilaku) ? $skpPerilaku->kerjasama : null?></th>
+                        <th class="text-center"><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->kerjasama : 0)?></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>6. Kepemimpinan</th>
+                        <th class="text-center"><?=!empty($skpPerilaku) ? $skpPerilaku->kepemimpinan : null?></th>
+                        <th class="text-center"><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->kepemimpinan : 0)?></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>Jumlah</th>
+                        <th class="text-center"><?=!empty($skpPerilaku) ? $skpPerilaku->total : 0;?></th>
+                        <th><label id="label_jumlah_persen"></label></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>Nilai rata-rata</th>
+                        <th class="text-center"><?=!empty($skpPerilaku) ? round($skpPerilaku->rata_rata,2) : 0;?></th>
+                        <th class="text-center">(<?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->rata_rata : 0)?>)</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>Nilai Perilaku kerja</th>
+                        <th class="text-center"><?=!empty($skpPerilaku) ? round($skpPerilaku->rata_rata,2) : 0;?></th>
+                        <th class="text-center">x 40 %</th>
+                        <th class="text-center"><?=!empty($skpPerilaku) ? round($skpPerilaku->rata_rata * 0.4,2) : 0;?></th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" colspan="4">Nilai Prestasi Kerja</th>
+                        <th class="text-center"><?=round($bobot_capaian_skp + $bobot_avg_perilaku,2)?></th>
+                        <!-- <th>b</th> -->
+                    </tr>
+                    <tr>
+                        <th class="text-center">(<?= MyHelper::kesimpulan($total_prestasi)?>)</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">a. Keberatan dari Pegawai yang dinilai (apabila ada)</th>
+                        <th colspan="3">
+                            <?=!empty($skpPerilaku) ? $skpPerilaku->keberatan_pegawai_dinilai : null?>
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th colspan="2">b. Keberatan dari Atasan Penilai (apabila ada)</th>
+                        <th colspan="3">
+                            <?=!empty($skpPerilaku) ? $skpPerilaku->keberatan_atasan_penilai : null?>
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th colspan="2">c. Keberatan dari Pejabat Penilai (apabila ada)</th>
+                        <th colspan="3">
+                            <?=!empty($skpPerilaku) ? $skpPerilaku->keberatan_pejabat_penilai  : null?>
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th colspan="2">d. Keputusan Atasan Pejabat Penilai Atas Keberatan</th>
+                        <th colspan="3">
+                            <?=!empty($skpPerilaku) ? $skpPerilaku->keputusan_atasan_pejabat_atas_keberatan : null?>
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th colspan="2">e. Rekomendasi</th>
+                        <th colspan="3">
+                            <?=!empty($skpPerilaku) ? $skpPerilaku->rekomendasi : null;?>
+                        </th>
+                       
+                    </tr>
+                </tbody>
+            </table>
 
 
 
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<?php } ?>
 
 <div class="row">
     <div class="col-md-12">

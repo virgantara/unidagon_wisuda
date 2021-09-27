@@ -52,6 +52,26 @@ class SkpController extends Controller
             return $this->redirect($url);
         }
 
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+            $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+            $sd = $session->get('tgl_awal');
+            $ed = $session->get('tgl_akhir');  
+            $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+            $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+            $tahun_id = $bkd_periode->tahun_id;
+            $sd = $bkd_periode->tanggal_bkd_awal;
+            $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
+
         $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
         $loggedInAs = MJabatan::find()->where(['nama'=>Yii::$app->user->identity->access_role])->one();
 
@@ -66,6 +86,52 @@ class SkpController extends Controller
         $jabatanPegawai = null;
         $atasanPejabatPenilai = null;
         $jabatanAtasanPenilai = null;
+
+        $skpPerilaku = null;
+
+
+
+        $model = Skp::findOne([
+            'periode_id' => $bkd_periode->tahun_id,
+            'pegawai_dinilai' => $user->NIY
+        ]);
+
+        $capaian_total = 0;
+        $avg_capaian_skp = 0;
+        $counter=0;
+        $bobot_capaian_skp = 0;
+        $bobot_avg_perilaku = 0;
+        $total_prestasi = 0;
+        if(!empty($model))
+        {
+            $skpPerilaku = $model->skpPerilaku;
+           
+            $pegawaiDinilai = $model->pegawaiDinilai;
+            $pejabatPenilai = $model->pejabatPenilai;
+            $atasanPejabatPenilai = $model->atasanPejabatPenilai;
+
+            
+            foreach($model->skpItems as $q => $item)
+            {
+                $counter++;
+
+                $item->hitungSkp();
+                $penghitungan = $item->capaian;
+                $tmp = $item->capaian_skp;
+                $capaian_total += $tmp;
+            }
+
+
+
+            if($counter > 0)
+                $avg_capaian_skp = $capaian_total / $counter;
+
+            $bobot_capaian_skp = $avg_capaian_skp * 0.6;
+            $bobot_avg_perilaku = !empty($skpPerilaku) ? $skpPerilaku->rata_rata * 0.4 : 0;
+
+            $total_prestasi = $bobot_capaian_skp + $bobot_avg_perilaku;
+
+        }
 
         $access_role = Yii::$app->user->identity->access_role;
         $list_staf = MyHelper::listRoleStaf();
@@ -140,8 +206,12 @@ class SkpController extends Controller
             'jabatanAtasanPenilai' => $jabatanAtasanPenilai,
             'atasanPejabatPenilai' => $atasanPejabatPenilai,
             'searchModel' => $searchModel,
+            'skpPerilaku' => $skpPerilaku,
             'dataProvider' => $dataProvider,
-            
+            'avg_capaian_skp' => $avg_capaian_skp,
+            'bobot_capaian_skp' => $bobot_capaian_skp,
+            'bobot_avg_perilaku' => $bobot_avg_perilaku,
+            'total_prestasi' => $total_prestasi
         ]);
 
     }
