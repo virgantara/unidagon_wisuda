@@ -44,8 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($data){
             if(!empty($data->berkas)){
             return
-            Html::a('<i class="fa fa-search"></i> View', ['hki/display', 'id' => $data->id],['class' => 'btn btn-warning','target'=>'_blank']).'&nbsp;&nbsp;'.
-            Html::a('<i class="fa fa-download"></i> Download', ['hki/download', 'id' => $data->id],['class' => 'btn btn-primary']);
+            Html::a('<i class="fa fa-search"></i> View', $data->berkas,['class' => 'btn btn-warning','target'=>'_blank']).'&nbsp;&nbsp;';
             }
             else
             {

@@ -175,30 +175,31 @@ class HkiController extends AppController
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
        
+        $s3config = Yii::$app->params['s3'];
 
+        $s3 = new \Aws\S3\S3Client($s3config);
         try 
         {
             if ($model->load(Yii::$app->request->post())) {
-                $tambah = new Verify();
-                $tambah->NIY = Yii::$app->user->identity->NIY;
-                $tambah->kategori = 16;
-                $tambah->ver = 'Belum Diverifikasi';
-                $tambah->ID_data = $model->id;
-                $tambah->save();
+                
 
                 $model->berkas = UploadedFile::getInstance($model,'berkas');
                 if($model->berkas){
-                    $file = $model->berkas->name;
+                    $berkas = $model->berkas->tempName;
+                    $mime_type = $model->berkas->type;
+                    $file = 'HKI_'.$model->jenis_hki_id.'_'.$model->tahun_pelaksanaan.'_'.date('YmdHis').'_'.rand(1,100).'.'.$model->berkas->extension;
+                    $key = 'hki/'.$file;
+                    $insert = $s3->putObject([
+                        'Bucket' => 'dosen',
+                        'Key'    => $key,
+                        'Body'   => 'This is the Body',
+                        'SourceFile' => $berkas,
+                        'ContentType' => $mime_type
+                    ]);
+                  
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->berkas = $plainUrl;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/hki'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/hki');
-
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/hki/'.date('Ym')))
-                        mkdir(Yii::getAlias('@frontend').'/web/uploads/hki/'.date('Ym'));
-
-                    if ($model->berkas->saveAs(Yii::getAlias('@frontend').'/web/uploads/hki/'.date('Ym').'/'.$file)){
-                        $model->berkas = date('Ym').'/'.$file;           
-                    }
                 }
 
                 $model->ver = 'Sudah Diverifikasi';
@@ -262,37 +263,31 @@ class HkiController extends AppController
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
        
+        $s3config = Yii::$app->params['s3'];
 
+        $s3 = new \Aws\S3\S3Client($s3config);
         try 
         {
             if ($model->load(Yii::$app->request->post())) {
-                $very = Verify::findOne(['kategori'=>'16','ID_data'=>$id]);
-                if(!empty($very)){
-                    $very->ver = 'Belum Diverifikasi';
-                    $very->save();
-                }else{
-                    $tambah = new Verify();
-                    $tambah->NIY = Yii::$app->user->identity->NIY;
-                    $tambah->kategori = 16;
-                    $tambah->ver = 'Belum Diverifikasi';
-                    $tambah->ID_data = $model->id;
-                    $tambah->save();
-                }
                 
 
                 $model->berkas = UploadedFile::getInstance($model,'berkas');
                 if($model->berkas){
-                    $file = $model->berkas->name;
+                    $berkas = $model->berkas->tempName;
+                    $mime_type = $model->berkas->type;
+                    $file = 'HKI_'.$model->jenis_hki_id.'_'.$model->tahun_pelaksanaan.'_'.date('YmdHis').'_'.rand(1,100).'.'.$model->berkas->extension;
+                    $key = 'hki/'.$file;
+                    $insert = $s3->putObject([
+                        'Bucket' => 'dosen',
+                        'Key'    => $key,
+                        'Body'   => 'This is the Body',
+                        'SourceFile' => $berkas,
+                        'ContentType' => $mime_type
+                    ]);
+                  
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->berkas = $plainUrl;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/hki'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/hki');
-
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/hki/'.date('Ym')))
-                        mkdir(Yii::getAlias('@frontend').'/web/uploads/hki/'.date('Ym'));
-
-                    if ($model->berkas->saveAs(Yii::getAlias('@frontend').'/web/uploads/hki/'.date('Ym').'/'.$file)){
-                        $model->berkas = date('Ym').'/'.$file;           
-                    }
                 }
 
                 if (empty($model->berkas)){
