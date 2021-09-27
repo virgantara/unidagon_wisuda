@@ -82,13 +82,7 @@ class JurnalController extends Controller
                 if($model->path_berkas){
                     $file = 'J'.date('YmdHis').Yii::$app->user->identity->NIY.'.'.$model->path_berkas->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/jurnal'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/jurnal');
-
-
-                    if ($model->path_berkas->saveAs(Yii::getAlias('@frontend').'/web/uploads/jurnal/'.$file)){
-                        $model->path_berkas = $file;           
-                    }
+                   
                 }
 
                 $model->is_approved = 1;//by pass
@@ -166,13 +160,6 @@ class JurnalController extends Controller
                 $model->path_berkas = UploadedFile::getInstance($model,'path_berkas');
                 if($model->path_berkas){
                     $file = 'J'.date('YmdHis').Yii::$app->user->identity->NIY.'.'.$model->path_berkas->extension;
-
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/jurnal'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/jurnal');
-
-                    if ($model->path_berkas->saveAs(Yii::getAlias('@frontend').'/web/uploads/jurnal/'.$file)){
-                        $model->path_berkas = $file;           
-                    }
                 }
 
                 if (empty($model->path_berkas)){

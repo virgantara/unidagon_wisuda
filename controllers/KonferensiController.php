@@ -91,15 +91,7 @@ class KonferensiController extends Controller
                 if($model->f_konferensi){
                     $file = $model->f_konferensi->name;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/konferensi'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/konferensi');
-
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/konferensi/'.$model->ID))
-                        mkdir(Yii::getAlias('@frontend').'/web/uploads/konferensi/'.$model->ID);
-
-                    if ($model->f_konferensi->saveAs(Yii::getAlias('@frontend').'/web/uploads/konferensi/'.$model->ID.'/'.$file)){
-                        $model->f_konferensi = $file;           
-                    }
+                   
                 }
 
                 if(!empty($_POST['author_id']))
@@ -183,15 +175,7 @@ class KonferensiController extends Controller
                 if($model->f_konferensi){
                     $file = $model->f_konferensi->name;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/konferensi'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/konferensi');
-
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/konferensi/'.$model->ID))
-                        mkdir(Yii::getAlias('@frontend').'/web/uploads/konferensi/'.$model->ID);
-
-                    if ($model->f_konferensi->saveAs(Yii::getAlias('@frontend').'/web/uploads/konferensi/'.$model->ID.'/'.$file)){
-                        $model->f_konferensi = $file;           
-                    }
+                    
                 }
 
                 if (empty($model->f_konferensi)){

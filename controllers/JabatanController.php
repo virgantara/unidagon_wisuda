@@ -153,12 +153,7 @@ class JabatanController extends AppController
                 if($model->f_penugasan){
                     $file = $model->f_penugasan->name.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_penugasan->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/jabatan'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/jabatan');
-
-                    if ($model->f_penugasan->saveAs(Yii::getAlias('@frontend').'/web/uploads/jabatan/'.$file)){
-                        $model->f_penugasan = $file;           
-                    }
+                    
                 }
 
                 $model->ver = 'Sudah Diverifikasi';
@@ -221,12 +216,7 @@ class JabatanController extends AppController
                 if($model->f_penugasan){
                     $file = $model->f_penugasan->name.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_penugasan->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/jabatan'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/jabatan');
-
-                    if ($model->f_penugasan->saveAs(Yii::getAlias('@frontend').'/web/uploads/jabatan/'.$file)){
-                        $model->f_penugasan = $file;           
-                    }
+                   
                 }
 
                 if (empty($model->f_penugasan)){

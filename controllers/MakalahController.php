@@ -90,12 +90,7 @@ class MakalahController extends Controller
                 if($model->f_makalah){
                     $file = 'J'.date('YmdHis').Yii::$app->user->identity->NIY.'.'.$model->f_makalah->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/makalah'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/makalah');
-
-                    if ($model->f_makalah->saveAs(Yii::getAlias('@frontend').'/web/uploads/makalah/'.$file)){
-                        $model->f_makalah = $file;           
-                    }
+                   
                 }
 
                 if($model->save())
@@ -186,12 +181,7 @@ class MakalahController extends Controller
                 if($model->f_makalah){
                     $file = 'J'.date('YmdHis').Yii::$app->user->identity->NIY.'.'.$model->f_makalah->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/makalah'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/makalah');
-                
-                    if ($model->f_makalah->saveAs(Yii::getAlias('@frontend').'/web/uploads/makalah/'.$file)){
-                        $model->f_makalah = $file;           
-                    }
+                    
                 }
 
                 if (empty($model->f_makalah)){

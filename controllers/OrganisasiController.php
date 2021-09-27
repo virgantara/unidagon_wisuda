@@ -233,12 +233,7 @@ class OrganisasiController extends AppController
                 if($model->f_sk){
                     $file = $model->f_sk->name.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_sk->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/organisasi'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/organisasi');
-
-                    if ($model->f_sk->saveAs(Yii::getAlias('@frontend').'/web/uploads/organisasi/'.$file)){
-                        $model->f_sk = $file;           
-                    }
+                    
                 }
 
                 $model->ver = 'Sudah Diverifikasi';
@@ -300,12 +295,7 @@ class OrganisasiController extends AppController
                 if($model->f_sk){
                     $file = $model->f_sk->name.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_sk->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/organisasi'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/organisasi');
-
-                    if ($model->f_sk->saveAs(Yii::getAlias('@frontend').'/web/uploads/organisasi/'.$file)){
-                        $model->f_sk = $file;           
-                    }
+                    
                 }
 
                 if (empty($model->f_sk)){

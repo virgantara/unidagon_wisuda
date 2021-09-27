@@ -89,13 +89,7 @@ class PelatihanController extends Controller
                 if($model->f_sertifikat){
                     $file = date('YmdHis').$model->f_sertifikat->name.'.'.$model->f_sertifikat->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/pelatihan'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/pelatihan');
-
-
-                    if ($model->f_sertifikat->saveAs(Yii::getAlias('@frontend').'/web/uploads/pelatihan/'.$file)){
-                        $model->f_sertifikat = $file;           
-                    }
+                    
                 }
 
                 if($model->save())

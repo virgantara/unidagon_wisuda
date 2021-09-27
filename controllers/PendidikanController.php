@@ -93,13 +93,7 @@ class PendidikanController extends AppController
                 if($model->f_ijazah){
                     $file = date('YmdHis').$model->f_ijazah->name.'.'.$model->f_ijazah->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/pendidikan'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/pendidikan');
-
-
-                    if ($model->f_ijazah->saveAs(Yii::getAlias('@frontend').'/web/uploads/pendidikan/'.$file)){
-                        $model->f_ijazah = $file;           
-                    }
+                    
                 }
 
                 if($model->save())
@@ -166,13 +160,7 @@ class PendidikanController extends AppController
                 if($model->f_ijazah){
                     $file = date('YmdHis').$model->f_ijazah->name.'.'.$model->f_ijazah->extension;
 
-                    if(!file_exists(Yii::getAlias('@frontend').'/web/uploads/pendidikan'))
-                      mkdir(Yii::getAlias('@frontend').'/web/uploads/pendidikan');
-
-               
-                    if ($model->f_ijazah->saveAs(Yii::getAlias('@frontend').'/web/uploads/pendidikan/'.$file)){
-                        $model->f_ijazah = $file;           
-                    }
+                    
                 }
 
                 if (empty($model->f_ijazah)){
