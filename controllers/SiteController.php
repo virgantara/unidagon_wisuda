@@ -3769,21 +3769,28 @@ class SiteController extends AppController
 
     public function actionAuthCallback()
     {
-
-        // $input = json_decode(file_get_contents('php://input'),true);
-        // header('Content-type:application/json;charset=utf-8');
-
         $results = [];
          
         try
         {
-            $token = $_SERVER['HTTP_X_JWT_TOKEN'];
-            $key = Yii::$app->params['jwt_key'];
-            $decoded = JWT::decode($token, base64_decode(strtr($key, '-_', '+/')), ['HS256']);
-            $results = [
-                'code' => 200,
-                'message' => 'Valid'
-            ];   
+            $request_method = $_SERVER["REQUEST_METHOD"];
+            switch($request_method)
+            {
+                case 'POST' :
+                    $token = $_SERVER['HTTP_X_JWT_TOKEN'];
+                    $key = Yii::$app->params['jwt_key'];
+                    $decoded = JWT::decode($token, base64_decode(strtr($key, '-_', '+/')), ['HS256']);
+                    $results = [
+                        'code' => 200,
+                        'message' => 'Valid'
+                    ];   
+                break;
+                default:
+                    header("HTTP/1.0 405 Method Not Allowed");
+                    exit;
+                break;
+            }
+            
         }
         catch(\Exception $e) 
         {
@@ -3794,10 +3801,10 @@ class SiteController extends AppController
             ];
         }
 
+        header('Content-Type: application/json');
         echo json_encode($results);
 
         die();
-        
        
     }
 
