@@ -49,8 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($data){
             if(!empty($data->f_sertifikat)){
             return
-            Html::a('View', ['pelatihan/display', 'id' => $data->ID],['class' => 'btn btn-warning']).'&nbsp;&nbsp;'.
-            Html::a('Download', ['pelatihan/download', 'id' => $data->ID],['class' => 'btn btn-primary']);
+            Html::a('View', $data->f_sertifikat,['class' => 'btn btn-warning','target'=>'_blank']);
             }
             else
             {

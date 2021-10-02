@@ -73,22 +73,29 @@ class PelatihanController extends Controller
 
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
-       
+        $s3config = Yii::$app->params['s3'];
+        $s3 = new \Aws\S3\S3Client($s3config);
         $model->NIY = Yii::$app->user->identity->NIY;
         try 
         {
             if ($model->load(Yii::$app->request->post())) {
-                $tambah = new Verify();
-                $tambah->NIY = Yii::$app->user->identity->NIY;
-                $tambah->kategori = 8;
-                $tambah->ver = 'Belum Diverifikasi';
-                $tambah->ID_data = $model->ID;
-                $tambah->save();
-
                 $model->f_sertifikat = UploadedFile::getInstance($model,'f_sertifikat');
                 if($model->f_sertifikat){
                     $file = date('YmdHis').$model->f_sertifikat->name.'.'.$model->f_sertifikat->extension;
 
+                    $f_sertifikat = $model->f_sertifikat->tempName;
+                    $mime_type = $model->f_sertifikat->type;
+                    $key = 'diklat/'.$model->NIY.'/'.$file;
+                    $insert = $s3->putObject([
+                       'Bucket' => 'dosen',
+                       'Key'    => $key,
+                       'Body'   => 'This is the Body',
+                       'SourceFile' => $f_sertifikat,
+                       'ContentType' => $mime_type
+                    ]);
+
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->f_sertifikat = $plainUrl;
                     
                 }
 
@@ -124,38 +131,67 @@ class PelatihanController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $very = Verify::findOne(['kategori'=>'8','ID_data'=>$id]);
-            if(!empty($very)){
-            $very->ver = 'Belum Diverifikasi';
-            $very->save();
-            }else{
-              $tambah = new Verify();
-              $tambah->NIY = Yii::$app->user->identity->NIY;
-              $tambah->kategori = 8;
-              $tambah->ver = 'Belum Diverifikasi';
-              $tambah->ID_data = $model->ID;
-              $tambah->save();
+        
+
+        $f_sertifikat = $model->f_sertifikat;
+        
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        $s3config = Yii::$app->params['s3'];
+        $s3 = new \Aws\S3\S3Client($s3config);
+
+        try 
+        {
+            if ($model->load(Yii::$app->request->post())) {
+
+                $model->f_sertifikat = UploadedFile::getInstance($model,'f_sertifikat');
+
+                if($model->f_sertifikat)
+                {
+                    $file = date('YmdHis').$model->f_sertifikat->name.'.'.$model->f_sertifikat->extension;
+                    $f_sertifikat = $model->f_sertifikat->tempName;
+                    $mime_type = $model->f_sertifikat->type;
+                    $key = 'diklat/'.$model->NIY.'/'.$file;
+                    $insert = $s3->putObject([
+                       'Bucket' => 'dosen',
+                       'Key'    => $key,
+                       'Body'   => 'This is the Body',
+                       'SourceFile' => $f_sertifikat,
+                       'ContentType' => $mime_type
+                    ]);
+
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->f_sertifikat = $plainUrl;
+                    
+                }
+
+                if (empty($model->f_sertifikat)){
+                     $model->f_sertifikat = $f_sertifikat;
+                }
+
+
+                if($model->validate())
+                    $model->save();
+
+                
+
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', "Data tersimpan");
+                return $this->redirect(['pendidikan/view', 'id' => $model->ID]);
             }
-        $sementara = $model->f_sertifikat;
-        if ($model->load(Yii::$app->request->post())) {
-            $model->NIY = Yii::$app->user->identity->NIY;
-            $model->ver='Belum Diverifikasi';
-            $f_sertifikat =UploadedFile::getInstance($model,'f_sertifikat');
-            if(!empty($f_sertifikat)){
-            $NameImage = $model->nama_pelatihan.'-'.$model->tanggal_awal.'-'.$model->penyelenggara.'-'.date('Ymd').'.'.$f_sertifikat->extension;
-            $model->f_sertifikat = $NameImage;
-            if($model->save()){
-                $f_sertifikat -> saveAs('uploads/'.$model->NIY.'/pelatihan/'.$NameImage);
-                return $this->redirect(['view', 'id' => $model->ID]); 
-            }}
-            $model->f_sertifikat = $sementara;
-            $model->save();
-            return $this->redirect(['view', 'id' => $model->ID]);  
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
         }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+        
     }
 
     /**

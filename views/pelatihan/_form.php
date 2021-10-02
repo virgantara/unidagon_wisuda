@@ -9,15 +9,24 @@ use kartik\date\DatePicker;
 /* @var $model common\models\Pelatihan */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-
-<div class="pelatihan-form">
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading"></div>
+            <div class="panel-body">
 
     <?php $form = ActiveForm::begin(); ?>
-      <?= $form->field($model, 'tanggal_awal',['options' => ['tag' => false]])->widget(DatePicker::classname(), [
+      
+    
+    <?= $form->field($model, 'nama_pelatihan')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'penyelenggara')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'tanggal_awal',['options' => ['tag' => false]])->widget(DatePicker::classname(), [
                     'options' => ['placeholder' => 'Input tanggal awal ...'],
                     'pluginOptions' => [
                         'autoclose' => true,
-                        'format' => 'yyyy-mm-dd'
+                        'format' => 'yyyy-mm-dd',
+                        'todayHighlight' => true,
                     ]
                 ]);
                  ?>
@@ -27,15 +36,11 @@ use kartik\date\DatePicker;
                     'options' => ['placeholder' => 'Input tanggal akhir ...'],
                     'pluginOptions' => [
                         'autoclose' => true,
-                        'format' => 'yyyy-mm-dd'
+                        'format' => 'yyyy-mm-dd',
+                        'todayHighlight' => true,
                     ]
                 ]);
                  ?>
-    
-    <?= $form->field($model, 'nama_pelatihan')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'penyelenggara')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'f_sertifikat')->fileInput().'NB: File format is pdf, png, jpeg, jpg and maximal sized 1 MB<br><br>' ?>
 
     <div class="form-group">
@@ -43,5 +48,7 @@ use kartik\date\DatePicker;
     </div>
 
     <?php ActiveForm::end(); ?>
-
+            </div>
+        </div>
+    </div>
 </div>

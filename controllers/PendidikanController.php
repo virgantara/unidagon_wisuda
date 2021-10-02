@@ -77,30 +77,42 @@ class PendidikanController extends AppController
 
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
-       
+
+        $s3config = Yii::$app->params['s3'];
+        $s3 = new \Aws\S3\S3Client($s3config);
+
         $model->NIY = Yii::$app->user->identity->NIY;
         try 
         {
-            if ($model->load(Yii::$app->request->post())) {
-                $tambah = new Verify();
-                $tambah->NIY = Yii::$app->user->identity->NIY;
-                $tambah->kategori = 9;
-                $tambah->ver = 'Belum Diverifikasi';
-                $tambah->ID_data = $model->ID;
-                $tambah->save();
-
+            if ($model->load(Yii::$app->request->post())) 
+            {
+                
                 $model->f_ijazah = UploadedFile::getInstance($model,'f_ijazah');
-                if($model->f_ijazah){
+                if($model->f_ijazah)
+                {
                     $file = date('YmdHis').$model->f_ijazah->name.'.'.$model->f_ijazah->extension;
+                    $f_ijazah = $model->f_ijazah->tempName;
+                    $mime_type = $model->f_ijazah->type;
+                    $key = 'ijazah/'.$model->jenjang.'/'.$model->NIY.'/'.$file;
+                    $insert = $s3->putObject([
+                       'Bucket' => 'dosen',
+                       'Key'    => $key,
+                       'Body'   => 'This is the Body',
+                       'SourceFile' => $f_ijazah,
+                       'ContentType' => $mime_type
+                    ]);
 
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->f_ijazah = $plainUrl;
                     
                 }
 
+
                 if($model->save())
                 {
-                  $transaction->commit();
-                  Yii::$app->session->setFlash('success', "Data tersimpan");
-                  return $this->redirect(['pendidikan/view', 'id' => $model->ID]);  
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Data tersimpan");
+                    return $this->redirect(['pendidikan/view', 'id' => $model->ID]);  
                 }
 
                 
@@ -137,29 +149,31 @@ class PendidikanController extends AppController
         $f_ijazah = $model->f_ijazah;
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
-       
+        $s3config = Yii::$app->params['s3'];
+        $s3 = new \Aws\S3\S3Client($s3config);
 
         try 
         {
             if ($model->load(Yii::$app->request->post())) {
-                $very = Verify::findOne(['kategori'=>'9','ID_data'=>$id]);
-                if(!empty($very)){
-                    $very->ver = 'Belum Diverifikasi';
-                    $very->save();
-                }else{
-                    $tambah = new Verify();
-                    $tambah->NIY = Yii::$app->user->identity->NIY;
-                    $tambah->kategori = 9;
-                    $tambah->ver = 'Belum Diverifikasi';
-                    $tambah->ID_data = $model->ID;
-                    $tambah->save();
-                }
-                
 
                 $model->f_ijazah = UploadedFile::getInstance($model,'f_ijazah');
-                if($model->f_ijazah){
-                    $file = date('YmdHis').$model->f_ijazah->name.'.'.$model->f_ijazah->extension;
 
+                if($model->f_ijazah)
+                {
+                    $file = date('YmdHis').$model->f_ijazah->name.'.'.$model->f_ijazah->extension;
+                    $f_ijazah = $model->f_ijazah->tempName;
+                    $mime_type = $model->f_ijazah->type;
+                    $key = 'ijazah/'.$model->jenjang.'/'.$model->NIY.'/'.$file;
+                    $insert = $s3->putObject([
+                       'Bucket' => 'dosen',
+                       'Key'    => $key,
+                       'Body'   => 'This is the Body',
+                       'SourceFile' => $f_ijazah,
+                       'ContentType' => $mime_type
+                    ]);
+
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->f_ijazah = $plainUrl;
                     
                 }
 

@@ -48,9 +48,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format'=>'raw',
                 'value' => function($data){
             if(!empty($data->f_ijazah)){
-            return
-            Html::a('View', ['pendidikan/display', 'id' => $data->ID],['class' => 'btn btn-warning']).'&nbsp;&nbsp;'.
-            Html::a('Download', ['pendidikan/download', 'id' => $data->ID],['class' => 'btn btn-primary']);
+            return Html::a('View', $data->f_ijazah,['class' => 'btn btn-warning']).'&nbsp;&nbsp;';
+            // Html::a('Download', ['pendidikan/download', 'id' => $data->ID],['class' => 'btn btn-primary']);
             }
             else
             {
@@ -59,11 +58,11 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             }
             ],
-            [
-                'attribute' => 'ver',
-                'format' => 'raw',
-                'filter' => ['Belum Diverifikasi' => 'Belum Diverivikasi', 'Sudah Diverifikasi' => 'Sudah Diverifikasi','Ditolak' => 'Ditolak']
-            ],
+            // [
+            //     'attribute' => 'ver',
+            //     'format' => 'raw',
+            //     'filter' => ['Belum Diverifikasi' => 'Belum Diverivikasi', 'Sudah Diverifikasi' => 'Sudah Diverifikasi','Ditolak' => 'Ditolak']
+            // ],
 
             ['class' => 'yii\grid\ActionColumn','header'=>'Action'],
         ],
