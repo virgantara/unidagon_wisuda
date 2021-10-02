@@ -39,7 +39,7 @@ class Tes extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'jenis_tes', 'nama', 'penyelenggara', 'tahun'], 'required'],
+            [['id', 'nama', 'penyelenggara', 'tahun'], 'required'],
             [['tahun', 'id_jenis_tes'], 'integer'],
             [['skor'], 'number'],
             [['tanggal', 'updated_at', 'created_at'], 'safe'],

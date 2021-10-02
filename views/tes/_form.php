@@ -16,7 +16,7 @@ $list_jenis_tes = ArrayHelper::map(\app\models\JenisTes::find()->all(),'id', 'na
 
     <?php $form = ActiveForm::begin(); ?>
 
-
+    <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>    
      <?= $form->field($model, 'id_jenis_tes',['options' => ['tag' => false]])->widget(Select2::classname(), [
             'data' => $list_jenis_tes,
 
