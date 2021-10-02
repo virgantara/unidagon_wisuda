@@ -2884,7 +2884,7 @@ class SiteController extends AppController
         $client = new Client(['baseUrl' => $api_baseurl]);
         $client_token = Yii::$app->params['client_token'];
         $headers = ['x-access-token'=>$client_token];
-        $unsur = \app\models\UnsurKegiatan::findOne(1);
+        
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
         $counter = 0;
@@ -2892,6 +2892,57 @@ class SiteController extends AppController
         $results = [];
         try     
         {
+            $dataDiri = \app\models\DataDiri::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
+
+            $kode_komponen = '-';
+
+            if(!empty($dataDiri))
+            {
+                $jabfung = !empty($dataDiri->jabatanFungsional) ? $dataDiri->jabatanFungsional->kode : '-';
+
+                if(in_array($jabfung,['AA','TT']))
+                {
+                    $kode_komponen = 'B1';
+                }
+
+                else if(in_array($jabfung,['L','LK','GB']))
+                {
+                    $kode_komponen = 'B2';
+                }
+            }
+
+            $session = Yii::$app->session;
+            $tahun_id = '';
+            $sd = '';
+            $ed = '';
+            $bkd_periode = null;
+            if($session->has('bkd_periode'))
+            {
+                $tahun_id = $session->get('bkd_periode');
+              // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+                $sd = $session->get('tgl_awal');
+                $ed = $session->get('tgl_akhir');  
+                $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+            }
+            else{
+                $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+                $tahun_id = $bkd_periode->tahun_id;
+                $sd = $bkd_periode->tanggal_bkd_awal;
+                $ed = $bkd_periode->tanggal_bkd_akhir;
+            }
+
+            $komponen = \app\models\KomponenKegiatan::find()->where(['kode' => $kode_komponen])->one();
+            $query = \app\models\SkpItem::find();
+            $query->joinWith(['skp']);
+            $query->alias('t');
+            $query->where([
+                'skp.pegawai_dinilai' => Yii::$app->user->identity->NIY,
+                't.komponen_kegiatan_id' => !empty($komponen) ? $komponen->id : '-',
+                'skp.periode_id' => $tahun_id
+            ]); 
+
+            $skp_item = $query->one();
+
             foreach($list as $model)
             {
                 $params = [
@@ -2911,7 +2962,6 @@ class SiteController extends AppController
                         foreach($results as $res)
                         {
                             $kondisi = 'CH'.$model->jadwal_id.'_'.$res['id'];    
-                        
 
                             $catatan = \app\models\CatatanHarian::find()->where(['kondisi' => $kondisi])->one();
                             if(empty($catatan)){
@@ -2919,15 +2969,15 @@ class SiteController extends AppController
                             }
 
                             $catatan->user_id = Yii::$app->user->identity->ID;
-                            $catatan->unsur_id = $unsur->id;
-                            $catatan->deskripsi = $unsur->nama.' pertemuan ke-'.$res['pertemuan_ke'].' matkul '.$model->matkul.' '.$model->sks.' di ruang '.$res['ruang'];
+                            $catatan->skp_item_id = !empty($skp_item) ? $skp_item->id : null;
+                            $catatan->deskripsi = 'Melaksanakan perkuliahan pertemuan ke-'.$res['pertemuan_ke'].' matkul '.$model->matkul.' '.$model->sks.' di ruang '.$res['ruang'];
                             $catatan->is_selesai = '1';
-                            $catatan->poin = 10;
+                            $catatan->poin = !empty($skp_item) ? $skp_item->target_ak : 0;
                             $catatan->kondisi = $kondisi;
                             $catatan->tanggal = date('Y-m-d',strtotime($res['waktu']));
                             if($catatan->save())
                             {
-                              $counter++;
+                                $counter++;
                             }
 
                             else{
