@@ -209,7 +209,12 @@ else
                                         'value' => $item->realisasi_ak,
                                         // 'displayValue' => 'oke',
                                         'size'=>'md',
-                                        'options' => ['class'=>'form-control']
+                                        'options' => ['class'=>'form-control'],
+                                        'pluginEvents' => [
+                                            "editableSuccess" => "function(event, val, form, data) { 
+                                                location.reload();
+                                            }",
+                                        ],
                                     ]);
                                 }
 
@@ -231,7 +236,12 @@ else
                                         'value' => $item->realisasi_qty,
                                         // 'displayValue' => 'oke',
                                         'size'=>'md',
-                                        'options' => ['class'=>'form-control']
+                                        'options' => ['class'=>'form-control'],
+                                        'pluginEvents' => [
+                                            "editableSuccess" => "function(event, val, form, data) { 
+                                                location.reload();
+                                            }",
+                                        ],
                                     ]);
                                 }
 
@@ -254,7 +264,12 @@ else
                                         'value' => $item->realisasi_mutu,
                                         // 'displayValue' => 'oke',
                                         'size'=>'md',
-                                        'options' => ['class'=>'form-control']
+                                        'options' => ['class'=>'form-control'],
+                                        'pluginEvents' => [
+                                            "editableSuccess" => "function(event, val, form, data) { 
+                                                location.reload();
+                                            }",
+                                        ],
                                     ]);
                                 }
 
@@ -276,7 +291,12 @@ else
                                         'value' => $item->realisasi_waktu,
                                         // 'displayValue' => 'oke',
                                         'size'=>'md',
-                                        'options' => ['class'=>'form-control']
+                                        'options' => ['class'=>'form-control'],
+                                        'pluginEvents' => [
+                                            "editableSuccess" => "function(event, val, form, data) { 
+                                                location.reload();
+                                            }",
+                                        ],
                                     ]);
                                 }
 
@@ -299,7 +319,12 @@ else
                                         'value' => MyHelper::formatRupiah($item->realisasi_biaya),
                                         // 'displayValue' => 'oke',
                                         'size'=>'md',
-                                        'options' => ['class'=>'form-control']
+                                        'options' => ['class'=>'form-control'],
+                                        'pluginEvents' => [
+                                            "editableSuccess" => "function(event, val, form, data) { 
+                                                location.reload();
+                                            }",
+                                        ],
                                     ]);
                                 }
 

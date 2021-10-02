@@ -316,6 +316,11 @@ if(Yii::$app->user->identity->NIY == $pegawaiDinilai->NIY)
 
 <?php } ?>
 
+<?php 
+if(!empty($dataProvider->getModels()))
+{
+ ?>
+
 <div class="row">
     <div class="col-md-12">
         <div class="panel">
@@ -435,7 +440,7 @@ if(Yii::$app->user->identity->NIY == $pegawaiDinilai->NIY)
 </div>
 
 
-
+<?php } ?>
 <?php 
 
 $this->registerJs(' 

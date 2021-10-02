@@ -131,13 +131,13 @@ else
             <td width="6%" style="text-align: center;"><?=$item->target_qty;?> <?=$item->target_satuan;?></td>
             <td width="6%" style="text-align: center;"><?=$item->target_mutu;?></td>
             <td width="6%" style="text-align: center;"><?=$item->target_waktu;?> <?=$item->target_waktu_satuan;?></td>
-            <td width="6%" style="text-align: center;"><?=MyHelper::formatRupiah($item->target_biaya);?></td>
+            <td width="6%" style="text-align: right;"><?=MyHelper::formatRupiah($item->target_biaya);?></td>
 
             <td width="6%" style="text-align: center;"><?=$item->realisasi_qty;?> <?=$item->target_satuan;?></td>
             <td width="6%" style="text-align: center;"><?=$item->realisasi_mutu;?></td>
             <td width="6%" style="text-align: center;"><?=$item->realisasi_waktu;?> <?=$item->target_waktu_satuan;?></td>
-            <td width="6%" style="text-align: center;"><?=MyHelper::formatRupiah($item->realisasi_biaya);?></td>
-            <td width="9%" style="text-align: center;"><?=$penghitungan?></td>
+            <td width="6%" style="text-align: right;"><?=MyHelper::formatRupiah($item->realisasi_biaya);?></td>
+            <td width="9%" style="text-align: center;"><?=round($penghitungan,2)?></td>
             <td width="9%" style="text-align: center;"><?=round($capaian_skp,2)?></td>
             
         </tr>
