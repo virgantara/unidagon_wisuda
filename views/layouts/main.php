@@ -88,6 +88,7 @@ SweetalertAsset::register($this);
             <!-- MAIN CONTENT -->
         <div class="main-content">
             <div class="container-fluid">
+                <?= Alert::widget() ?>
                 <?= $content ?>
             </div>
         </div>

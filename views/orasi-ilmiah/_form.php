@@ -10,7 +10,7 @@ use kartik\select2\Select2;
 /* @var $form yii\widgets\ActiveForm */
 
 
-$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('110900');
+$listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('1109');
 
 $list_capaian_luaran = ArrayHelper::map(\app\models\CapaianLuaran::find()->all(),'id','nama');
 $list_kategori_pembicara = ArrayHelper::map(\app\models\KategoriPembicara::find()->all(),'id','nama');
@@ -22,7 +22,7 @@ $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama')
 
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
-    <?= $form->field($model, 'NIY',['options' => ['tag' => false]])->textInput(['class'=>'form-control','readonly' => 'readonly']) ?>
+   
     <?= $form->field($model, 'kategori_kegiatan_id',['options' => ['tag' => false]])->widget(Select2::classname(), [
             'data' => $listKegiatan,
 
@@ -58,12 +58,7 @@ $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama')
                 'allowClear' => true,
             ],
         ])?>
-    <?= $form->field($model, 'nama_kategori_kegiatan',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'nama_kategori_pencapaian',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
     
-
     <?= $form->field($model, 'judul_buku_makalah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
 
     <?= $form->field($model, 'nama_pertemuan_ilmiah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
@@ -98,7 +93,7 @@ $list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama')
 
     <?= $form->field($model, 'bahasa',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
 
-    
+    <?= $form->field($model, 'file_path')->fileInput().'NB: File format is pdf and max size 2 MB<br><br>' ?>
 
    
     <div class="form-group">

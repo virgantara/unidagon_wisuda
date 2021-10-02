@@ -54,6 +54,7 @@ class OrasiIlmiah extends \yii\db\ActiveRecord
             [['kategori_kegiatan_id'], 'string', 'max' => 10],
             [['no_sk_tugas', 'bahasa', 'sister_id'], 'string', 'max' => 100],
             [['tingkat_pertemuan_id'], 'string', 'max' => 1],
+            [['file_path'], 'file', 'extensions' => 'pdf','maxSize' => 1024 * 1024 * 2],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
             [['kategori_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KategoriKegiatan::className(), 'targetAttribute' => ['kategori_kegiatan_id' => 'id']],
             [['tingkat_pertemuan_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tingkat::className(), 'targetAttribute' => ['tingkat_pertemuan_id' => 'id']],
@@ -84,6 +85,7 @@ class OrasiIlmiah extends \yii\db\ActiveRecord
             'id_kategori_pembicara' => 'Kategori Pembicara',
             'tingkat_pertemuan_id' => 'Tingkat Pertemuan',
             'updated_at' => 'Updated At',
+            'file_path' => 'Bukti Kegiatan',
             'created_at' => 'Created At',
         ];
     }

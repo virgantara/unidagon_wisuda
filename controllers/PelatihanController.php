@@ -177,7 +177,7 @@ class PelatihanController extends Controller
 
                 $transaction->commit();
                 Yii::$app->session->setFlash('success', "Data tersimpan");
-                return $this->redirect(['pendidikan/view', 'id' => $model->ID]);
+                return $this->redirect(['pelatihan/view', 'id' => $model->ID]);
             }
 
         } catch (\Exception $e) {

@@ -1,5 +1,5 @@
 <?php
-
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 
@@ -7,8 +7,10 @@ use kartik\grid\GridView;
 /* @var $searchModel app\models\OrasiIlmiahSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Orasi Ilmiahs';
+$this->title = 'Orasi Ilmiah';
 $this->params['breadcrumbs'][] = $this->title;
+
+$list_tingkat = ArrayHelper::map(\app\models\Tingkat::find()->all(),'id','nama');
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -35,7 +37,19 @@ $this->params['breadcrumbs'][] = $this->title;
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
             // 'NIY',
-            'nama_kategori_kegiatan',
+            [
+                'attribute' => 'kategori_kegiatan_id',
+                'value' => function($data){
+                    return !empty($data->kategoriKegiatan) ? $data->kategoriKegiatan->nama :null;
+                }
+            ],
+            [
+                'attribute' => 'tingkat_pertemuan_id',
+                'filter' => $list_tingkat,
+                'value' => function($data){
+                    return !empty($data->tingkatPertemuan) ? $data->tingkatPertemuan->nama :null;
+                }
+            ],
             'nama_kategori_pencapaian',
             //'id_kategori_capaian_luaran',
             //'kategori_kegiatan_id',
@@ -47,6 +61,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'no_sk_tugas',
             'tanggal_sk_penugasan',
             'bahasa',
+            [
+                'attribute'=>'file_path',
+                'format'=>'raw',
+                'value' => function($data){
+                    if(!empty($data->file_path)){
+                        return Html::a('<i class="fa fa-download"></i> View', $data->file_path,['class' => 'btn btn-info','target'=>'_blank']);
+                    }
+                    else
+                    {
+                        return "<p class='btn btn-danger' align='center'>No File</p>";
+                    }
+                }
+            ],
             //'updated_at',
             //'created_at',
     ['class' => 'yii\grid\ActionColumn']
