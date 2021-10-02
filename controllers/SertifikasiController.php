@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\helpers\MyHelper;
 use app\models\Sertifikasi;
 use app\models\SertifikasiSearch;
 use yii\web\Controller;
@@ -66,7 +67,8 @@ class SertifikasiController extends Controller
     public function actionCreate()
     {
         $model = new Sertifikasi();
-
+        $model->NIY = Yii::$app->user->identity->NIY;
+        $model->id = MyHelper::gen_uuid();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', "Data tersimpan");
             return $this->redirect(['view', 'id' => $model->id]);

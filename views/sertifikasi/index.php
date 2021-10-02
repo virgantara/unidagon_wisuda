@@ -36,7 +36,12 @@ $this->params['breadcrumbs'][] = $this->title;
     ],
             // 'id',
             'jenis_sertifikasi',
-            'bidang_studi',
+            [
+                'attribute' => 'id_bidang_studi',
+                'value' => function($data){
+                    return !empty($data->bidangStudi) ? $data->bidangStudi->nama : null;
+                }
+            ],
             'tahun_sertifikasi',
             'sk_sertifikasi',
             'nomor_registrasi',

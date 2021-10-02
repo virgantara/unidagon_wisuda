@@ -15,12 +15,13 @@ use Yii;
  * @property string|null $nomor_registrasi
  * @property string|null $NIY
  * @property int|null $id_jenis_sertifikasi
- * @property int|null $id_bidang_studi
+ * @property string|null $id_bidang_studi
  * @property string|null $sister_id
  * @property string|null $updated_at
  * @property string|null $created_at
  *
  * @property User $nIY
+ * @property BidangIlmu $bidangStudi
  */
 class Sertifikasi extends \yii\db\ActiveRecord
 {
@@ -39,12 +40,14 @@ class Sertifikasi extends \yii\db\ActiveRecord
     {
         return [
             [['id'], 'required'],
-            [['tahun_sertifikasi', 'id_jenis_sertifikasi', 'id_bidang_studi'], 'integer'],
+            [['tahun_sertifikasi', 'id_jenis_sertifikasi'], 'integer'],
             [['updated_at', 'created_at'], 'safe'],
             [['id', 'jenis_sertifikasi', 'bidang_studi', 'sk_sertifikasi', 'nomor_registrasi', 'sister_id'], 'string', 'max' => 50],
             [['NIY'], 'string', 'max' => 15],
+            [['id_bidang_studi'], 'string', 'max' => 5],
             [['id'], 'unique'],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
+            [['id_bidang_studi'], 'exist', 'skipOnError' => true, 'targetClass' => BidangIlmu::className(), 'targetAttribute' => ['id_bidang_studi' => 'kode']],
         ];
     }
 
@@ -62,7 +65,7 @@ class Sertifikasi extends \yii\db\ActiveRecord
             'nomor_registrasi' => 'Nomor Registrasi',
             'NIY' => 'Niy',
             'id_jenis_sertifikasi' => 'Id Jenis Sertifikasi',
-            'id_bidang_studi' => 'Id Bidang Studi',
+            'id_bidang_studi' => 'Bidang Studi',
             'sister_id' => 'Sister ID',
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',
@@ -77,5 +80,15 @@ class Sertifikasi extends \yii\db\ActiveRecord
     public function getNIY()
     {
         return $this->hasOne(User::className(), ['NIY' => 'NIY']);
+    }
+
+    /**
+     * Gets query for [[BidangStudi]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBidangStudi()
+    {
+        return $this->hasOne(BidangIlmu::className(), ['kode' => 'id_bidang_studi']);
     }
 }

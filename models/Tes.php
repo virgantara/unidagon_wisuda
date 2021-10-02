@@ -21,6 +21,7 @@ use Yii;
  * @property string|null $created_at
  *
  * @property User $nIY
+ * @property JenisTes $jenisTes
  */
 class Tes extends \yii\db\ActiveRecord
 {
@@ -47,6 +48,7 @@ class Tes extends \yii\db\ActiveRecord
             [['NIY'], 'string', 'max' => 15],
             [['id'], 'unique'],
             [['NIY'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['NIY' => 'NIY']],
+            [['id_jenis_tes'], 'exist', 'skipOnError' => true, 'targetClass' => JenisTes::className(), 'targetAttribute' => ['id_jenis_tes' => 'id']],
         ];
     }
 
@@ -63,7 +65,7 @@ class Tes extends \yii\db\ActiveRecord
             'tahun' => 'Tahun',
             'skor' => 'Skor',
             'NIY' => 'Niy',
-            'id_jenis_tes' => 'Id Jenis Tes',
+            'id_jenis_tes' => 'Jenis Tes',
             'tanggal' => 'Tanggal',
             'sister_id' => 'Sister ID',
             'updated_at' => 'Updated At',
@@ -79,5 +81,15 @@ class Tes extends \yii\db\ActiveRecord
     public function getNIY()
     {
         return $this->hasOne(User::className(), ['NIY' => 'NIY']);
+    }
+
+    /**
+     * Gets query for [[JenisTes]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJenisTes()
+    {
+        return $this->hasOne(JenisTes::className(), ['id' => 'id_jenis_tes']);
     }
 }

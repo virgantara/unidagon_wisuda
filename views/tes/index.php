@@ -2,13 +2,16 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
-
+use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Tes';
 $this->params['breadcrumbs'][] = $this->title;
+
+$list_jenis_tes = ArrayHelper::map(\app\models\JenisTes::find()->all(),'id', 'nama');
+
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -34,14 +37,43 @@ $this->params['breadcrumbs'][] = $this->title;
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
-            'jenis_tes',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'refreshGrid' => true,
+                'filter' => $list_jenis_tes,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                    'asPopover' => false,
+                    'data' => $list_jenis_tes
+                ],
+                'attribute' => 'id_jenis_tes',
+                'value' => function($data){
+                    return !empty($data->jenisTes) ? $data->jenisTes->nama : null;
+                }
+            ],
             'nama',
             'penyelenggara',
             'tahun',
             'skor',
             //'NIY',
-            //'id_jenis_tes',
-            // 'tanggal',
+            //,
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'tanggal',
+
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_DATE,
+                    'options'=>[
+                        'convertFormat'=>true, // autoconvert PHP format to JS format
+                        'pluginOptions'=>[
+                            'format'=>'php:Y-m-d',
+                            'todayHighlight' => true,
+                            'autoclose' => true
+                        ] // php date format
+                   ]
+                    
+                ],
+            ],
             //'sister_id',
             //'updated_at',
             //'created_at',
