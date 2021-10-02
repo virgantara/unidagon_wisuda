@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use yii\web\UploadedFile;
+use kartik\select2\Select2;
 
 use kartik\depdrop\DepDrop;
 use kartik\date\DatePicker;
@@ -113,38 +114,58 @@ $kepakaran_id_parent = !empty($model->kepakaran) && !empty($model->kepakaran->pa
                 </div>
                 <div class="panel-body">
                     <div class="form-group">
-                        <label class="control-label">Bidang Ilmu</label><div class="">
-                        <?= Html::dropDownList('bidang_ilmu',$bidang_ilmu, ArrayHelper::map($listBidangIlmu,'kode',function($data){
-                            return (!empty($data->kode0) ? $data->kode0->nama : '').' - '.$data->nama;
-                        }),['prompt'=>'..Pilih Bidang Ilmu','id'=>'bidang_ilmu']); ?>
-                            
+                        <label class="control-label">Bidang Ilmu</label>
+                        <div class="">
+                        
+                        <?= Select2::widget([
+                            'name'=>'bidang_ilmu',
+                            'value'=>$bidang_ilmu, 
+                            'data' => ArrayHelper::map($listBidangIlmu,'kode',function($data){
+                                return (!empty($data->kode0) ? $data->kode0->nama : '').' - '.$data->nama;
+                            }),
+                            'options'=>['id'=>'bidang_ilmu','placeholder'=>Yii::t('app','- bidang_ilmu -')],
+                            ]); ?>
+                        
+                       <div class="help-block"></div>
                         <?php
 
 
                         echo $form->field($model, 'bidang_ilmu_id',['options'=>['tag'=>false]])->widget(DepDrop::classname(), [
+                        'type'=>DepDrop::TYPE_SELECT2,
+                        
                         'options' => ['id' => 'bidang_ilmu_id', 'placeholder' => '- Pilih Bidang Ilmu -','class'=>' '],
+                        'select2Options'=>['pluginOptions'=>['allowClear'=>true]],
                         'pluginOptions'=>[
                             'depends'=>['bidang_ilmu'],
                             'class'=>'',
+                            'initialize' => true,
                             'url'=>\yii\helpers\Url::to(['/bidang-ilmu/get-bidang-ilmu'])
                         ]
                     ])->label(false);?>
                         </div>
+
                     </div>
                     <div class="form-group">
                     <label class="control-label">Bidang Kepakaran</label><div class="">
-                    <?= Html::dropDownList('kepakaran_id_parent',$kepakaran_id_parent, ArrayHelper::map($listKepakaran,'kode',function($data){
-                        return $data->kode.' - '.$data->nama;
-                    }),['prompt'=>'..Pilih Bidang Kepakaran','id'=>'parent_kepakaran_id']); ?>
-                        
+                    <?= Select2::widget([
+                        'name' => 'kepakaran_id_parent',
+                        'value' => $kepakaran_id_parent, 
+                        'data' => ArrayHelper::map($listKepakaran,'kode',function($data){
+                            return $data->kode.' - '.$data->nama;
+                        }),
+                        'options' => ['prompt'=>'..Pilih Bidang Kepakaran','id'=>'parent_kepakaran_id']]); 
+                    ?>
+                    <div class="help-block"></div>    
                     <?php
 
 
                     echo $form->field($model, 'kepakaran_id',['options'=>['tag'=>false]])->widget(DepDrop::classname(), [
                     'options' => ['id' => 'kepakaran_id', 'placeholder' => '- Pilih Bidang Kepakaran -','class'=>' '],
+                    'type'=>DepDrop::TYPE_SELECT2,
                     'pluginOptions'=>[
                         'depends'=>['parent_kepakaran_id'],
                         'class'=>'',
+                            'initialize' => true,
                         'url'=>\yii\helpers\Url::to(['/bidang-kepakaran/get-bidang-kepakaran'])
                     ]
                 ])->label(false);?>

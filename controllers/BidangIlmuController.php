@@ -59,7 +59,8 @@ class BidangIlmuController extends Controller
         {
             $result[] = [
                 'id' => $item->kode,
-                'name' => $item->nama
+                // 'label' => $item->kode.' '.$item->nama,
+                'name' => '['.$item->kode.'] '.$item->nama,
             ];
         }
 
