@@ -8,17 +8,19 @@ use Yii;
  * This is the model class for table "catatan_harian".
  *
  * @property int $id
- * @property int $unsur_id
+ * @property string|null $skp_item_id
  * @property int $user_id
  * @property string $deskripsi
  * @property string|null $tanggal
- * @property string|null $is_selesai
- * @property int $approved_by
+ * @property string|null $is_selesai 1=setuju,2=tolak
+ * @property float|null $poin
+ * @property int|null $approved_by
+ * @property string|null $kondisi
  * @property string|null $updated_at
  * @property string|null $created_at
  *
  * @property User $user
- * @property UnsurKegiatan $unsur
+ * @property SkpItem $skpItem
  */
 class CatatanHarian extends \yii\db\ActiveRecord
 {
@@ -36,13 +38,16 @@ class CatatanHarian extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['unsur_id', 'user_id', 'deskripsi'], 'required'],
-            [['unsur_id', 'user_id', 'approved_by'], 'integer'],
+            [['user_id', 'deskripsi'], 'required'],
+            [['user_id', 'approved_by'], 'integer'],
             [['deskripsi'], 'string'],
-            [['tanggal', 'updated_at', 'created_at','poin','kondisi'], 'safe'],
+            [['tanggal', 'updated_at', 'created_at'], 'safe'],
+            [['poin'], 'number'],
+            [['skp_item_id'], 'string', 'max' => 50],
             [['is_selesai'], 'string', 'max' => 1],
+            [['kondisi'], 'string', 'max' => 100],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'ID']],
-            [['unsur_id'], 'exist', 'skipOnError' => true, 'targetClass' => UnsurKegiatan::className(), 'targetAttribute' => ['unsur_id' => 'id']],
+            [['skp_item_id'], 'exist', 'skipOnError' => true, 'targetClass' => SkpItem::className(), 'targetAttribute' => ['skp_item_id' => 'id']],
         ];
     }
 
@@ -53,13 +58,14 @@ class CatatanHarian extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'unsur_id' => 'Unsur Kegiatan',
+            'skp_item_id' => 'Item SKP',
             'user_id' => 'User ID',
             'deskripsi' => 'Deskripsi',
             'tanggal' => 'Tanggal',
-            'poin' => 'Poin',
             'is_selesai' => 'Is Selesai',
+            'poin' => 'Poin',
             'approved_by' => 'Approved By',
+            'kondisi' => 'Kondisi',
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',
         ];
@@ -76,13 +82,13 @@ class CatatanHarian extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Unsur]].
+     * Gets query for [[SkpItem]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUnsur()
+    public function getSkpItem()
     {
-        return $this->hasOne(UnsurKegiatan::className(), ['id' => 'unsur_id']);
+        return $this->hasOne(SkpItem::className(), ['id' => 'skp_item_id']);
     }
 
     public static function sumPoinCatatanHarian($user_id)

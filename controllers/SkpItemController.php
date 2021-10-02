@@ -32,6 +32,57 @@ class SkpItemController extends Controller
         ];
     }
 
+    public function actionAjaxList()
+    {
+        $id = $_POST['id'];
+        $list = SkpItem::find()->where(['skp_id'=>$id])->orderBy(['nama'=>SORT_ASC])->all();
+
+        $result = [];
+        foreach($list as $item)
+        {
+            $result[] = [
+                'id' => $item->id,
+                'name' => $item->nama.' ['.(!empty($item->komponenKegiatan) ? $item->komponenKegiatan->unsur->nama : null).']'
+            ];
+        }
+
+        echo json_encode($result);
+        die();
+    }
+
+    private function getList($id)
+    {
+        $list = SkpItem::find()->where(['skp_id'=>$id])->orderBy(['nama'=>SORT_ASC])->all();
+
+        $result = [];
+        foreach($list as $item)
+        {
+            $result[] = [
+                'id' => $item->id,
+                'name' => $item->nama.' ['.(!empty($item->komponenKegiatan) ? $item->komponenKegiatan->unsur->nama : null).']'
+            ];
+        }
+
+        return $result;
+    }
+
+    public function actionSubitem()
+    {
+        $out = [];
+        if (isset($_POST['depdrop_parents'])) {
+            $parents = $_POST['depdrop_parents'];
+            if ($parents != null) {
+                $cat_id = $parents[0];
+                $out = self::getList($cat_id); 
+               
+                echo json_encode(['output'=>$out, 'selected'=>'']);
+                exit;
+            }
+        }
+        echo json_encode(['output'=>'', 'selected'=>'']);
+        exit;
+    }
+
     public function actionAjaxAdd()
     {
 

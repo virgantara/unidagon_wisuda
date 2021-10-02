@@ -189,21 +189,28 @@ else
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
+            
+            'nama',
             [
                 'attribute' => 'komponen_kegiatan_id',
-                'contentOptions' => ['width' => '30%'],
+                'contentOptions' => ['width' => '25%'],
                 'value' => function($data){
                     return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - '.$data->komponenKegiatan->subunsur : null;
                 }
             ],
-            'nama',
             'target_ak',
             'target_qty',
             'target_satuan',
             'target_mutu',
             'target_waktu',
             //'target_waktu_satuan',
-            'target_biaya:currency',
+            [
+                'attribute' => 'target_biaya',
+                'contentOptions' => ['class' => 'text-right'],
+                'value' => function($data){
+                    return 'Rp '.MyHelper::formatRupiah($data->target_biaya);
+                }
+            ],
             //'realisasi_ak',
             //'realisasi_qty',
             //'realisasi_satuan',

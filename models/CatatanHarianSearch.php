@@ -18,7 +18,7 @@ class CatatanHarianSearch extends CatatanHarian
     public function rules()
     {
         return [
-            [['id', 'unsur_id', 'user_id', 'approved_by'], 'integer'],
+            [['id', 'skp_item_id', 'user_id', 'approved_by'], 'integer'],
             [['deskripsi', 'tanggal', 'is_selesai', 'updated_at', 'created_at'], 'safe'],
         ];
     }
@@ -52,7 +52,7 @@ class CatatanHarianSearch extends CatatanHarian
             ]
         ]);
 
-        $query->joinWith(['unsur as u']);
+        $query->joinWith(['skpItem as skp']);
 
         $this->load($params);
 
@@ -79,7 +79,7 @@ class CatatanHarianSearch extends CatatanHarian
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'unsur_id' => $this->unsur_id,
+            'skp_item_id' => $this->skp_item_id,
             'user_id' => $this->user_id,
             'tanggal' => $this->tanggal,
             'approved_by' => $this->approved_by,

@@ -62,6 +62,169 @@ class CatatanHarianController extends Controller
         ];
     }
 
+    public function actionAjaxGet()
+    {
+
+        $results = [];
+
+        $id = $_POST['id'];
+        if(!empty($id))
+        {
+            $model = CatatanHarian::findOne($id);
+                
+            $results = $model->attributes;
+            $results['skp_id'] = $model->skpItem->skp_id;
+        }
+
+        
+        echo json_encode($results);
+        exit;
+    }
+
+    public function actionAjaxUpdate()
+    {
+
+        $results = [];
+
+        $errors = '';
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        
+        try 
+        {
+            $dataPost = $_POST;
+            if(!empty($dataPost))
+            {
+
+                $model = CatatanHarian::findOne($dataPost['id']);
+                    $model->attributes = $dataPost;
+                    // $model->poin = $skpItem->target_ak;
+
+                    if(!$model->save())
+                    {
+                        $errors .= MyHelper::logError($model);
+                        throw new \Exception;
+                    }
+
+                    $transaction->commit();
+                    $results = [
+                        'code' => 200,
+                        'message' => 'Data successfully updated'
+                    ];
+
+                
+            }
+
+            else
+            {
+                $errors .= 'Oops, you cannot POST empty data';
+                throw new \Exception;
+                
+            }   
+        } 
+
+        catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+            
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+        }
+        echo json_encode($results);
+        exit;
+    }
+
+    public function actionAjaxAdd()
+    {
+
+        $results = [];
+
+        $errors = '';
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        
+        try 
+        {
+            $dataPost = $_POST;
+            if(!empty($dataPost))
+            {
+
+                $skpItem = \app\models\SkpItem::findOne($dataPost['skp_item_id']);
+
+                if(!empty($skpItem))
+                {
+
+                    $model = CatatanHarian::find()->where([
+                        'skp_item_id' => $dataPost['skp_item_id'],
+                        'user_id' => $dataPost['user_id'],
+                        'deskripsi' => trim($dataPost['deskripsi'])
+                    ])->one();
+
+                    if(empty($model)){
+                        $model = new CatatanHarian;
+                    }
+                    
+                    $model->attributes = $dataPost;
+                    
+                    $model->poin = $skpItem->target_ak;
+
+                    if(!$model->save())
+                    {
+                        $errors .= MyHelper::logError($model);
+                        throw new \Exception;
+                    }
+
+                    $transaction->commit();
+                    $results = [
+                        'code' => 200,
+                        'message' => 'Data successfully added'
+                    ];
+                }
+
+                
+            }
+
+            else
+            {
+                $errors .= 'Oops, you cannot POST empty data';
+                throw new \Exception;
+                
+            }   
+        } 
+
+        catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+            
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+        }
+        echo json_encode($results);
+        exit;
+    }
+
     public function actionAjaxList()
     {
         if(Yii::$app->request->isPost)

@@ -234,6 +234,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
 </div>
 
+<?php 
+
+// print_r($dataProviderApproval->getModels());exit;
+if(!empty($dataProviderApproval->getModels()))
+{
+ ?>
 
 
 <div class="row">
@@ -348,7 +354,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 </div>
 
-
+<?php } ?>
 
 <?php 
 
