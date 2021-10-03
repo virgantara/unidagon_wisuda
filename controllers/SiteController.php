@@ -3846,7 +3846,7 @@ class SiteController extends AppController
         {
 
             $results = [
-                'code' => 500,
+                'code' => $e->getCode(),
                 'message' => $e->getMessage()
             ];
         }
