@@ -145,7 +145,7 @@ class Publikasi extends \yii\db\ActiveRecord
      */
     public function getJenisPublikasi()
     {
-        return $this->hasOne(JenisPublikasi::className(), ['id' => 'jenis_publikasi_id']);
+        return $this->hasOne(JenisPublikasi::className(), ['kode' => 'jenis_publikasi_id']);
     }
 
     /**

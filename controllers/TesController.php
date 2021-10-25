@@ -30,6 +30,13 @@ class TesController extends Controller
         ];
     }
 
+    public function actionGetSisterToken()
+    {
+        $sisterToken = \app\helpers\MyHelper::getSisterToken();
+        echo $sisterToken;
+        die();
+    }
+
     /**
      * Lists all Tes models.
      * @return mixed

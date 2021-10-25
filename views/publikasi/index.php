@@ -12,7 +12,9 @@ $this->title = 'Publikasi';
 $this->params['breadcrumbs'][] = $this->title;
 
 $listKegiatan = \app\helpers\MyHelper::convertKategoriKegiatan('120');
-$listJenisPublikasi = ArrayHelper::map(\app\models\JenisPublikasi::find()->all(),'id','nama');
+$listJenisPublikasi = ArrayHelper::map(\app\models\JenisPublikasi::find()->all(),'kode',function($data){
+    return $data->kode.' - '.$data->nama;
+});
 
 $query = \app\models\KomponenKegiatan::find();
 $query->alias('p');

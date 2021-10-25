@@ -2642,7 +2642,7 @@ class SiteController extends AppController
                 $model->sister_id = $detail->id;
                 $model->judul_publikasi_paten = $detail->judul;
                 $model->nama_jenis_publikasi = $detail->jenis_publikasi;
-                $model->jenis_publikasi_id = $detail->id_jenis_publikasi;
+                $model->jenis_publikasi_id = $jenisPublikasi->kode;
                 $model->tanggal_terbit = $item->tanggal;
                 $model->tautan_laman_jurnal = $detail->tautan;
                 $model->tautan = $detail->tautan;
