@@ -2820,7 +2820,7 @@ class SiteController extends AppController
                             $model->jam = $res['jam'];
                             $model->hari = $res['hari'];
                             $model->kelas = $res['kelas'];
-                            $model->sks = $res['sks'];
+                            $model->sks = $res['sks_mk'];
                             $model->tahun_akademik = $res['ta'];
                             $model->ver = 'Sudah Diverifikasi';
                             $model->komponen_id = $komponen->id;
