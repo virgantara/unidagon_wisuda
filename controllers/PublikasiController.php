@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\SisterFiles;
 use app\helpers\MyHelper;
+
 use app\models\User;
 use app\models\DataDiri;
 use app\models\Publikasi;
@@ -35,6 +37,237 @@ class PublikasiController extends AppController
                 ],
             ],
         ];
+    }
+
+    public function actionAjaxImport()
+    {
+        $start = microtime(true);
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+
+        $list_peran = \app\helpers\MyHelper::getPeranPublikasi();
+        $flipped_list_peran = array_flip($list_peran);
+        $results = [];
+        
+        
+       
+        $errors ='';
+        $results = [];
+        $counter_insert = 0;
+        $counter_update = 0;
+        $sister_baseurl = Yii::$app->params['sister_baseurl'];
+        $sisterToken = \app\helpers\MyHelper::getSisterToken();
+        $headers = ['content-type' => 'application/json'];
+        $client = new \GuzzleHttp\Client([
+            'timeout'  => 5.0,
+            'headers' => $headers,
+       
+        ]);
+
+        try     
+        {
+
+            $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+            
+            
+            
+            
+            $full_url = $sister_baseurl.'/publikasi';
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id
+                ], 
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]);  
+            
+            $response = json_decode($response->getBody());
+            
+            $results = $response;    
+        }
+        catch(\Exception $e){
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+
+            return $results;
+        }
+
+           
+            
+            
+        $counter = 0;
+        foreach($results as $item)
+        {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            try
+            {
+                $full_url = $sister_baseurl.'/publikasi/'.$item->id;
+                $resp = $client->get($full_url, [ 
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
+
+                ]); 
+
+                $detail = json_decode($resp->getBody());
+
+                $jenisPublikasi = \app\models\JenisPublikasi::find()->where(['kode'=> $detail->id_jenis_publikasi])->one();
+
+                if(empty($jenisPublikasi)){
+                    $jenisPublikasi = new JenisPublikasi;
+                    $jenisPublikasi->kode = $detail->id;
+                }
+
+                $jenisPublikasi->nama = $detail->jenis_publikasi;
+                $jenisPublikasi->save();
+
+                $kategoriKegiatan = \app\models\KategoriKegiatan::find()->where(['id'=> $detail->id_kategori_kegiatan])->one();
+
+                if(empty($kategoriKegiatan)){
+                    $kategoriKegiatan = new KategoriKegiatan;
+                    $kategoriKegiatan->id = $detail->id_kategori_kegiatan;
+                }
+
+                $kategoriKegiatan->nama = $detail->kategori_kegiatan;
+                $kategoriKegiatan->save();
+
+                $model = \app\models\Publikasi::find()->where([
+                    'sister_id' => $item->id
+                ])->one();
+
+                if(empty($model))
+                    $model = new \app\models\Publikasi;
+
+                if($model->isNewRecord)
+                    $counter_insert++;
+                else
+                    $counter_update++;
+
+                $model->NIY = Yii::$app->user->identity->NIY;
+                $model->sister_id = $detail->id;
+                $model->judul_publikasi_paten = $detail->judul;
+                $model->nama_jenis_publikasi = $detail->jenis_publikasi;
+                $model->jenis_publikasi_id = $jenisPublikasi->kode;
+                $model->tanggal_terbit = $item->tanggal;
+                $model->tautan_laman_jurnal = $detail->tautan;
+                $model->tautan = $detail->tautan;
+                $model->volume = (string)$detail->volume;
+                $model->nomor = (string)$detail->nomor;
+                $model->halaman = $detail->halaman;
+                $model->penerbit = $detail->penerbit;
+                $model->doi = $detail->doi;
+                $model->issn = $detail->e_issn;    
+                $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
+                $model->nama_kategori_kegiatan = $detail->kategori_kegiatan;
+           
+                
+
+                if(!empty($detail->dokumen))
+                {
+                    foreach($detail->dokumen as $file)
+                    {
+                        $pf = SisterFiles::findOne($file->id);
+                        if(empty($pf))
+                            $pf = new SisterFiles;
+
+                        $pf->id_dokumen = $file->id;
+                        $pf->parent_id = $item->id;
+                        $pf->nama_dokumen = $file->nama;
+                        $pf->nama_file = $file->nama_file;
+                        $pf->jenis_file = $file->jenis_file;
+                        $pf->tanggal_upload = $file->tanggal_upload;
+                        $pf->nama_jenis_dokumen = $file->jenis_dokumen;
+                        $pf->tautan = $file->tautan;
+                        $pf->keterangan_dokumen = $file->keterangan;
+
+                        if(!$pf->save())
+                        {
+                            $errors .= 'PF: '.\app\helpers\MyHelper::logError($pf);
+                            throw new \Exception;
+                        }
+                    }
+                }
+
+                if($model->save())
+                {
+                    foreach($detail->penulis as $author)
+                    {
+                        // print_r($author);exit;
+                        $pa = \app\models\PublikasiAuthor::find()->where([
+                            'author_id' => $author->id_sdm,
+                            'publikasi_id' => $item->id
+                        ])->one();
+
+                        if(empty($pa))
+                            $pa = new \app\models\PublikasiAuthor;
+
+                        $dd = DataDiri::find()->where(['sister_id' => $author->id_sdm])->one();
+
+                        $pa->pub_id = $model->id;
+                        $pa->NIY = !empty($dd) ? $dd->NIY : Yii::$app->user->identity->NIY;
+                        $pa->author_id = $author->id_sdm;
+                        $pa->author_nama = $author->nama;
+                        $pa->publikasi_id = $item->id;
+                        $pa->urutan = $author->urutan;
+                        $pa->afiliasi = $author->afiliasi;
+                        $pa->peran_nama = $author->peran;
+                        $pa->peran_id = $flipped_list_peran[$pa->peran_nama];
+                        $pa->corresponding_author = (string)$author->corresponding_author;
+                        $pa->jenis_peranan = $author->jenis;
+                        if(!$pa->save())
+                        {
+                            $errors .= \app\helpers\MyHelper::logError($pa);
+                            throw new \Exception;
+                        }
+                    }
+
+                    $counter++;
+
+                    $transaction->commit();
+                }
+
+                else
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                    throw new \Exception;
+                }
+            }
+
+            catch(\Exception $e){
+                $transaction->rollBack();
+                $errors .= $e->getMessage();
+                
+                MyHelper::createLogSync($user->NIY, 'Publikasi '.$errors);
+                continue;
+                // $errors .= $item->judul;
+                // $results = [
+                //     'code' => 500,
+                //     'message' => $errors
+                // ];
+            }
+
+        }
+
+        $results = [
+            'code' => 200,
+            'message' => 'Total '.$counter_insert.' inserted, '.$counter_update.' updated'
+            
+        ];
+       
+        $time_elapsed_secs = microtime(true) - $start;
+        $results['elapsed_time'] = $time_elapsed_secs;
+        echo json_encode($results);
+        die(); 
     }
 
     public function actionAjaxRemoveAuthor()
@@ -90,7 +323,7 @@ class PublikasiController extends AppController
         $model->peran_id = $dataPost['peran_id'];
         $model->peran_nama = $list_peran[$dataPost['peran_id']];
         $model->author_nama = !empty($user) ? strtoupper($user->dataDiri->nama) : '-';
-        $model->author_id = !empty($user) ? strtoupper($user->dataDiri->sister_id) : null;
+        $model->author_id = !empty($user) ? strtoupper($user->sister_id) : null;
 
         $results = [];
         if($model->save())

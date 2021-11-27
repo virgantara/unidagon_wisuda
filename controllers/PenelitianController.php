@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\SisterFiles;
+use app\helpers\MyHelper;
 use app\models\User;
 use app\models\PenelitianAnggota;
 use app\models\Penelitian;
@@ -30,6 +32,212 @@ class PenelitianController extends AppController
                 ],
             ],
         ];
+    }
+
+    public function actionAjaxImport()
+    {
+        $start = microtime(true);
+        
+        $results = [];
+        if(!parent::handleEmptyUser())
+        {
+            return $this->redirect(Yii::$app->params['sso_login']);
+        }
+
+        // print_r($sisterToken);exit;
+        $sister_baseurl = Yii::$app->params['sister_baseurl'];
+        
+        
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        $counter = 0;
+        $errors ='';
+        $results = [];
+
+        $counter_insert = 0;
+        $counter_update = 0;
+        try {
+
+            $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+            MyHelper::clearLogSync($user->NIY);
+            if(empty($user->sister_id)){
+                throw new \Exception('Akun SISTER belum dipetakan');
+            }
+
+            $sisterToken = \app\helpers\MyHelper::getSisterToken();
+            $headers = ['content-type' => 'application/json'];
+            $client = new \GuzzleHttp\Client([
+                'timeout'  => 10.0,
+                'headers' => $headers,
+                // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+            ]);
+            $full_url = $sister_baseurl.'/penelitian';
+
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id,
+                ],
+                
+                'headers' => [
+                    'Content-type' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
+
+            ]); 
+            
+            
+           
+            $response = json_decode($response->getBody());
+
+            $results = $response;
+        
+        
+            foreach($results as $item)
+            {
+                
+
+                $full_url = $sister_baseurl.'/penelitian/'.$item->id;
+                $resp = $client->get($full_url, [
+                    
+                     'headers' => [
+                        'Content-type' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
+
+                ]); 
+                
+                
+                $detail = json_decode($resp->getBody());
+
+                $model = Penelitian::find()->where([
+                    'sister_id' => $item->id
+                ])->one();
+
+                if(empty($model)){
+                    $model = new Penelitian;
+
+                }
+
+                if($model->isNewRecord)
+                    $counter_insert++;
+                else
+                    $counter_update++;
+                
+                $model->NIY = Yii::$app->user->identity->NIY;
+                $model->sister_id = $detail->id;
+                $model->judul_penelitian_pengabdian = $detail->judul;
+                $model->nama_skim = $detail->jenis_skim;
+                $model->nama_tahun_ajaran = 'Tahun '.$detail->tahun_pelaksanaan;
+                $model->durasi_kegiatan = $detail->lama_kegiatan;
+                $model->tempat_kegiatan = $detail->lokasi;
+                $model->tahun_usulan = $detail->tahun_usulan;
+                $model->tahun_kegiatan = $detail->tahun_kegiatan;
+                $model->tahun_dilaksanakan = $detail->tahun_pelaksanaan;
+                $model->tahun_pelaksanaan_ke = $detail->tahun_pelaksanaan_ke;
+                $model->dana_dikti = $detail->dana_dikti;
+                $model->dana_pt = $detail->dana_perguruan_tinggi;
+                $model->dana_institusi_lain = $detail->dana_institusi_lain;
+                $model->no_sk_tugas = $detail->sk_penugasan;
+                $model->tgl_sk_tugas = $detail->tanggal_sk_penugasan;
+                $model->kategori_kegiatan_id = (string)$detail->id_kategori_kegiatan;
+                    // print_r($res);exit;
+                if($detail->dana_dikti > 0 || $detail->dana_institusi_lain > 0)
+                {
+                    $model->jenis_sumber_dana = 'dalam';   
+                }
+
+                else if($detail->dana_perguruan_tinggi > 0)
+                {
+                    $model->jenis_sumber_dana = 'mandiri';   
+                }
+
+                if($model->save())
+                {
+
+                    if(!empty($detail->dokumen))
+                    {
+                        foreach($detail->dokumen as $file)
+                        {
+                            $pf = SisterFiles::findOne($file->id);
+                            if(empty($pf))
+                                $pf = new SisterFiles;
+
+                            $pf->id_dokumen = $file->id;
+                            $pf->parent_id = $item->id;
+                            $pf->nama_dokumen = $file->nama;
+                            $pf->nama_file = $file->nama_file;
+                            $pf->jenis_file = $file->jenis_file;
+                            $pf->tanggal_upload = $file->tanggal_upload;
+                            $pf->nama_jenis_dokumen = $file->jenis_dokumen;
+                            $pf->tautan = $file->tautan;
+                            $pf->keterangan_dokumen = $file->keterangan;
+
+                            if(!$pf->save())
+                            {
+                                $errors .= 'PF: '.\app\helpers\MyHelper::logError($pf);
+                                throw new \Exception;
+                            }
+                        }
+                    }
+
+                    $pa = \app\models\PenelitianAnggota::find()->where([
+                        'penelitian_id' => $model->ID,
+                        'NIY' => Yii::$app->user->identity->NIY
+                    ])->one();
+
+                    if(empty($pa))
+                        $pa = new \app\models\PenelitianAnggota;
+
+                    
+                    $pa->NIY = Yii::$app->user->identity->NIY;
+                    $pa->penelitian_id = $model->ID;
+                    $pa->status_anggota = '-';
+                    $pa->beban_kerja = '0';
+
+                    if($pa->save())
+                    {
+                        $counter++;
+                    }
+
+                    else{
+                        $errors .= 'PenelitianAnggota_ERR: '.\app\helpers\MyHelper::logError($model);
+                        throw new \Exception;
+                    }
+
+                    
+                }
+
+                else
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                    throw new \Exception;
+                }
+            }
+
+            $transaction->commit();
+            $results = [
+                'code' => 200,
+                'message' => 'Total '.$counter_insert.' inserted, '.$counter_update.' updated'
+                
+            ];
+        }
+
+        catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+        } 
+
+
+        $time_elapsed_secs = microtime(true) - $start;
+        $results['elapsed_time'] = $time_elapsed_secs;
+        echo json_encode($results);
+        die(); 
+
+
     }
 
     public function actionAjaxListAnggota()
@@ -177,6 +385,7 @@ class PenelitianController extends AppController
 
     public function actionImport()
     {
+
         if(!parent::handleEmptyUser())
         {
             return $this->redirect(Yii::$app->params['sso_login']);

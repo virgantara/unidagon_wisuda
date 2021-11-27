@@ -24,8 +24,21 @@ $list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
 <div class="panel-body ">
 
     <p>
-        <?= Html::a('Tambah Data', ['create'], ['class' => 'btn btn-success']) ?>
-      
+    <?php
+
+    $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+    
+
+    if(!empty($dataDiri) && empty($user->sister_id)){
+
+        echo Html::a('<i class="fa fa-plus"></i> Pengabdian', ['create'], ['class' => 'btn btn-success']);
+    } 
+
+    else{
+        echo Html::a('<i class="fa fa-download"></i> Import Pengabdian dari SISTER', 'javascript:void(0)', ['class' => 'btn btn-success','id'=>'btn-import']);  
+    }
+
+    ?>
     </p>
     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
@@ -104,6 +117,12 @@ $list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
             'fontAwesome' => true
         ],
         'pjax' => true,
+        'pjaxSettings' =>[
+            'neverTimeout'=>true,
+            'options'=>[
+                'id'=>'pjax-container',
+            ]
+        ], 
         'bordered' => true,
         'striped' => true,
         // 'condensed' => false,
@@ -122,3 +141,64 @@ $list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
 
 </div>
 
+
+
+<?php
+
+$this->registerJs(' 
+   
+$(document).on("click","#btn-import",function(e){
+    e.preventDefault()
+    $.ajax({
+        url: "'.\yii\helpers\Url::to(["pengabdian/ajax-import"]).'",
+        type: "POST",
+        beforeSend : function(){
+            Swal.fire({
+                title: \'Please Wait !\',
+                html: \'Importing data\',
+                allowOutsideClick: false,
+                showCancelButton: false, 
+                showConfirmButton: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading()
+                },
+            });
+        },
+        error : function(e){
+
+            Swal.fire(\'Oops...\', e.responseText, \'error\')
+        },
+        success: function (data) {
+            Swal.close();
+            var res = $.parseJSON(data)
+            var elapsedTime = Math.round(res.elapsed_time * 1000) / 1000
+            if(res.code == 200){
+                $("#tabel-sync > tbody").empty();
+                var row = "";
+                $(res.items).each(function(i,obj){
+                    row += "<tr>";
+                    row += "<td>"+eval(i+1)+"</td>";
+                    row += "<td>"+obj.modul+"</td>";
+                    row += "<td>"+obj.data+"</td>";
+                    row += "<td>"+obj.source+"</td>";
+                    row += "</tr>";
+                })
+
+                $("#tabel-sync > tbody").append(row);
+                Swal.fire({
+                    title: \'Yeay!\',
+                    icon: \'success\',
+                    html: "Import succeeded. <br>Elapsed time: "+elapsedTime+" secs. <br>"+res.message,
+                })
+                $.pjax.reload({container: "#pjax-container"})
+            }
+
+            else{
+                Swal.fire(\'Oops...\', res.message, \'error\')
+            }
+        }
+    })
+}); 
+', \yii\web\View::POS_READY);
+
+?>

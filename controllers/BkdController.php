@@ -10,6 +10,7 @@ use app\models\TugasDosenBkd;
 use app\models\TugasDosen;
 use app\models\KomponenKegiatan;
 use app\models\Pengajaran;
+use app\models\BkdPengajaran;
 use app\models\Organisasi;
 use app\models\PengelolaJurnal;
 use app\models\Publikasi;
@@ -568,7 +569,7 @@ class BkdController extends AppController
           $model->sks_bkd = $komponen->angka_kredit;
           $model->is_claimed = $dataPost['is_claimed'];
 
-        
+          
           $bkd = BkdDosen::find()->where([
             'tahun_id' => $dataPost['tahun_id'],
             'dosen_id' => Yii::$app->user->identity->ID,
@@ -676,7 +677,7 @@ class BkdController extends AppController
             $bkd->kondisi = (string)$model->id;
             $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
             $publikasiAuthor = PublikasiAuthor::find()->where([
-              'author_id' => $user->dataDiri->sister_id,
+              'author_id' => $user->sister_id,
               'publikasi_id' => $model->sister_id
             ])->one();
             $multiplier = !empty($publikasiAuthor) && $publikasiAuthor->urutan == 1 ? 0.6 : 0.4;
