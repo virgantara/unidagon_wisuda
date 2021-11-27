@@ -36,122 +36,110 @@ class JabatanFungsionalController extends AppController
         {
             return $this->redirect(Yii::$app->params['sso_login']);
         }
-
-        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
-        $sisterToken = \app\helpers\MyHelper::getSisterToken();
-        
-        // print_r($sisterToken);exit;
+        $errors = '';
+        $counter = 0;
         $sister_baseurl = Yii::$app->params['sister_baseurl'];
-        $headers = ['content-type' => 'application/json'];
-        $client = new \GuzzleHttp\Client([
-            'timeout'  => 10.0,
-            'headers' => $headers,
-            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
-        ]);
-        $full_url = $sister_baseurl.'/JabatanFungsional';
-        $response = $client->post($full_url, [
-            'body' => json_encode([
-                'id_token' => $sisterToken,
-                'id_dosen' => $user->sister_id,
-                'updated_after' => [
-                    'tahun' => '2000',
-                    'bulan' => '01',
-                    'tanggal' => '01'
-                ]
-            ]), 
-            'headers' => ['Content-type' => 'application/json']
-
-        ]); 
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        try {
         
-        $results = [];
-       
-        $response = json_decode($response->getBody());
-        
-        if($response->error_code == 0)
-        {
-            $results = $response->data;
             
-            $connection = \Yii::$app->db;
-            $transaction = $connection->beginTransaction();
-            $counter = 0;
-            $errors ='';
-            try     
-            {
-                foreach($results as $item)
-                {
-                    $model = JabatanFungsional::find()->where([
-                        'sister_id' => $item->id_riwayat_jabatan_fungsional
-                    ])->one();
-
-                    if(empty($model))
-                        $model = new JabatanFungsional;
-                    $model->NIY = Yii::$app->user->identity->NIY;
-                    $model->sister_id = $item->id_riwayat_jabatan_fungsional;
-                    $model->sk_jabatan_fungsional = $item->sk_jabatan_fungsional;
-                    $model->jabatan_fungsional = $item->jabatan_fungsional;
-                    $model->terhitung_mulai_tanggal_jabatan_fungsional = $item->terhitung_mulai_tanggal_jabatan_fungsional;
-                    
-                    $full_url = $sister_baseurl.'/JabatanFungsional/detail';
-                    $resp = $client->post($full_url, [
-                        'body' => json_encode([
-                            'id_token' => $sisterToken,
-                            'id_dosen' => $user->sister_id,
-                            'id_riwayat_jabatan_fungsional' => $model->sister_id
-                        ]), 
-                        'headers' => ['Content-type' => 'application/json']
-
-                    ]); 
-                    
-                    
-                    $resp = json_decode($resp->getBody());
-                    if($resp->error_code == 0){
-                        $res = $resp->data;
-                        // print_r($res);exit;
-                        $model->angka_kredit = $res->angka_kredit;
-                        $model->kelebihan_pengajaran = $res->kelebihan_pengajaran;
-                        $model->kelebihan_penelitian = $res->kelebihan_penelitian;
-                        $model->kelebihan_pengabdian_masyarakat = $res->kelebihan_pengabdian_masyarakat;
-                        $model->kelebihan_kegiatan_penunjang = $res->kelebihan_kegiatan_penunjang;
-                        $model->id_jabfung = $res->id_jabfung;
-                       
-                        
-                    }
-
-                    if($model->save())
-                    {
-                        $counter++;
-
-                        
-                    }
-
-                    else
-                    {
-                        $errors .= \app\helpers\MyHelper::logError($model);
-                        throw new \Exception;
-                    }
-                }
-
-                $transaction->commit();
-                Yii::$app->getSession()->setFlash('success',$counter.' data imported');
-                return $this->redirect(['index']);
+            $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+            
+            if(empty($user->sister_id)){
+                throw new \Exception('Akun SISTER belum dipetakan');
             }
 
-            catch (\Exception $e) {
-                $transaction->rollBack();
-                $errors .= $e->getMessage();
-                Yii::$app->getSession()->setFlash('danger',$errors);
-                return $this->redirect(['index']);
-            } 
-        }
+            $sisterToken = \app\helpers\MyHelper::getSisterToken();
+            $headers = ['content-type' => 'application/json'];
+            $client = new \GuzzleHttp\Client([
+                'timeout'  => 10.0,
+                'headers' => $headers,
+                // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+            ]);
+            $full_url = $sister_baseurl.'/jabatan_fungsional';
 
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id,
+                ],
+                
+                'headers' => [
+                    'Content-type' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
 
-        else
-        {
-            Yii::$app->getSession()->setFlash('danger',json_encode($response));
+            ]); 
+            
+            $results = [];
+           
+            $response = json_decode($response->getBody());
+        
+            $results = $response;
+            foreach($results as $item) {
+                $model = JabatanFungsional::find()->where([
+                    'sister_id' => $item->id
+                ])->one();
+
+                if(empty($model))
+                    $model = new JabatanFungsional;
+
+            
+                $model->NIY = Yii::$app->user->identity->NIY;
+                $model->sister_id = $item->id;
+                $model->sk_jabatan_fungsional = $item->sk;
+                $model->jabatan_fungsional = $item->jabatan_fungsional;
+                $model->terhitung_mulai_tanggal_jabatan_fungsional = $item->tanggal_mulai;
+                
+                $full_url = $sister_baseurl.'/jabatan_fungsional/'.$item->id;
+                $resp = $client->get($full_url, [
+                    
+                     'headers' => [
+                        'Content-type' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
+
+                ]); 
+                
+                $res = json_decode($resp->getBody());
+                
+                $model->angka_kredit = $res->angka_kredit;
+                $model->kelebihan_pengajaran = $res->kelebihan_pengajaran;
+                $model->kelebihan_penelitian = $res->kelebihan_penelitian;
+                $model->kelebihan_pengabdian_masyarakat = $res->kelebihan_pengabdian;
+                $model->kelebihan_kegiatan_penunjang = $res->kelebihan_penunjang;
+                $model->id_jabfung = $res->id_jabatan_fungsional;
+                   
+                    
+                
+
+                if($model->save())
+                {
+                    $counter++;
+
+                    
+                }
+
+                else
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                    throw new \Exception;
+                }
+            }
+
+            $transaction->commit();
+            Yii::$app->getSession()->setFlash('success',$counter.' data imported');
             return $this->redirect(['index']);
         }
 
-
+        catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            Yii::$app->getSession()->setFlash('danger',$errors);
+            return $this->redirect(['index']);
+        } 
+        
     }
 
     /**

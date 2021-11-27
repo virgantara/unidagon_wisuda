@@ -36,119 +36,116 @@ class KepangkatanController extends AppController
         {
             return $this->redirect(Yii::$app->params['sso_login']);
         }
-
-        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
-        $sisterToken = \app\helpers\MyHelper::getSisterToken();
-        
-        // print_r($sisterToken);exit;
+        $errors = '';
         $sister_baseurl = Yii::$app->params['sister_baseurl'];
-        $headers = ['content-type' => 'application/json'];
-        $client = new \GuzzleHttp\Client([
-            'timeout'  => 10.0,
-            'headers' => $headers,
-            // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
-        ]);
-        $full_url = $sister_baseurl.'/Pangkat';
-        $response = $client->post($full_url, [
-            'body' => json_encode([
-                'id_token' => $sisterToken,
-                'id_dosen' => $user->sister_id,
-                'updated_after' => [
-                    'tahun' => '2000',
-                    'bulan' => '01',
-                    'tanggal' => '01'
-                ]
-            ]), 
-            'headers' => ['Content-type' => 'application/json']
-
-        ]); 
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        try {
         
-        $results = [];
-       
-        $response = json_decode($response->getBody());
-        
-        if($response->error_code == 0)
-        {
-            $results = $response->data;
             
-            $connection = \Yii::$app->db;
-            $transaction = $connection->beginTransaction();
-            $counter = 0;
-            $errors ='';
-            try     
-            {
-                foreach($results as $item)
-                {
-                    $model = Kepangkatan::find()->where([
-                        'sister_id' => $item->id_riwayat_kepangkatan
-                    ])->one();
-
-                    if(empty($model))
-                        $model = new Kepangkatan;
-                    $model->NIY = Yii::$app->user->identity->NIY;
-                    $model->sister_id = $item->id_riwayat_kepangkatan;
-                    $model->kode_golongan = $item->kode_golongan;
-                    $model->nama_golongan = $item->nama_golongan;
-                    $model->no_sk_pangkat = $item->no_sk_pangkat;
-                    $model->terhitung_mulai_tanggal_sk_pangkat = $item->terhitung_mulai_tanggal_sk_pangkat;
-                    
-                    $full_url = $sister_baseurl.'/Pangkat/detail';
-                    $resp = $client->post($full_url, [
-                        'body' => json_encode([
-                            'id_token' => $sisterToken,
-                            'id_dosen' => $user->sister_id,
-                            'id_riwayat_kepangkatan' => $model->sister_id
-                        ]), 
-                        'headers' => ['Content-type' => 'application/json']
-
-                    ]); 
-                    
-                    
-                    $resp = json_decode($resp->getBody());
-                    if($resp->error_code == 0){
-                        $res = $resp->data;
-                        // print_r($res);exit;
-                        $model->tanggal_sk_pengangkatan = $res->tanggal_sk_pengangkatan;
-                        $model->masa_kerja_golongan_tahun = $res->masa_kerja_golongan_tahun;
-                        $model->masa_kerja_golongan_bulan = $res->masa_kerja_golongan_bulan;
-                        $model->id_pangkat_golongan = $res->id_pangkat_golongan;
-                       
-                        
-                    }
-
-                    if($model->save())
-                    {
-                        $counter++;
-
-                        
-                    }
-
-                    else
-                    {
-                        $errors .= \app\helpers\MyHelper::logError($model);
-                        throw new \Exception;
-                    }
-                }
-
-                $transaction->commit();
-                Yii::$app->getSession()->setFlash('success',$counter.' data imported');
-                return $this->redirect(['index']);
+            $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+            
+            if(empty($user->sister_id)){
+                throw new \Exception('Akun SISTER belum dipetakan');
             }
 
-            catch (\Exception $e) {
-                $transaction->rollBack();
-                $errors .= $e->getMessage();
-                Yii::$app->getSession()->setFlash('danger',$errors);
-                return $this->redirect(['index']);
-            } 
-        }
+            $sisterToken = \app\helpers\MyHelper::getSisterToken();
+            $headers = ['content-type' => 'application/json'];
+            $client = new \GuzzleHttp\Client([
+                'timeout'  => 10.0,
+                'headers' => $headers,
+                // 'base_uri' => 'http://sister.unida.gontor.ac.id/api.php/0.1'
+            ]);
+            $full_url = $sister_baseurl.'/kepangkatan';
 
+            $response = $client->get($full_url, [
+                'query' => [
+                    'id_sdm' => $user->sister_id,
+                ],
+                
+                'headers' => [
+                    'Content-type' => 'application/json',
+                    'Authorization' => 'Bearer '.$sisterToken
+                ]
 
-        else
-        {
-            Yii::$app->getSession()->setFlash('danger',json_encode($response));
+            ]); 
+            
+            $results = [];
+           
+            $response = json_decode($response->getBody());
+
+            
+            $counter = 0;
+            
+            $results = $response;
+            foreach($results as $item) {
+
+                
+                $model = Kepangkatan::find()->where([
+                    'sister_id' => $item->id
+                ])->one();
+
+                if(empty($model))
+                    $model = new Kepangkatan;
+                $model->NIY = Yii::$app->user->identity->NIY;
+                $model->sister_id = $item->id;
+                // 
+                $model->nama_golongan = $item->pangkat_golongan;
+                $model->no_sk_pangkat = $item->sk;
+                $model->terhitung_mulai_tanggal_sk_pangkat = $item->tanggal_mulai;
+                
+                $full_url = $sister_baseurl.'/kepangkatan/'.$item->id;
+                $resp = $client->get($full_url, [
+                    
+                     'headers' => [
+                        'Content-type' => 'application/json',
+                        'Authorization' => 'Bearer '.$sisterToken
+                    ]
+
+                ]); 
+                
+                
+                $res = json_decode($resp->getBody());
+
+                $model->kode_golongan = $res->golongan;
+                $model->tanggal_sk_pengangkatan = $res->tanggal_sk;
+                $model->masa_kerja_golongan_tahun = $res->masa_kerja_tahun;
+                $model->masa_kerja_golongan_bulan = $res->masa_kerja_bulan;
+                $model->id_pangkat_golongan = $res->id_pangkat_golongan;
+                
+                if($model->save()) {
+                    $counter++;
+
+                    
+                }
+
+                else
+                {
+                    $errors .= \app\helpers\MyHelper::logError($model);
+                    throw new \Exception;
+                }
+            }
+
+            $transaction->commit();
+            Yii::$app->getSession()->setFlash('success',$counter.' data imported');
             return $this->redirect(['index']);
         }
+
+        catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            Yii::$app->getSession()->setFlash('danger',$errors);
+            return $this->redirect(['index']);
+        } 
+        
+
+
+        // else
+        // {
+        //     Yii::$app->getSession()->setFlash('danger',json_encode($response));
+        //     return $this->redirect(['index']);
+        // }
 
 
     }

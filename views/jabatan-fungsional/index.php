@@ -44,10 +44,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'sk_jabatan_fungsional',
             'terhitung_mulai_tanggal_jabatan_fungsional',
             'angka_kredit',
-            //'kelebihan_pengajaran',
-            //'kelebihan_penelitian',
-            //'kelebihan_pengabdian_masyarakat',
-            //'kelebihan_kegiatan_penunjang',
+            'kelebihan_pengajaran',
+            'kelebihan_penelitian',
+            'kelebihan_pengabdian_masyarakat',
+            'kelebihan_kegiatan_penunjang',
             //'id_jabfung',
     // ['class' => 'yii\grid\ActionColumn']
 ];?>    

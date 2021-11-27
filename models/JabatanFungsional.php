@@ -40,7 +40,8 @@ class JabatanFungsional extends \yii\db\ActiveRecord
             [['terhitung_mulai_tanggal_jabatan_fungsional'], 'safe'],
             [['angka_kredit'], 'number'],
             [['id_jabfung'], 'integer'],
-            [['sister_id', 'jabatan_fungsional', 'kelebihan_pengajaran', 'kelebihan_penelitian', 'kelebihan_pengabdian_masyarakat', 'kelebihan_kegiatan_penunjang'], 'string', 'max' => 100],
+            [['kelebihan_pengajaran', 'kelebihan_penelitian', 'kelebihan_pengabdian_masyarakat', 'kelebihan_kegiatan_penunjang'],'number'],
+            [['sister_id', 'jabatan_fungsional'], 'string', 'max' => 100],
             [['NIY'], 'string', 'max' => 15],
             [['sk_jabatan_fungsional'], 'string', 'max' => 255],
         ];
