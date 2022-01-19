@@ -29,7 +29,7 @@ $list_jenis_sumber_dana = \app\helpers\MyHelper::listJenisSumberDana();
     $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
     
 
-    if(!empty($dataDiri) && empty($user->sister_id)){
+    if(empty($user->sister_id)){
 
         echo Html::a('<i class="fa fa-plus"></i> Pengabdian', ['create'], ['class' => 'btn btn-success']);
     } 
