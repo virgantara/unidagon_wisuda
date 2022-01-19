@@ -40,7 +40,7 @@ class DosenController extends Controller
             echo 'Oops, Person not found';
             return;
         }
-        $path=Yii::getAlias('@webroot').'/uploads/foto_profil/'.$dd->NIY.'/'.$dd->f_foto;
+        $path=$dd->f_foto;
         if (file_exists($path)) {
             return Yii::$app->response->sendFile($path,$dd->f_foto,['inline'=>true]);
         }else{
