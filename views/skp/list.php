@@ -246,7 +246,7 @@ if(!empty($dataProviderApproval->getModels()))
     <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
-                <h3 class="panel-title">List SKP Approval</h3>
+                <h3 class="panel-title">Daftar SKP Pegawai</h3>
             </div>
 <div class="panel-body ">
 

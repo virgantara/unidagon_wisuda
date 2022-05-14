@@ -123,14 +123,20 @@ else
             <th style="text-align:center;border-left:solid 1px black;border-right:solid 1px black;border-right:solid 1px black"><?=!empty($skpPerilaku) ? round($skpPerilaku->rata_rata * 0.4,2) : 0;?></th>
         </tr>
         <tr>
-            <th  style=";border-left:solid 1px black;border-top:solid 1px black;border-bottom:solid 1px black" rowspan="2" colspan="4">Nilai Prestasi Kerja</th>
+            <th  style=";border-left:solid 1px black;border-top:solid 1px black;border-bottom:solid 1px black" colspan="4">Nilai Prestasi Kerja</th>
             <th style="text-align:center;border-top:solid 1px black;border-bottom:solid 1px black;border-left:solid 1px black;border-right:solid 1px black"><?=round($bobot_capaian_skp + $bobot_avg_perilaku,2)?></th>
             <!-- <th>b</th> -->
         </tr>
-        <tr>
-            <th  style="text-align:center;border-left:solid 1px black;border-top:solid 1px black;border-bottom:solid 1px black;border-right:solid 1px black" >(<?= MyHelper::kesimpulan($total_prestasi)?>)</th>
-        </tr>
         
+        <tr>
+            <th  style=";border-left:solid 1px black;border-top:solid 1px black;border-bottom:solid 1px black"  >Predikat</th>
+            <th colspan="4" style="text-align:center;border-left:solid 1px black;border-top:solid 1px black;border-bottom:solid 1px black;border-right:solid 1px black" >(<?= MyHelper::kesimpulan($total_prestasi)?>)</th>
+        </tr>
+        <tr>
+            <th  style=";border-left:solid 1px black;border-top:solid 1px black;border-bottom:solid 1px black"  >Rekomendasi</th>
+            <th style="text-align:center;border-top:solid 1px black;border-bottom:solid 1px black;border-left:solid 1px black;border-right:solid 1px black" colspan="4"><?=!empty($skpPerilaku) ? $skpPerilaku->rekomendasi : '-';?></th>
+            <!-- <th>b</th> -->
+        </tr>
     </tbody>
 </table>
 
