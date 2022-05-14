@@ -679,38 +679,79 @@ class SkpController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $skpPerilaku = $model->skpPerilaku;
         $searchModel = new SkpItemSearch();
         $searchModel->skp_id = $id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         if (Yii::$app->request->post('hasEditable')) {
             // instantiate your book model for saving
-            $id = Yii::$app->request->post('editableKey');
-            $model = Skp::findOne($id);
 
-            // store a default json response as desired by editable
-            $out = json_encode(['output'=>'', 'message'=>'']);
-
-            
-            $posted = $_POST['Skp'];
-            $post = ['Skp' => $posted];
-
-            // load model like any single model validation
-            if ($model->load($post)) {
-            // can save model or do something before saving model
-                // print_r($post);exit;
-                if($model->save())
-                {
-                    $out = json_encode(['output'=>'', 'message'=>'']);
+            if(!empty($_POST['skp_id'])){
+                $id = Yii::$app->request->post('skp_id');
+                $tmp = SkpPerilaku::findOne(['skp_id' => $id]);
+                if(empty($tmp)){
+                    $tmp = new SkpPerilaku;
+                    $tmp->id = MyHelper::gen_uuid();
+                    $tmp->skp_id = $id;
                 }
-
-                else
-                {
-                    $error = \app\helpers\MyHelper::logError($model);
-                    $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
-                }
+                // store a default json response as desired by editable
+                $out = json_encode(['output'=>'', 'message'=>'']);
 
                 
+                // $posted = $_POST['Skp'];
+                $post = ['SkpPerilaku' => $_POST];
+                
+                
+                // load model like any single model validation
+                if ($tmp->load($post)) {
+
+
+                    if($tmp->save())
+                    {
+                        $out = json_encode(['output'=>'', 'message'=>'']);
+                    }
+
+                    else
+                    {
+                        $error = \app\helpers\MyHelper::logError($tmp);
+                        $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                    }
+
+                    
+                }
+            }
+
+            else if(!empty($_POST['editableKey'])){
+
+
+                $id = Yii::$app->request->post('editableKey');
+                $model = Skp::findOne($id);
+
+                // store a default json response as desired by editable
+                $out = json_encode(['output'=>'', 'message'=>'']);
+
+                
+                $posted = $_POST['Skp'];
+                $post = ['Skp' => $posted];
+
+                // load model like any single model validation
+                if ($model->load($post)) {
+                // can save model or do something before saving model
+                    // print_r($post);exit;
+                    if($model->save())
+                    {
+                        $out = json_encode(['output'=>'', 'message'=>'']);
+                    }
+
+                    else
+                    {
+                        $error = \app\helpers\MyHelper::logError($model);
+                        $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                    }
+
+                    
+                }
             }
             // return ajax json encoded response and exit
             echo $out;
@@ -720,6 +761,7 @@ class SkpController extends Controller
         return $this->render('view', [
             'model' => $model,
             'searchModel' => $searchModel,
+            'skpPerilaku' => $skpPerilaku,
             'dataProvider' => $dataProvider            
         ]);
     }

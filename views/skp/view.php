@@ -10,6 +10,8 @@ use yii\jui\AutoComplete;
 use yii\web\JsExpression;
 use kartik\select2\Select2;
 use kartik\editable\Editable;
+use kartik\number\NumberControl;
+
 
 $list_status_skp = MyHelper::statusSkp();
 /* @var $this yii\web\View */
@@ -51,15 +53,18 @@ else
 <div class="block-header">
     <h2><?= Html::encode($this->title) ?></h2>
 </div>
- <?php 
-    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
-    }
-    ?>
+
 <div class="row">
    <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
+
+                <?php 
+                if($model->status_skp != 2):
+
+
+                ?>
+
                 <?= Html::a('<i class="fa fa-edit"></i> Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
                 <?= Html::a('<i class="fa fa-trash"></i> Delete', ['delete', 'id' => $model->id], [
@@ -69,6 +74,8 @@ else
                         'method' => 'post',
                     ],
                 ]) ?>
+
+                <?php endif ?>
 
                 <?= Html::a('<i class="fa fa-print"></i> Print', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
 
@@ -147,6 +154,7 @@ else
                                     '3' => '<span class="label label-danger">Dikembalikan</span>',
                                 ],
                                 'inputType' => Editable::INPUT_DROPDOWN_LIST,
+
                                 'data' => ['1'=>'Menunggu persetujuan atasan','2'=>'Disetujui atasan','3'=>'Dikembalikan'],
                                 'size'=>'md',
                                 'options' => ['class'=>'form-control']
@@ -166,7 +174,128 @@ else
 
     </div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Catatan</h3>
+            </div>
+            <div class="panel-body ">
+                <table class="table">
+                     <tr>
+                        <th>a. Keberatan dari Pegawai yang dinilai (apabila ada)</th>
+                        <th>
+                            <?php 
+                            if($model->pegawai_dinilai != Yii::$app->user->identity->NIY){
+                                echo (!empty($skpPerilaku) ? $skpPerilaku->keberatan_pegawai_dinilai : '-');
 
+                            }
+
+                            else{
+                                echo Editable::widget([
+                                    'name' => 'keberatan_pegawai_dinilai',
+                                    'beforeInput' => Html::hiddenInput('skp_id',$model->id),
+                                    'asPopover' => false,
+                                    'inputType' => Editable::INPUT_TEXTAREA,
+                                    'disabled' => $model->pegawai_dinilai != Yii::$app->user->identity->NIY,
+                                    'value' => !empty($skpPerilaku) ? $skpPerilaku->keberatan_pegawai_dinilai : null,
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control'],
+                                    'pluginEvents' => [
+                                        "editableSuccess" => "function(event, val, form, data) { 
+                                            location.reload();
+                                        }",
+                                    ],
+                                ]);
+                            }
+                             ?>
+                            
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th>b. Keberatan dari Atasan Penilai (apabila ada)</th>
+                        <th>
+                            <?php 
+                            if($model->atasan_pejabat_penilai != Yii::$app->user->identity->NIY){
+                                echo (!empty($skpPerilaku) ? $skpPerilaku->keberatan_atasan_penilai : '-');
+
+                            }
+
+                            else{
+                                echo Editable::widget([
+                                    'name' => 'keberatan_atasan_penilai',
+                                    'beforeInput' => Html::hiddenInput('skp_id',$model->id),
+                                    'asPopover' => false,
+                                    'inputType' => Editable::INPUT_TEXTAREA,
+                                    'disabled' => $model->atasan_pejabat_penilai != Yii::$app->user->identity->NIY,
+                                    'value' => !empty($skpPerilaku) ? $skpPerilaku->keberatan_atasan_penilai : null,
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control'],
+                                    'pluginEvents' => [
+                                        "editableSuccess" => "function(event, val, form, data) { 
+                                            location.reload();
+                                        }",
+                                    ],
+                                ]);
+                            }
+                             ?>
+                            
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th>c. Keberatan dari Pejabat Penilai (apabila ada)</th>
+                        <th>
+                            <?php 
+                            if($model->pejabat_penilai != Yii::$app->user->identity->NIY){
+                                echo (!empty($skpPerilaku) ? $skpPerilaku->keberatan_pejabat_penilai : '-');
+
+                            }
+
+                            else{
+                                echo Editable::widget([
+                                    'name' => 'keberatan_pejabat_penilai',
+                                    'beforeInput' => Html::hiddenInput('skp_id',$model->id),
+                                    'asPopover' => false,
+                                    'inputType' => Editable::INPUT_TEXTAREA,
+                                    'disabled' => $model->pejabat_penilai != Yii::$app->user->identity->NIY,
+                                    'value' => !empty($skpPerilaku) ? $skpPerilaku->keberatan_pejabat_penilai : null,
+                                    'size'=>'md',
+                                    'options' => ['class'=>'form-control'],
+                                    'pluginEvents' => [
+                                        "editableSuccess" => "function(event, val, form, data) { 
+                                            location.reload();
+                                        }",
+                                    ],
+                                ]);
+                            }
+                             ?>
+                            
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th>d. Keputusan Atasan Pejabat Penilai Atas Keberatan (apabila ada)</th>
+                        <th>
+                            <?= (!empty($skpPerilaku) ? $skpPerilaku->keputusan_atasan_pejabat_atas_keberatan : null);?> 
+
+                        </th>
+                       
+                    </tr>
+                    <tr>
+                        <th>e. Rekomendasi</th>
+                        <th>
+                            <?= (!empty($skpPerilaku) ? $skpPerilaku->rekomendasi : null);?> 
+                        </th>
+                       
+                    </tr>
+                </table>
+               
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12">
         <div class="panel">
@@ -228,7 +357,12 @@ else
                     {
                         return Url::to(['skp-item/delete','id'=>$model->id]); 
                     }
-                }
+                },
+                // 'visibleButtons' => [
+                //     'delete' => function ($data) use ($model) {
+                //         return $model->status_skp != 2;
+                //     },
+                // ]
             ]
 ];?>    
 <?= GridView::widget([
@@ -374,7 +508,18 @@ yii\bootstrap\Modal::begin([
                 </tr>
                 <tr>
                     <td>Biaya*</td>
-                    <td colspan="3"><?= Html::textInput('target_biaya','',['type'=>'number','class'=>'form-control']) ?></td>
+                    <td colspan="3">
+                        <?= NumberControl::widget([
+                            'name' => 'target_biaya',
+
+                            'maskedInputOptions' => [
+                                'prefix' => 'Rp ',
+                                'groupSeparator' => '.',
+                                'radixPoint' => ','
+                            ]
+                        ]) ?>
+                            
+                    </td>
                 </tr>
             </table>
             

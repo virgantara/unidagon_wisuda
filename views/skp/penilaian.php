@@ -371,22 +371,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                         <th colspan="2">a. Keberatan dari Pegawai yang dinilai (apabila ada)</th>
                         <th colspan="3">
-                            <?php 
-                            echo Editable::widget([
-                                'name' => 'keberatan_pegawai_dinilai',
-                                'beforeInput' => Html::hiddenInput('editableKey',$model->id),
-                                'asPopover' => false,
-                                'inputType' => Editable::INPUT_TEXTAREA,
-                                'value' => !empty($skpPerilaku) ? $skpPerilaku->keberatan_pegawai_dinilai : null,
-                                'size'=>'md',
-                                'options' => ['class'=>'form-control'],
-                                'pluginEvents' => [
-                                    "editableSuccess" => "function(event, val, form, data) { 
-                                        location.reload();
-                                    }",
-                                ],
-                            ]);
-                             ?>
+                            <?=(!empty($skpPerilaku) ? $skpPerilaku->keberatan_pegawai_dinilai : null);?>
+                           
                         </th>
                        
                     </tr>
@@ -415,22 +401,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                         <th colspan="2">c. Keberatan dari Pejabat Penilai (apabila ada)</th>
                         <th colspan="3">
-                            <?php 
-                            echo Editable::widget([
-                                'name' => 'keberatan_pejabat_penilai',
-                                'beforeInput' => Html::hiddenInput('editableKey',$model->id),
-                                'asPopover' => false,
-                                'inputType' => Editable::INPUT_TEXTAREA,
-                                'value' => !empty($skpPerilaku) ? $skpPerilaku->keberatan_pejabat_penilai  : null,
-                                'size'=>'md',
-                                'options' => ['class'=>'form-control'],
-                                'pluginEvents' => [
-                                    "editableSuccess" => "function(event, val, form, data) { 
-                                        location.reload();
-                                    }",
-                                ],
-                            ]);
-                             ?>
+                            <?=(!empty($skpPerilaku) ? $skpPerilaku->keberatan_pejabat_penilai : null);?>
+                           
                         </th>
                        
                     </tr>
