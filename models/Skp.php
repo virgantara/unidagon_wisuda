@@ -50,6 +50,7 @@ class Skp extends \yii\db\ActiveRecord
             [['updated_at', 'created_at'], 'safe'],
             [['id'], 'string', 'max' => 50],
             [['pejabat_penilai', 'pegawai_dinilai', 'atasan_pejabat_penilai'], 'string', 'max' => 15],
+            [['pegawai_dinilai', 'jabatan_pegawai_id', 'periode_id'], 'unique', 'targetAttribute' => ['pegawai_dinilai', 'jabatan_pegawai_id', 'periode_id'],'message' => 'SKP sudah dibuat sebelumnya'],
             [['status_skp'], 'string', 'max' => 1],
             [['id'], 'unique'],
             [['pegawai_dinilai'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['pegawai_dinilai' => 'NIY']],
