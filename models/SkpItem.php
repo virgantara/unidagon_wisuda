@@ -143,17 +143,14 @@ class SkpItem extends \yii\db\ActiveRecord
             
         }
         
-        if($this->target_biaya > 0)
-        {
+        if($this->target_biaya > 0) {
             $eb = 100 - ($this->realisasi_biaya / $this->target_biaya * 100);
 
-            if($eb > 24)
-            {
+            if($eb > 24)  {
                 $aspek_biaya = 76-(((($nilai_tertimbang * $this->target_biaya - $this->realisasi_biaya) / $this->target_biaya)*100)-100);
             }
 
-            else
-            {
+            else {
                 $aspek_biaya = ($nilai_tertimbang * $this->target_biaya - $this->realisasi_biaya) / $this->target_biaya * 100;
             }
 

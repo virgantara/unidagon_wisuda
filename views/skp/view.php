@@ -142,7 +142,7 @@ else
                             echo Editable::widget([
                                 'model' => $model,
                                 'attribute' => 'status_skp',
-                                'beforeInput' => Html::hiddenInput('editableKey',$model->id),
+                                'beforeInput' => Html::hiddenInput('editableKeyStatusSKP',$model->id),
                                 'asPopover' => false,
                                 'disabled' => $model->pejabat_penilai != Yii::$app->user->identity->NIY,
                                 // 'format' => 'raw',
@@ -323,8 +323,9 @@ else
             [
                 'attribute' => 'komponen_kegiatan_id',
                 'contentOptions' => ['width' => '25%'],
+                'format' => 'raw',
                 'value' => function($data){
-                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - '.$data->komponenKegiatan->subunsur : null;
+                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - <b>'.$data->komponenKegiatan->subunsur.'</b>' : null;
                 }
             ],
             'target_ak',
@@ -334,12 +335,21 @@ else
             'target_waktu',
             //'target_waktu_satuan',
             [
+                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'target_biaya',
-                'contentOptions' => ['class' => 'text-right'],
-                'value' => function($data){
-                    return 'Rp '.MyHelper::formatRupiah($data->target_biaya);
-                }
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
             ],
+            // [
+            //     'attribute' => 'target_biaya',
+            //     'contentOptions' => ['class' => 'text-right'],
+            //     'value' => function($data){
+            //         return 'Rp '.MyHelper::formatRupiah($data->target_biaya);
+            //     }
+            // ],
             //'realisasi_ak',
             //'realisasi_qty',
             //'realisasi_satuan',

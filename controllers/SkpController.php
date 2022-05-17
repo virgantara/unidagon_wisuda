@@ -538,6 +538,16 @@ class SkpController extends Controller
 
     public function actionPengukuran($id)
     {
+
+        if(Yii::$app->user->isGuest)
+        {
+            $session = Yii::$app->session;
+            $session->remove('token');
+            Yii::$app->user->logout();
+            $url = Yii::$app->params['sso_logout'];
+            return $this->redirect($url);
+        }
+
         $model = $this->findModel($id);
         $searchModel = new SkpItemSearch();
         $searchModel->skp_id = $id;
@@ -723,17 +733,46 @@ class SkpController extends Controller
                 }
             }
 
-            else if(!empty($_POST['editableKey'])){
-
-
+            else if(!empty($_POST['SkpItem'])){
                 $id = Yii::$app->request->post('editableKey');
-                $model = Skp::findOne($id);
+                $model = SkpItem::findOne($id);
 
                 // store a default json response as desired by editable
                 $out = json_encode(['output'=>'', 'message'=>'']);
 
                 
-                $posted = $_POST['Skp'];
+                $posted = current($_POST['SkpItem']);
+                $post = ['SkpItem' => $posted];
+
+                // load model like any single model validation
+                if ($model->load($post)) {
+                // can save model or do something before saving model
+                    if($model->save())
+                    {
+                        $out = json_encode(['output'=>'', 'message'=>'']);
+                    }
+
+                    else
+                    {
+                        $error = \app\helpers\MyHelper::logError($model);
+                        $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                    }
+
+                    
+                }
+
+            }
+
+            else if(!empty($_POST['editableKeyStatusSKP'])){
+
+
+                $id = Yii::$app->request->post('editableKeyStatusSKP');
+                $model = Skp::findOne($id);
+
+                // store a default json response as desired by editable
+                $out = json_encode(['output'=>'', 'message'=>'']);
+
+                $posted = current($_POST['Skp']);
                 $post = ['Skp' => $posted];
 
                 // load model like any single model validation
@@ -754,6 +793,8 @@ class SkpController extends Controller
                     
                 }
             }
+
+            
             // return ajax json encoded response and exit
             echo $out;
             return;
@@ -898,40 +939,83 @@ class SkpController extends Controller
             try 
             {
 
-                if($model->save())
-                {
-                    if($access_role == 'Dosen')
-                    {
+                if($model->save()) {
+                    $counter = 0;
+                    if($access_role == 'Dosen'){
                         
                         $list_skp_templates = SkpTemplate::find()->where(['peran' => $access_role])->all();
-                        // $dataDiri = DataDiri::findOne(['NIY'=>$model->pegawai_dinilai]);
+                        $dataDiri = DataDiri::findOne(['NIY'=>$model->pegawai_dinilai]);
                         // $kode_komponen = '-';
 
-                        // if(!empty($dataDiri))
-                        // {
-                        //     $jabfung = !empty($dataDiri->jabatanFungsional) ? $dataDiri->jabatanFungsional->kode : '-';
+                        if(!empty($dataDiri))
+                        {
+                            $jabfung = !empty($dataDiri->jabatanFungsional) ? $dataDiri->jabatanFungsional->kode : '-';
 
-                        //     if(in_array($jabfung,['AA','TT']))
-                        //     {
-                        //         $kode_komponen = 'B1';
-                        //     }
+                            if(in_array($jabfung,['AA','TT'])) {
+                                $kode_komponen = 'B1';
+                            }
 
-                        //     else if(in_array($jabfung,['L','LK','GB']))
-                        //     {
-                        //         $kode_komponen = 'B2';
-                        //     }
-                        // }
+                            else if(in_array($jabfung,['L','LK','GB'])) {
+                                $kode_komponen = 'B2';
+                            }
+                        }
+
                         foreach($list_skp_templates as $tmp){
                             $komponen = $tmp->komponenKegiatan;
-                        
-                            if(!empty($komponen)) {
-                                
-                                $total_sks = $komponen->angka_kredit;
-                                
+                            $total_sks = $tmp->target_qty;
+                            
+                            if(in_array($komponen->kode, ['B1','B2']) && $kode_komponen == $komponen->kode) {
+
+                                $nama_kegiatan = $tmp->nama.' '.$total_sks.' '.$tmp->target_satuan;
+
+                                $item = SkpItem::findOne([
+                                    'skp_id' => $model->id,
+                                    // 'komponen_kegiatan_id' => $komponen->id,
+                                    'nama' => $nama_kegiatan
+                                ]);
+
+                                if(empty($item)){
+                                    $item = new SkpItem;
+                                    $item->id = MyHelper::gen_uuid();
+                                    
+                                    $item->komponen_kegiatan_id = $komponen->id;
+                                    $item->nama = $nama_kegiatan;
+                                    $item->skp_id = $model->id;
+                                    
+                                    $ak = $total_sks * $komponen->angka_kredit_pak;
+                                    if($total_sks > 10)
+                                    {
+                                        $ak = 10 * $komponen->angka_kredit_pak;
+                                        $sisa = $total_sks - 10;
+
+                                        $ak = $ak + ($sisa * ($komponen->angka_kredit_pak / 2));
+                                    }
+
+                                    $item->target_ak = $ak;
+                                    $item->realisasi_ak = 0;
+                                    $item->target_qty = $tmp->target_qty;
+                                    $item->target_satuan = $tmp->target_satuan;
+                                    $item->target_mutu = $tmp->target_mutu;
+                                    $item->target_waktu = $tmp->target_waktu;
+                                    $item->target_waktu_satuan = $tmp->target_waktu_satuan;
+
+                                    
+                                    if($item->save()) {
+                                        $counter++;
+
+                                    }
+                                    else{
+                                        $errors .= MyHelper::logError($item);
+                                        throw new \Exception;
+                                    }
+                                }
+                            }    
+
+                            else if(!in_array($komponen->kode, ['B1','B2'])){
                                 $item = SkpItem::find()->where([
                                     'skp_id' => $model->id,
                                     'komponen_kegiatan_id' => $komponen->id,
-                                    'nama' => 'Melaksanaan perkuliahan '.$total_sks.' sks'
+                                    'nama' => $tmp->nama
                                 ])->one();
 
                                 if(empty($item)){
@@ -943,16 +1027,9 @@ class SkpController extends Controller
                                 $item->nama = $tmp->nama;
                                 $item->skp_id = $model->id;
                                 
-                                // $ak = $total_sks * $komponen->angka_kredit;
-                                // if($total_sks > 10)
-                                // {
-                                //     $ak = 10 * $komponen->angka_kredit;
-                                //     $sisa = $total_sks - 10;
-
-                                //     $ak = $ak + ($sisa * ($komponen->angka_kredit / 2));
-                                // }
-
-                                $item->target_ak = $komponen->angka_kredit;
+                                $ak = 0;
+                                
+                                $item->target_ak = $ak;
                                 $item->realisasi_ak = 0;
                                 $item->target_qty = $tmp->target_qty;
                                 $item->target_satuan = $tmp->target_satuan;
@@ -960,18 +1037,21 @@ class SkpController extends Controller
                                 $item->target_waktu = $tmp->target_waktu;
                                 $item->target_waktu_satuan = $tmp->target_waktu_satuan;
 
+                                
+                                if($item->save()) {
+                                    $counter++;
+                                }
 
-                                if(!$item->save())
-                                {
+                                else{
                                     $errors .= MyHelper::logError($item);
                                     throw new \Exception;
                                 }
-                            }    
+                            }
                         }
                     }
                     
                     $transaction->commit();
-                    Yii::$app->session->setFlash('success', "Data tersimpan");
+                    Yii::$app->session->setFlash('success', "Data tersimpan. ".$counter." items created");
                     return $this->redirect(['view', 'id' => $model->id]);    
                 }
             }   
@@ -1114,7 +1194,7 @@ class SkpController extends Controller
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['list']);
     }
 
     /**
