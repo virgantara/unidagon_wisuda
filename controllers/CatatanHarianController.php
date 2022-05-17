@@ -226,7 +226,8 @@ class CatatanHarianController extends Controller
     }
 
     public function actionAjaxList()
-    {
+    {   
+        setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
         if(Yii::$app->request->isPost)
         {
             $dataPost = $_POST['dataPost'];
@@ -241,7 +242,7 @@ class CatatanHarianController extends Controller
                 $query = CatatanHarian::find();
                 $sd = date('Y-m-d 00:00:00');
                 $ed = date('Y-m-d 23:59:59');
-                $query->joinWith(['unsur as u']);
+                // $query->joinWith(['skpItem as si','skpItem.komponenKegiatan as kk']);
                 $query->andWhere(['between','tanggal',$sd,$ed]);
                 $query->andWhere([
                     // 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
@@ -253,46 +254,47 @@ class CatatanHarianController extends Controller
                     $results[] = [
                         'id' => $r->id,
                         'nama' => $r->deskripsi,
-                        'tanggal' => $r->tanggal,
+                        'tanggal' => strftime('%A, %d %B %Y',strtotime($r->tanggal)),
                         'poin' => $r->poin,
                         'is_selesai' => $r->is_selesai,
-                        'unsur' => $r->unsur->nama,
-                        'induk' => $r->unsur->induk->nama,
-                        'role' => $r->unsur->jenis_pegawai
+                        'unsur' => $r->skpItem->komponenKegiatan->nama.' '.$r->skpItem->komponenKegiatan->subunsur,
+                        // 'subunsur' => $r->skpItem->komponenKegiatan->subunsur,
+                        'induk' => $r->skpItem->komponenKegiatan->unsur->nama,
+                        'role' => '',//$r->unsur->jenis_pegawai
                     ];
                 }
             }
             
             else if($params == 'week')
             {
-                $list_induk = \app\models\IndukKegiatan::find()->all();
-                foreach($list_induk as $induk)
+                $list_unsur_utama = \app\models\UnsurUtama::find()->all();
+                foreach($list_unsur_utama as $utama)
                 {
                     $total_poin = 0;
-                    foreach($induk->unsurKegiatans as $uk)
-                    {
+                    // foreach($induk->unsurKegiatans as $uk)
+                    // {
                         $query = CatatanHarian::find();
                         $query->alias('t');
-                        $query->joinWith(['unsur as u']);
+                        $query->joinWith(['skpItem.komponenKegiatan as kk']);
                         $sd = date('Y-m-d 00:00:00', strtotime("last Saturday"));
                         $ed = date('Y-m-d 23:59:59');
                         $query->andWhere(['between','tanggal',$sd,$ed]);
                         $query->andWhere([
-                            'unsur_id'=>$uk->id,
-                            'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
-                            'user_id' => Yii::$app->user->identity->id
+                            'kk.unsur_id'=>$utama->id,
+                            // 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
+                            't.user_id' => Yii::$app->user->identity->id
                         ]);
                         $tmp = $query->sum('t.poin');
                         $total_poin += $tmp;
-                    }
+                    // }
 
                     $results[] = [
-                        'id' => $induk->id,
-                        'nama' => $induk->nama,
+                        'id' => $utama->id,
+                        'nama' => $utama->nama,
                         'tanggal' => null,
                         'poin' => $total_poin,
                         'is_selesai' => null,
-                        'unsur' => $induk->nama,
+                        'unsur' => $utama->nama,
                         'induk' => ''
                     ];
                 }
@@ -300,31 +302,34 @@ class CatatanHarianController extends Controller
 
             else if($params == 'month')
             {
-                $list_induk = \app\models\IndukKegiatan::find()->all();
-                foreach($list_induk as $induk)
+                $list_unsur_utama = \app\models\UnsurUtama::find()->all();
+                foreach($list_unsur_utama as $utama)
                 {
                     $total_poin = 0;
-                    foreach($induk->unsurKegiatans as $uk)
-                    {
+                    // foreach($induk->unsurKegiatans as $uk)
+                    // {
                         $query = CatatanHarian::find();
+                        $query->alias('t');
+                        $query->joinWith(['skpItem.komponenKegiatan as kk']);
                         $sd = date('Y-m-01 00:00:00');
                         $ed = date('Y-m-t 23:59:59');
                         $query->andWhere(['between','tanggal',$sd,$ed]);
                         $query->andWhere([
-                            'unsur_id'=>$uk->id,
-                            'user_id' => Yii::$app->user->identity->id
+                            'kk.unsur_id'=>$utama->id,
+                            // 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
+                            't.user_id' => Yii::$app->user->identity->id
                         ]);
                         $tmp = $query->sum('poin');
                         $total_poin += $tmp;
-                    }
+                    // }
 
                     $results[] = [
-                        'id' => $induk->id,
-                        'nama' => $induk->nama,
+                        'id' => $utama->id,
+                        'nama' => $utama->nama,
                         'tanggal' => null,
                         'poin' => $total_poin,
                         'is_selesai' => null,
-                        'unsur' => $induk->nama,
+                        'unsur' => $utama->nama,
                         'induk' => ''
                     ];
                 }

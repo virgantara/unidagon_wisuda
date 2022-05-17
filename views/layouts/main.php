@@ -89,6 +89,28 @@ SweetalertAsset::register($this);
         <div class="main-content">
             <div class="container-fluid">
                 <?= Alert::widget() ?>
+                
+                <?php 
+                    if(isset($this->params['breadcrumbs'])){
+                    ?>
+                    <div class="breadcrumbs ace-save-state" id="breadcrumbs">
+                        <?php
+
+                        echo Breadcrumbs::widget([
+                            // 'options' => [
+                            //     'class' => 'breadcrumb',
+                            // ]
+                            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+                        ]);
+
+                         ?>
+                       
+
+                        
+                    </div>
+                    <?php 
+                }
+                    ?>
                 <?= $content ?>
             </div>
         </div>

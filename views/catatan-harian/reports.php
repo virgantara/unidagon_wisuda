@@ -11,7 +11,6 @@ $this->title = 'Laporan Catatan Harian';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<h3><?= Html::encode($this->title) ?></h3>
 <div class="row">
     <div class="col-md-12">
         <div class="panel">
@@ -109,7 +108,7 @@ function getToday(){
             $("#today_list").empty()
             var row = ""
             $.each(res, function(i, obj){
-                row += "<li value=\'"+obj.id+"\'><i class=\'fa fa-comment activity-icon\'></i><p>"+obj.nama+" <a href=\'#\'>["+obj.induk+"] - ["+obj.role+"]</a></p></li>"
+                row += "<li value=\'"+obj.id+"\'><i class=\'fa fa-comment activity-icon\'></i><p>"+obj.nama+" <a href=\'#\'>["+obj.induk+"] - ["+obj.unsur+"]</a></p></li>"
             })
 
             $("#today_list").append(row)
