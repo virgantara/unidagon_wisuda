@@ -324,24 +324,24 @@ yii\bootstrap\Modal::begin([
                 <tr>
                     <td><b>Kuantitas/Output</b></td>
                     <td><span id="span_target_qty"></span>&nbsp;<span id="span_target_satuan"></span></td>
-                    <td><?= Html::textInput('realisasi_qty','',['class'=>'form-control','type' => 'number']) ?></td>
+                    <td><?= Html::textInput('realisasi_qty','',['class'=>'form-control','id'=>'realisasi_qty']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Kualitas/Mutu</b></td>
                     <td><span id="span_target_mutu"></span></td>
-                    <td><?= Html::textInput('realisasi_mutu','',['class'=>'form-control','type' => 'number']) ?></td>
+                    <td><?= Html::textInput('realisasi_mutu','',['class'=>'form-control','id'=>'realisasi_mutu']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Waktu</b></td>
                     <td><span id="span_target_waktu"></span>&nbsp;<span id="span_target_waktu_satuan"></span></td>
-                    <td><?= Html::textInput('realisasi_waktu','',['class'=>'form-control','type' => 'number']) ?></td>
+                    <td><?= Html::textInput('realisasi_waktu','',['class'=>'form-control','id'=>'realisasi_waktu']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Biaya</b></td>
                     <td><span id="span_target_biaya"></span></td>
                     <td><?= NumberControl::widget([
                             'name' => 'realisasi_biaya',
-
+                            'options' => ['id'=>'realisasi_biaya'],
                             'maskedInputOptions' => [
                                 'prefix' => 'Rp ',
                                 'groupSeparator' => '.',
@@ -406,6 +406,10 @@ $(document).on("click", ".btn_isi_capaian", function(e){
             $("#span_target_waktu").html(hasil.target_waktu)
             $("#span_target_waktu_satuan").html(hasil.target_waktu_satuan)
             $("#span_target_biaya").html(hasil.target_biaya)
+            $("#realisasi_qty").val(hasil.realisasi_qty)
+            $("#realisasi_mutu").val(hasil.realisasi_mutu)
+            $("#realisasi_biaya-disp").val(hasil.realisasi_biaya)
+            $("#realisasi_waktu").val(hasil.realisasi_waktu)
             $("#modal").modal("show")
             
         }
