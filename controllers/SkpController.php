@@ -37,18 +37,18 @@ class SkpController extends Controller
                 'denyCallback' => function ($rule, $action) {
                     throw new \yii\web\ForbiddenHttpException('You are not allowed to access this page');
                 },
-                'only' => ['create','update','delete','index','list','riwayat','list-penilaian','pengukuran'],
+                'only' => ['create','update','delete','index','list','riwayat','list-penilaian','realisasi','pengisian'],
                 'rules' => [
                     [
                         'actions' => [
-                            'create','update','delete','index','list','riwayat','list-penilaian','pengukuran'
+                            'create','update','delete','index','list','riwayat','list-penilaian','realisasi','pengisian'
                         ],
                         'allow' => true,
                         'roles' => ['Dosen','Dekan','Kaprodi','Kepala','Kepala Bagian','Kepala Biro','Kepala TU','Staf','Staf TU','Staf UPT','Staf Biro'],
                     ],
                     [
                         'actions' => [
-                            'create','update','delete','index','list','riwayat','list-penilaian','pengukuran'
+                            'create','update','delete','index','list','riwayat','list-penilaian','realisasi','pengisian'
                         ],
                         'allow' => true,
                         'roles' => ['theCreator','admin'],
@@ -755,7 +755,7 @@ class SkpController extends Controller
 
     }
 
-    public function actionPengukuran($id)
+    public function actionPengisian($id)
     {
 
         if(Yii::$app->user->isGuest)
@@ -808,6 +808,65 @@ class SkpController extends Controller
         }
        
         return $this->render('pengisian', [
+            'model' => $model,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider            
+        ]);
+    }
+
+    public function actionRealisasi($id)
+    {
+
+        if(Yii::$app->user->isGuest)
+        {
+            $session = Yii::$app->session;
+            $session->remove('token');
+            Yii::$app->user->logout();
+            $url = Yii::$app->params['sso_logout'];
+            return $this->redirect($url);
+        }
+
+        $model = $this->findModel($id);
+        $searchModel = new SkpItemSearch();
+        $searchModel->skp_id = $id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        if (Yii::$app->request->post('hasEditable')) {
+            // instantiate your book model for saving
+            $id = Yii::$app->request->post('editableKey');
+            $model = SkpItem::findOne($id);
+
+            // store a default json response as desired by editable
+            $out = json_encode(['output'=>'', 'message'=>'']);
+
+            
+            // $posted = $_POST['Skp'];
+            $post = ['SkpItem' => $_POST];
+            
+            // load model like any single model validation
+            if ($model->load($post)) {
+            // can save model or do something before saving model
+                // print_r($post);exit;
+                if($model->save())
+                {
+                    $model->hitungSkp();
+                    $out = json_encode(['output'=>'', 'message'=>'']);
+                }
+
+                else
+                {
+                    $error = \app\helpers\MyHelper::logError($model);
+                    $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                }
+
+                
+            }
+            // return ajax json encoded response and exit
+            echo $out;
+            return;
+        }
+       
+        return $this->render('realisasi', [
             'model' => $model,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider            

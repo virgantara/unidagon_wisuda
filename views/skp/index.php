@@ -157,12 +157,17 @@ else
             //'created_at',
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{update}',
+                'template' => '{update} {realisasi}',
                 'header' => 'Opsi',
                 'urlCreator' => function ($action, $model, $key, $index) {
                     if($action == 'update')
                     {
-                        return Url::to(['skp/pengukuran','id'=>$model->id,['title'=>'Pengukuran']]); 
+                        return Url::to(['skp/pengisian','id'=>$model->id,['title'=>'Pengukuran']]); 
+                    }
+
+                    else if($action == 'realisasi')
+                    {
+                        return Url::to(['skp/realisasi','id'=>$model->id,['title'=>'Realisasi']]); 
                     }
                 },
                 'buttons' => [
@@ -176,6 +181,18 @@ else
 
                         else{
                             return '<span style="font-size:100%"  class="label label-danger">Mohon maaf, SKP Anda belum disetujui sehingga belum bisa mengisi Formulir</span>';
+                        }
+                    },
+                    'realisasi' => function ($url, $model) {
+                        if($model->status_skp == 2){
+                            return Html::a('<i class="fa fa-search"></i> Lihat Realisasi', $url, [
+                                       'title' => 'Preview Realisasi',
+                                       'class' => 'btn btn-primary'
+                            ]);
+                        }
+
+                        else{
+                            return '<span style="font-size:100%"  class="label label-danger">Mohon maaf, SKP Anda belum disetujui sehingga belum bisa melihat realisasi</span>';
                         }
                     }
                 ],
