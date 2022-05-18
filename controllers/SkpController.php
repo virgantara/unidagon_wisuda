@@ -32,13 +32,128 @@ class SkpController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'denyCallback' => function ($rule, $action) {
+                    throw new \yii\web\ForbiddenHttpException('You are not allowed to access this page');
+                },
+                'only' => ['create','update','delete','index','list','riwayat','list-penilaian','pengukuran'],
+                'rules' => [
+                    [
+                        'actions' => [
+                            'create','update','delete','index','list','riwayat','list-penilaian','pengukuran'
+                        ],
+                        'allow' => true,
+                        'roles' => ['Dosen','Dekan','Kaprodi','Kepala','Kepala Bagian','Kepala Biro','Kepala TU','Staf','Staf TU','Staf UPT','Staf Biro'],
+                    ],
+                    [
+                        'actions' => [
+                            'create','update','delete','index','list','riwayat','list-penilaian','pengukuran'
+                        ],
+                        'allow' => true,
+                        'roles' => ['theCreator','admin'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['post','bayar'],
                 ],
             ],
         ];
+    }
+
+    public function actionRiwayat()
+    {
+
+        if(Yii::$app->user->isGuest)
+        {
+            $session = Yii::$app->session;
+            $session->remove('token');
+            Yii::$app->user->logout();
+            $url = Yii::$app->params['sso_logout'];
+            return $this->redirect($url);
+        }
+
+        $user = \app\models\User::findOne(Yii::$app->user->identity->ID);
+        $loggedInAs = MJabatan::find()->where(['nama'=>Yii::$app->user->identity->access_role])->one();
+
+        $jabatan = Jabatan::find()->where([
+          'jabatan_id' => !empty($loggedInAs) ? $loggedInAs->id : '-',
+          'NIY' => Yii::$app->user->identity->NIY
+        ])->one();
+
+        $pejabatPenilai = null;
+        $pegawaiDinilai = $user;
+        $jabatanPenilai = null;
+        $jabatanPegawai = null;
+
+        $access_role = Yii::$app->user->identity->access_role;
+        $list_staf = MyHelper::listRoleStaf();
+        if(!empty($jabatan))
+        {
+            
+
+            $unker = $jabatan->unker;
+
+            if($access_role == 'Kaprodi' && !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat) ? $unker->parent->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->parent->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+
+            else if($access_role == 'Dosen' && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+
+            else if(in_array(Yii::$app->user->identity->access_role, $list_staf) && !empty($unker) && !empty($unker->pejabat))
+            {
+                $niyAsesor = !empty($unker) && !empty($unker->pejabat) ? $unker->pejabat->NIY : null;
+
+                $jabatanPenilai = Jabatan::find()->where([
+                    'jabatan_id' => $unker->jabatan_id,
+                    'NIY' => $niyAsesor
+                ])->one();
+
+                $pejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAsesor])->one();    
+            }
+            
+
+            $jabatanPegawai = !empty($jabatan) ? $jabatan : null;
+        }
+
+        $searchModel = new SkpSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $searchModelApproval = new SkpSearch();
+        $dataProviderApproval = $searchModelApproval->searchApproval(Yii::$app->request->queryParams);
+
+        return $this->render('riwayat',[
+            'pejabatPenilai' => $pejabatPenilai,
+            'pegawaiDinilai' => $pegawaiDinilai,
+            'jabatanPegawai' => $jabatanPegawai,
+            'jabatanPenilai' => $jabatanPenilai,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'searchModelApproval' => $searchModelApproval,
+            'dataProviderApproval' => $dataProviderApproval,
+        ]);
+
     }
 
     public function actionListPenilaian()
@@ -518,7 +633,7 @@ class SkpController extends Controller
         }
 
         $searchModel = new SkpSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->searchAktif(Yii::$app->request->queryParams);
 
         $searchModelApproval = new SkpSearch();
         $dataProviderApproval = $searchModelApproval->searchApproval(Yii::$app->request->queryParams);
@@ -588,7 +703,7 @@ class SkpController extends Controller
             return;
         }
        
-        return $this->render('pengukuran', [
+        return $this->render('pengisian', [
             'model' => $model,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider            
@@ -669,7 +784,7 @@ class SkpController extends Controller
             $jabatanPegawai = !empty($jabatan) ? $jabatan : null;
         }
         $searchModel = new SkpSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->searchAktif(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'pejabatPenilai' => $pejabatPenilai,

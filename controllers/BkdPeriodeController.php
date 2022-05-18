@@ -21,10 +21,26 @@ class BkdPeriodeController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'denyCallback' => function ($rule, $action) {
+                    throw new \yii\web\ForbiddenHttpException('You are not allowed to access this page');
+                },
+                'only' => ['create','update','delete','index'],
+                'rules' => [
+                    [
+                        'actions' => [
+                            'create','update','delete','index'
+                        ],
+                        'allow' => true,
+                        'roles' => ['theCreator','admin'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['post','bayar'],
                 ],
             ],
         ];

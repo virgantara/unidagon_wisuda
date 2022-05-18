@@ -82,8 +82,8 @@ class SkpItem extends \yii\db\ActiveRecord
             'realisasi_waktu' => 'Realisasi Waktu',
             'realisasi_waktu_satuan' => 'Realisasi Waktu Satuan',
             'realisasi_biaya' => 'Realisasi Biaya',
-            'capaian' => 'Capaian',
-            'capaian_skp' => 'Capaian Skp',
+            'capaian' => 'Perhitungan',
+            'capaian_skp' => 'Nilai Capaian SKP',
         ];
     }
 

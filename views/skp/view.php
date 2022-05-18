@@ -337,6 +337,8 @@ else
             [
                 'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'target_biaya',
+                'contentOptions' => ['class' => 'text-right'],
+                'format' => 'currency',
                 'editableOptions' => [
                     'inputType' => \kartik\editable\Editable::INPUT_TEXT,
                     'asPopover' => false
@@ -379,6 +381,7 @@ else
         'dataProvider' => $dataProvider,
         // 'filterModel' => $searchModel,
         'columns' => $gridColumns,
+        'responsiveWrap' => false,
         'containerOptions' => ['style' => 'overflow: auto'], 
         'headerRowOptions' => ['class' => 'kartik-sheet-style'],
         'filterRowOptions' => ['class' => 'kartik-sheet-style'],

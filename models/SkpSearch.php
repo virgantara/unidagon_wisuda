@@ -32,6 +32,46 @@ class SkpSearch extends Skp
         return Model::scenarios();
     }
 
+    public function searchAktif($params)
+    {
+        $query = Skp::find();
+        $query->alias('t');
+        $query->joinWith(['periode as p']);
+
+        $query->andWhere([
+            'pegawai_dinilai'=>Yii::$app->user->identity->NIY,
+            'p.buka'=> 'Y'
+        ]);
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            't.periode_id' => $this->periode_id,
+            't.updated_at' => $this->updated_at,
+            't.created_at' => $this->created_at,
+        ]);
+
+        $query->andFilterWhere(['like', 't.id', $this->id])
+            ->andFilterWhere(['like', 't.pejabat_penilai', $this->pejabat_penilai])
+            ->andFilterWhere(['like', 't.pegawai_dinilai', $this->pegawai_dinilai])
+            ->andFilterWhere(['like', 't.status_skp', $this->status_skp]);
+
+        return $dataProvider;
+    }
+
     /**
      * Creates data provider instance with search query applied
      *

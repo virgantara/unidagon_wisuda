@@ -32,6 +32,135 @@ class SkpItemController extends Controller
         ];
     }
 
+    public function actionAjaxUpdate()
+    {
+
+        $results = [];
+
+        $errors = '';
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        
+        try 
+        {
+            $dataPost = $_POST;
+            if(!empty($dataPost))
+            {
+
+
+                $model = SkpItem::findOne($dataPost['id']);
+
+                if(empty($model)){
+                    $results = [
+                        'code' => 404,
+                        'message' => 'Item not found'
+                    ];
+                    echo json_encode($results);
+                    exit;
+                }
+                
+                $model->attributes = $dataPost;
+                
+                $komponen = KomponenKegiatan::findOne($model->komponen_kegiatan_id);
+                if(!empty($komponen))
+                {
+                    if(in_array($komponen->kode,['B1','B2']))
+                    {
+                        $total_sks = $model->target_qty;
+                        $ak = $total_sks * $komponen->angka_kredit_pak;
+                        if($total_sks > 10){
+                            $ak = 10 * $komponen->angka_kredit_pak;
+                            $sisa = $total_sks - 10;
+
+                            $ak = $ak + ($sisa * ($komponen->angka_kredit_pak / 2));
+                        }
+
+                        $model->target_ak = $ak;
+                        $model->realisasi_ak = $ak;
+                    }
+
+                    else
+                    {
+                        $model->target_ak = $model->target_qty * $komponen->angka_kredit_pak;
+                    }
+                }
+
+                $model->hitungSkp();
+
+                if(!$model->save())
+                {
+                    $errors .= MyHelper::logError($model);
+                    throw new \Exception;
+                }
+
+                $transaction->commit();
+                $results = [
+                    'code' => 200,
+                    'message' => 'Data successfully updated'
+                ];
+            }
+
+            else
+            {
+                $errors .= 'Oops, you cannot POST empty data';
+                throw new \Exception;
+                
+            }   
+        } 
+
+        catch (\Exception $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+            
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            $errors .= $e->getMessage();
+            $results = [
+                'code' => 500,
+                'message' => $errors
+            ];
+            
+        }
+        echo json_encode($results);
+        exit;
+    }
+
+    public function actionAjaxGet(){
+        $results = [];
+        if(Yii::$app->request->isPost){
+            $dataPost = $_POST['dataPost'];
+
+            $model = SkpItem::findOne($dataPost['id']);
+
+            $results = [
+                'id' => $model->id,
+                'nama' => $model->nama,
+                'unsur' => $model->komponenKegiatan->unsur->nama,
+                'komponen' => $model->komponenKegiatan->nama,
+                'target_qty' => $model->target_qty,
+                'target_satuan' => $model->target_satuan,
+                'target_mutu' => $model->target_mutu,
+                'target_waktu' => $model->target_waktu,
+                'target_biaya' => MyHelper::formatRupiah($model->target_biaya,2),
+                'target_waktu_satuan' => $model->target_waktu_satuan,
+                'realisasi_qty' => $model->realisasi_qty,
+                'realisasi_mutu' => $model->realisasi_mutu,
+                'realisasi_waktu' => $model->realisasi_waktu,
+                'realisasi_biaya' => $model->realisasi_biaya,
+            ];
+
+
+        }
+        
+        echo json_encode($results);
+        exit;
+    }
+
     public function actionAjaxList()
     {
         $id = $_POST['id'];

@@ -41,6 +41,7 @@ class MenuHelper
 		           	['label' => 'Pengukuran', 'url' => ['/skp/index']],
 		           	// ['label' => 'Perilaku Kerja', 'url' => ['/skp/penilaian']],
 		           	['label' => 'Penilaian', 'url' => ['/skp/list-penilaian']],
+		           	['label' => 'Riwayat', 'url' => ['/skp/riwayat']],
 		        ]
 	        ];
 
@@ -86,9 +87,10 @@ class MenuHelper
 		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_skp">{label}</a>',
 		        'items'=>[
 		        	['label' => 'Form SKP', 'url' => ['/skp/list']],
-		           	['label' => 'Pengukuran', 'url' => ['/skp/index']],
+		           	['label' => 'Pengisian', 'url' => ['/skp/index']],
 		           	// ['label' => 'Perilaku Kerja', 'url' => ['/skp/penilaian']],
 		           	['label' => 'Penilaian', 'url' => ['/skp/list-penilaian']],
+		           	['label' => 'Riwayat', 'url' => ['/skp/riwayat']],
 		        ]
 	        ];
 	        
