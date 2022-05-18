@@ -89,7 +89,7 @@ class MenuHelper
 		        	['label' => 'Form SKP', 'url' => ['/skp/list']],
 		           	['label' => 'Pengisian', 'url' => ['/skp/index']],
 		           	// ['label' => 'Perilaku Kerja', 'url' => ['/skp/penilaian']],
-		           	['label' => 'Penilaian', 'url' => ['/skp/list-penilaian']],
+		           	['label' => 'Penilaian Perilaku', 'url' => ['/skp/list-penilaian']],
 		           	['label' => 'Riwayat', 'url' => ['/skp/riwayat']],
 		        ]
 	        ];

@@ -64,6 +64,110 @@ class SkpController extends Controller
         ];
     }
 
+    public function actionPrintRencana($id)
+    {
+        $model = $this->findModel($id);
+        
+        try
+        {
+            $session = Yii::$app->session;
+            $tahun_id = '';
+            $sd = '';
+            $ed = '';
+            $bkd_periode = null;
+            if($session->has('bkd_periode'))
+            {
+                $tahun_id = $session->get('bkd_periode');
+              // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+                $sd = $session->get('tgl_awal');
+                $ed = $session->get('tgl_akhir');  
+                $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+            }
+            else{
+                $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+                $tahun_id = $bkd_periode->tahun_id;
+                $sd = $bkd_periode->tanggal_bkd_awal;
+                $ed = $bkd_periode->tanggal_bkd_akhir;
+            }
+
+            $skpPerilaku = $model->skpPerilaku;
+       
+            $pegawaiDinilai = $model->pegawaiDinilai;
+            $pejabatPenilai = $model->pejabatPenilai;
+            $atasanPejabatPenilai = $model->atasanPejabatPenilai;
+
+            $capaian_total = 0;
+            $avg_capaian_skp = 0;
+            $counter=0;
+            foreach($model->skpItems as $q => $item)
+            {
+                $counter++;
+
+                $item->hitungSkp();
+                $penghitungan = $item->capaian;
+                $tmp = $item->capaian_skp;
+                $capaian_total += $tmp;
+            }
+
+            if($counter > 0)
+                $avg_capaian_skp = $capaian_total / $counter;
+
+            $bobot_capaian_skp = $avg_capaian_skp * 0.6;
+            $bobot_avg_perilaku = !empty($skpPerilaku) ? $skpPerilaku->rata_rata * 0.4 : 0;
+
+            $total_prestasi = $bobot_capaian_skp + $bobot_avg_perilaku;
+       
+            $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);  
+            $pdf->SetPrintHeader(false);
+            $pdf->SetPrintFooter(false);
+            $fontpath = Yii::getAlias('@webroot').'/klorofil/assets/fonts/pala.ttf';
+            
+            $fontreg = \TCPDF_FONTS::addTTFfont($fontpath, 'TrueTypeUnicode', '', 86);
+            $pdf->SetFont($fontreg, '', 12);
+            $pdf->AddPage();
+            ob_start();
+            echo $this->renderPartial('cover_rencana', [
+                'user' => $model->pegawaiDinilai,
+                'model' => $model,
+                'bkd_periode' =>   $bkd_periode,
+            ]);
+
+            $data = ob_get_clean();
+            ob_start();
+            $imgdata = Yii::getAlias('@webroot').'/klorofil/assets/img/logo-ori.png';
+            $pdf->Image($imgdata,$pdf->getPageWidth()/2 - 10,10,20);
+            $pdf->Ln(50);
+            // $pdf->writeHTMLCell(50, 38, '', $y, $grades, 1, 0, 0, true, 'J', true);
+            $pdf->writeHTMLCell($pdf->getPageWidth() - 50,10,25,50,$data, 0, 0, 0, true, 'J', true);
+
+            ob_start();
+            echo $this->renderPartial('print_formulir', [
+                 'model' => $model,
+            ]);
+
+            $data = ob_get_clean();
+            ob_start();
+            
+            
+            $pdf->SetFont($fontreg, '', 9);
+            $pdf->AddPage();
+            // $imgdata = Yii::getAlias('@webroot').'/klorofil/assets/img/logo-ori.png';
+            // $pdf->Image($imgdata,10,10,15);
+            $pdf->writeHTML($data);
+
+
+            
+
+            $nama = $model->pegawai_dinilai;
+            $pdf->Output('skp_'.$nama.''.rand(1,100).'.pdf','I');
+        }
+        catch(\HTML2PDF_exception $e) {
+            echo $e;
+            exit;
+        }
+        die();
+    }
+
     public function actionRiwayat()
     {
 

@@ -16,10 +16,9 @@ else
   <tr>
     
     <td style="text-align: center;">
-      <span style="font-size: 1.15em">LAPORAN SASARAN KINERJA PEGAWAI</span><br>
-      <span style="font-size: 1.15em">DAN PENILAIAN PERILAKU</span>
-     
- 
+      <span style="font-size: 1.15em">RENCANA SASARAN KINERJA PEGAWAI</span><br>
+      <span style="font-size: 1.0em">UNIVERSITAS DARUSSALAM GONTOR</span>
+  
     </td>
   </tr>
 </table>
@@ -43,7 +42,7 @@ else
       <th width="60%" >: <?=!empty($model->jabatanPegawai) && !empty($model->jabatanPegawai->unker) ? $model->jabatanPegawai->unker->nama: '';?></th>
     </tr>
     <tr>
-      <th width="40%" ><strong>Tahun Laporan</strong></th>
+      <th width="40%" ><strong>Tahun Pelaksanaan</strong></th>
       <th width="60%" >: <?=$bkd_periode->nama_periode;?></th>
     </tr>
     

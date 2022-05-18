@@ -19,7 +19,7 @@ $list_status_skp = MyHelper::statusSkp();
 
 $list_unsur = ArrayHelper::map(\app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all(),'id','nama');
 
-$this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
+$this->title = 'Pengisian Form SKP';
 $this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -58,26 +58,8 @@ else
    <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
-
-                <?php 
-                if($model->status_skp != 2):
-
-
-                ?>
-
-                <?= Html::a('<i class="fa fa-edit"></i> Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-
-                <?= Html::a('<i class="fa fa-trash"></i> Delete', ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-danger',
-                    'data' => [
-                        'confirm' => 'Are you sure you want to delete this item?',
-                        'method' => 'post',
-                    ],
-                ]) ?>
-
-                <?php endif ?>
-
-                <?= Html::a('<i class="fa fa-print"></i> Print', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+<?= Html::a('<i class="fa fa-print"></i> Print Rencana SKP', ['print-rencana', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
 
                 
             </div>
@@ -173,7 +155,7 @@ else
         'contentOptions'=>['class'=>'kartik-sheet-style'],
         'width'=>'36px',
         'pageSummary'=>'Total',
-        'pageSummaryOptions' => ['colspan' => 6],
+        'pageSummaryOptions' => ['colspan' => 3],
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
@@ -187,8 +169,30 @@ else
                     return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - <b>'.$data->komponenKegiatan->subunsur.'</b>' : null;
                 }
             ],
-            'capaian',
-            'capaian_skp',
+            [
+                'attribute' => 'capaian',
+                'contentOptions' => ['class'=>'text-center'],
+                'value' => function($data){
+                    return round($data->capaian, 2);
+                },
+                'pageSummary' => true,
+                'pageSummaryOptions' => ['class'=>'text-center'],
+                'footer' => function($data){
+                    return round($data->sumCapaian, 2);
+                },     
+            ],
+            [
+                'attribute' => 'capaian_skp',
+                'contentOptions' => ['class'=>'text-center'],   
+                'value' => function($data){
+                    return round($data->capaian_skp, 2);
+                },
+                'pageSummary' => true,
+                'pageSummaryOptions' => ['class'=>'text-center'],
+                'footer' => function($data){
+                    return round($data->sumCapaianSkp, 2);
+                },     
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update}',
@@ -202,7 +206,7 @@ else
                     'update' => function ($url, $model, $key) { 
                          return Html::a('<i class="fa fa-pencil"></i> Isi Capaian', 'javascript:void(0)',[
                             'title'=>'Pengisian Capaian',
-                            'class'=>'btn_isi_capaian',
+                            'class'=>'btn btn-info btn_isi_capaian',
                             'data-item' => $model->id
                         ]);
 
@@ -263,7 +267,7 @@ else
         // 'responsive' => false,
         'hover' => true,
         // 'floatHeader' => true,
-        // 'showPageSummary' => true, //true untuk menjumlahkan nilai di suatu kolom, kebetulan pada contoh tidak ada angka.
+        'showPageSummary' => true, //true untuk menjumlahkan nilai di suatu kolom, kebetulan pada contoh tidak ada angka.
         'panel' => [
             'type' => GridView::TYPE_PRIMARY
         ],
@@ -293,52 +297,52 @@ yii\bootstrap\Modal::begin([
         <div class="col-md-12">
             <table class="table">
                 <tr>
-                    <td>Unsur Utama</td>
-                    <td colspan="3">
-                        <span id="span_unsur_utama"></span>
-                    </td>
+                    <th>Unsur Utama</th>
+                    <th colspan="3">: <span id="span_unsur_utama"></span></th>
                 </tr>
                 <tr>
-                    <td>Komponen</td>
-                    <td colspan="3">
-                        <span id="span_komponen_kegiatan"></span>
-                        
-                    </td>
+                    <th>Komponen</th>
+                    <th colspan="3">: <span id="span_komponen_kegiatan"></span></th>
                 </tr>
                 <tr>
-                    <td>Nama Kegiatan</td>
-                    <td colspan="3">
-                        <span id="span_nama_kegiatan"></span>
-                        
-                        
-                    </td>
+                    <th>Nama Kegiatan</th>
+                    <th colspan="3">: <span id="span_nama_kegiatan"></span></th>
                     
                 </tr>
             </table>
             <table class="table table-bordered">
                 <tr>
                     <th width="40%">Item</th>
-                    <th width="30%">Target</th>
-                    <th width="30%">Realisasi</th>
+                    <th width="20%">Satuan</th>
+                    <th width="20%" class="text-center">Target</th>
+                    <th width="20%">Realisasi</th>
                 </tr>
                 <tr>
                     <td><b>Kuantitas/Output</b></td>
-                    <td><span id="span_target_qty"></span>&nbsp;<span id="span_target_satuan"></span></td>
+                    <td><span id="span_target_satuan"></span></td>
+                    <td class="text-center"><span id="span_target_qty"></span></td>
+                    
                     <td><?= Html::textInput('realisasi_qty','',['class'=>'form-control','id'=>'realisasi_qty']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Kualitas/Mutu</b></td>
-                    <td><span id="span_target_mutu"></span></td>
+                    <td></td>
+                    <td class="text-center"><span id="span_target_mutu"></span></td>
+                    
                     <td><?= Html::textInput('realisasi_mutu','',['class'=>'form-control','id'=>'realisasi_mutu']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Waktu</b></td>
-                    <td><span id="span_target_waktu"></span>&nbsp;<span id="span_target_waktu_satuan"></span></td>
+                    <td><span id="span_target_waktu_satuan"></span></td>
+                    <td class="text-center"><span id="span_target_waktu"></span></td>
+                    
                     <td><?= Html::textInput('realisasi_waktu','',['class'=>'form-control','id'=>'realisasi_waktu']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Biaya</b></td>
-                    <td><span id="span_target_biaya"></span></td>
+                    <td></td>
+                    <td class="text-center"><span id="span_target_biaya"></span></td>
+                    
                     <td><?= NumberControl::widget([
                             'name' => 'realisasi_biaya',
                             'options' => ['id'=>'realisasi_biaya'],
@@ -440,6 +444,7 @@ $(document).on("click", "#btn-simpan-skp", function(e){
             Swal.close()
             var hasil = $.parseJSON(data)
             if(hasil.code == 200){
+                $("#modal").modal("hide")
                 Swal.fire({
                     title: \'Yeay!\',
                     icon: \'success\',

@@ -148,8 +148,9 @@ else
                 'attribute' => 'status_skp',
                 'format' => 'raw',
                 'filter' => ['1'=>'Diajukan','2'=>'Disetujui','3'=>'Dikembalikan'],
+
                 'value' => function($data) use ($list_status_skp){
-                    return '<span class="label label-'.$list_status_skp[$data->status_skp]['label'].'">'.$list_status_skp[$data->status_skp]['nama'].'</span>';
+                    return '<span style="font-size:100%" class="label label-'.$list_status_skp[$data->status_skp]['label'].'">'.$list_status_skp[$data->status_skp]['nama'].'</span>';
                 }
             ],
             //'updated_at',
@@ -157,12 +158,27 @@ else
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update}',
+                'header' => 'Opsi',
                 'urlCreator' => function ($action, $model, $key, $index) {
                     if($action == 'update')
                     {
                         return Url::to(['skp/pengukuran','id'=>$model->id,['title'=>'Pengukuran']]); 
                     }
-                }
+                },
+                'buttons' => [
+                    'update' => function ($url, $model) {
+                        if($model->status_skp == 2){
+                            return Html::a('<i class="fa fa-pencil"></i> Isi Formulir', $url, [
+                                       'title' => 'Isi Kinerja',
+                                       'class' => 'btn btn-info'
+                            ]);
+                        }
+
+                        else{
+                            return '<span style="font-size:100%"  class="label label-danger">Mohon maaf, SKP Anda belum disetujui sehingga belum bisa mengisi Formulir</span>';
+                        }
+                    }
+                ],
             ]
 ];?>    
 <?= GridView::widget([

@@ -76,8 +76,8 @@ else
                 ]) ?>
 
                 <?php endif ?>
-
-                <?= Html::a('<i class="fa fa-print"></i> Print', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                <?= Html::a('<i class="fa fa-print"></i> Print Rencana SKP', ['print-rencana', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
 
                 
             </div>
@@ -328,15 +328,61 @@ else
                     return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - <b>'.$data->komponenKegiatan->subunsur.'</b>' : null;
                 }
             ],
-            'target_ak',
-            'target_qty',
-            'target_satuan',
-            'target_mutu',
-            'target_waktu',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'target_ak',
+                'readonly' => $model->status_skp == 2,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'target_qty',
+                'readonly' => $model->status_skp == 2,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'target_satuan',
+                'readonly' => $model->status_skp == 2,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'target_mutu',
+                'readonly' => $model->status_skp == 2,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'target_waktu',
+                'readonly' => $model->status_skp == 2,
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                    'asPopover' => false
+                ],
+                
+            ],
             //'target_waktu_satuan',
             [
                 'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'target_biaya',
+                'readonly' => $model->status_skp == 2,
                 'contentOptions' => ['class' => 'text-right'],
                 'format' => 'currency',
                 'editableOptions' => [

@@ -163,6 +163,26 @@ class Skp extends \yii\db\ActiveRecord
         return $this->hasMany(SkpItem::className(), ['skp_id' => 'id']);
     }
 
+    public function getSumCapaian()
+    {
+        $total = 0;
+        foreach($this->skpItems as $item){
+            $total += $item->capaian;
+        }
+
+        return $total;
+    }
+
+    public function getSumCapaianSkp()
+    {
+        $total = 0;
+        foreach($this->skpItems as $item){
+            $total += $item->capaian_skp;
+        }
+
+        return $total;
+    }
+
     /**
      * Gets query for [[SkpPerilakus]].
      *
