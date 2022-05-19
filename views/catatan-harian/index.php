@@ -58,6 +58,14 @@ $list_skp = ArrayHelper::map(\app\models\Skp::find()->where([
             'deskripsi:html',
             
             'tanggal',
+            [
+                'attribute' => 'tautan',
+                'format' => 'raw',
+                'value' => function($data){
+                    if(!empty($data->tautan))
+                        return Html::a('<i class="fa fa-external-link"></i> Tautan',$data->tautan,['class'=>'btn btn-info','data-pjax' => 0,'target' => '_blank']);
+                }
+            ],
             'poin',
             //'updated_at',
             //'created_at',
@@ -192,11 +200,7 @@ yii\bootstrap\Modal::begin([
                         
                     </td>
                 </tr>
-                <tr>
-                    <td>Deskripsi <span style="color:red">*</span></td>
-                    <td><?= Html::textInput('deskripsi','',['class'=>'form-control','id'=>'deskripsi']) ?></td>
-                    
-                </tr>
+                
                 <tr>
                     <td>Tanggal Kegiatan <span style="color:red">*</span></td>
                     <td>
@@ -211,6 +215,22 @@ yii\bootstrap\Modal::begin([
                                 'todayHighlight' => true,
                             ]
                          ]) ?>        
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>Deskripsi <span style="color:red">*</span></td>
+                    <td><?= Html::textInput('deskripsi','',['class'=>'form-control','id'=>'deskripsi']) ?></td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        Tautan Bukti <span style="color:red">*</span>
+                    </td>
+                    <td>
+                        <?= Html::textInput('tautan','',['class'=>'form-control','id'=>'tautan']) ?>
+                        
+                        <small>Pastikan file bisa diakses secara umum/public</small>
                     </td>
                     
                 </tr>
@@ -269,11 +289,7 @@ yii\bootstrap\Modal::begin([
                       
                     </td>
                 </tr>
-                <tr>
-                    <td>Deskripsi <span style="color:red">*</span></td>
-                    <td><?= Html::textInput('deskripsi','',['class'=>'form-control','id'=>'deskripsi_update']) ?></td>
-                    
-                </tr>
+                
                 <tr>
                     <td>Tanggal Kegiatan <span style="color:red">*</span></td>
                     <td>
@@ -291,7 +307,13 @@ yii\bootstrap\Modal::begin([
                     </td>
                     
                 </tr>
-                
+                <tr>
+                    <td>Tautan <span style="color:red">*</span></td>
+                    <td><?= Html::textInput('tautan','',['class'=>'form-control','id'=>'tautan_update']) ?>
+                        <small>Pastikan file bisa diakses secara umum/public</small>
+                    </td>
+                    
+                </tr>
                 
             </table>
             
@@ -379,6 +401,7 @@ $(document).on("click",".btn-update", function(e){
             $("#deskripsi_update").val(hasil.deskripsi)
             $("#tanggal_update").val(hasil.tanggal)
             $("#id_update").val(hasil.id)
+            $("#tautan_update").val(hasil.tautan)
             
             $("#skp_id_update").val(hasil.skp_id).trigger("change")
             //     // $("#skp_id_update").

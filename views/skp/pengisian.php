@@ -322,7 +322,7 @@ yii\bootstrap\Modal::begin([
                     <td><span id="span_target_satuan"></span></td>
                     <td class="text-center"><span id="span_target_qty"></span></td>
                     
-                    <td><?= Html::textInput('realisasi_qty','',['class'=>'form-control','id'=>'realisasi_qty']) ?></td>
+                    <td><?= Html::textInput('realisasi_qty','',['class'=>'form-control','id'=>'realisasi_qty','readonly'=>'readonly']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Kualitas/Mutu</b></td>

@@ -41,7 +41,7 @@ class CatatanHarian extends \yii\db\ActiveRecord
             [['user_id', 'deskripsi'], 'required'],
             [['user_id', 'approved_by'], 'integer'],
             [['deskripsi'], 'string'],
-            [['tanggal', 'updated_at', 'created_at'], 'safe'],
+            [['tanggal', 'updated_at', 'created_at','tautan'], 'safe'],
             [['poin'], 'number'],
             [['skp_item_id'], 'string', 'max' => 50],
             [['is_selesai'], 'string', 'max' => 1],
@@ -66,6 +66,7 @@ class CatatanHarian extends \yii\db\ActiveRecord
             'poin' => 'Poin',
             'approved_by' => 'Approved By',
             'kondisi' => 'Kondisi',
+            'tautan' => Yii::t('app','Tautan'),
             'updated_at' => 'Updated At',
             'created_at' => 'Created At',
         ];

@@ -20,7 +20,7 @@ $list_status_skp = MyHelper::statusSkp();
 $list_unsur = ArrayHelper::map(\app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all(),'id','nama');
 
 $this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
-$this->params['breadcrumbs'][] = ['label' => 'Skps', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'SKP', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $nama_pegawai = '';
@@ -49,6 +49,7 @@ else
   text-overflow: inherit !important;
   white-space: normal !important;
 }
+
 </style>
 <div class="block-header">
     <h2><?= Html::encode($this->title) ?></h2>
@@ -60,24 +61,24 @@ else
             <div class="panel-heading">
 
                 <?php 
-                if($model->status_skp != 2):
+                $is_disabled = $model->status_skp == 2 ? 'disabled' : '';
 
+                
 
                 ?>
 
-                <?= Html::a('<i class="fa fa-edit"></i> Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('<i class="fa fa-edit"></i> Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary '.($model->status_skp == 2 ? 'disabled' : '')]) ?>
 
                 <?= Html::a('<i class="fa fa-trash"></i> Delete', ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-danger',
+                    'class' => 'btn btn-danger '.($model->status_skp == 2 ? 'disabled' : ''),
                     'data' => [
                         'confirm' => 'Are you sure you want to delete this item?',
                         'method' => 'post',
                     ],
                 ]) ?>
 
-                <?php endif ?>
-                <?= Html::a('<i class="fa fa-print"></i> Print Rencana SKP', ['print-rencana', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
-                <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
+                <?= Html::a('<i class="fa fa-print"></i> Print Rencana SKP', ['print-rencana', 'id' => $model->id], ['class' => 'btn btn-success '.($model->status_skp != 2 ? 'disabled' : ''),'target'=>'_blank']) ?>
+                <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success '.($model->status_skp != 2 ? 'disabled' : ''),'target'=>'_blank']) ?>
 
                 
             </div>
@@ -606,8 +607,6 @@ yii\bootstrap\Modal::end();
 <?php 
 
 $this->registerJs(' 
-
-
 
 $("#modal").on("shown.bs.modal", function (e) {
    $("#unsur_utama").val("")

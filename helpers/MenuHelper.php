@@ -306,7 +306,7 @@ class MenuHelper
 			$menuItems[] = [
 		     	'template' => '<a href="{url}" >Logged in as {label}</a>',
 		        'label' => '<strong>'.Yii::$app->user->identity->access_role.'</strong>',
-		        'url' => '#'
+		        'url' => ['site/change'],
 		        
 		    ];
     		$class = Yii::$app->user->identity->class ?: '';
@@ -346,12 +346,12 @@ class MenuHelper
 	         			'url' => ['tendik/view'],
 	         			'visible' => (Yii::$app->user->identity->access_role == 'Staf' || Yii::$app->user->identity->access_role == 'Tendik')
 	         		],
-	         		[
-	         			'template' => '<a href="{url}">{label}</a>',
-		        		'label' => 'Change Role', 
-	         			'url' => ['site/change'],
-	         			'visible' => !(Yii::$app->user->identity->access_role == 'Staf' || Yii::$app->user->identity->access_role == 'Tendik')
-	         		],
+	         		// [
+	         		// 	'template' => '<a href="{url}">{label}</a>',
+		        		// 'label' => 'Change Role', 
+	         		// 	'url' => ['site/change'],
+	         		// 	'visible' => !(Yii::$app->user->identity->access_role == 'Staf' || Yii::$app->user->identity->access_role == 'Tendik')
+	         		// ],
 	         		[
 	         			'template' => '<a href="{url}" data-method="POST">{label}</a>',
 		        		'label' => 'Sign Out', 

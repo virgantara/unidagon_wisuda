@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\helpers\MyHelper;
 use app\models\SkpItem;
+use app\models\CatatanHarian;
 use app\models\KomponenKegiatan;
 use app\models\SkpItemSearch;
 use yii\web\Controller;
@@ -30,6 +31,40 @@ class SkpItemController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionAjaxGet(){
+        $results = [];
+        if(Yii::$app->request->isPost){
+            $dataPost = $_POST['dataPost'];
+
+            $model = SkpItem::findOne($dataPost['id']);
+            $query = CatatanHarian::find();
+            $query->andWhere(['skp_item_id' => $model->id]);
+            $realisasi_qty = $query->count();
+
+            $results = [
+                'id' => $model->id,
+                'nama' => $model->nama,
+                'unsur' => $model->komponenKegiatan->unsur->nama,
+                'komponen' => $model->komponenKegiatan->nama,
+                'target_qty' => $model->target_qty,
+                'target_satuan' => $model->target_satuan,
+                'target_mutu' => $model->target_mutu,
+                'target_waktu' => $model->target_waktu,
+                'target_biaya' => MyHelper::formatRupiah($model->target_biaya,2),
+                'target_waktu_satuan' => $model->target_waktu_satuan,
+                'realisasi_qty' => $realisasi_qty,//$model->realisasi_qty,
+                'realisasi_mutu' => $model->realisasi_mutu,
+                'realisasi_waktu' => $model->realisasi_waktu,
+                'realisasi_biaya' => $model->realisasi_biaya,
+            ];
+
+
+        }
+        
+        echo json_encode($results);
+        exit;
     }
 
     public function actionAjaxUpdate()
@@ -126,37 +161,6 @@ class SkpItemController extends Controller
             ];
             
         }
-        echo json_encode($results);
-        exit;
-    }
-
-    public function actionAjaxGet(){
-        $results = [];
-        if(Yii::$app->request->isPost){
-            $dataPost = $_POST['dataPost'];
-
-            $model = SkpItem::findOne($dataPost['id']);
-
-            $results = [
-                'id' => $model->id,
-                'nama' => $model->nama,
-                'unsur' => $model->komponenKegiatan->unsur->nama,
-                'komponen' => $model->komponenKegiatan->nama,
-                'target_qty' => $model->target_qty,
-                'target_satuan' => $model->target_satuan,
-                'target_mutu' => $model->target_mutu,
-                'target_waktu' => $model->target_waktu,
-                'target_biaya' => MyHelper::formatRupiah($model->target_biaya,2),
-                'target_waktu_satuan' => $model->target_waktu_satuan,
-                'realisasi_qty' => $model->realisasi_qty,
-                'realisasi_mutu' => $model->realisasi_mutu,
-                'realisasi_waktu' => $model->realisasi_waktu,
-                'realisasi_biaya' => $model->realisasi_biaya,
-            ];
-
-
-        }
-        
         echo json_encode($results);
         exit;
     }

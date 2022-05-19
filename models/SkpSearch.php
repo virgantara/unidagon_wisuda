@@ -118,7 +118,12 @@ class SkpSearch extends Skp
     {
         $query = Skp::find();
         $query->alias('t');
-        $query->where(['pejabat_penilai'=>Yii::$app->user->identity->NIY]);
+        $query->joinWith(['periode as p']);
+
+        $query->andWhere([
+            'pejabat_penilai'=>Yii::$app->user->identity->NIY,
+            'p.buka'=> 'Y'
+        ]);
 
         // add conditions that should always apply here
 
