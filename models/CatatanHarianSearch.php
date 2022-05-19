@@ -12,6 +12,10 @@ use app\models\CatatanHarian;
  */
 class CatatanHarianSearch extends CatatanHarian
 {
+
+    public $skp_nama;
+    public $skp_item_nama;
+
     /**
      * {@inheritdoc}
      */
@@ -19,7 +23,7 @@ class CatatanHarianSearch extends CatatanHarian
     {
         return [
             [['id', 'skp_item_id', 'user_id', 'approved_by'], 'integer'],
-            [['deskripsi', 'tanggal', 'is_selesai', 'updated_at', 'created_at'], 'safe'],
+            [['deskripsi', 'tanggal', 'is_selesai', 'updated_at', 'created_at','skp_nama','skp_item_nama'], 'safe'],
         ];
     }
 
@@ -42,7 +46,7 @@ class CatatanHarianSearch extends CatatanHarian
     public function search($params)
     {
         $query = CatatanHarian::find();
-
+        $query->joinWith(['skpItem as si']);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -52,7 +56,10 @@ class CatatanHarianSearch extends CatatanHarian
             ]
         ]);
 
-        $query->joinWith(['skpItem as skp']);
+        $query->joinWith(['skpItem as s','skpItem.skp as sp','skpItem.skp.periode as p']);
+        $query->andWhere([
+            'p.buka' => 'Y'
+        ]);
 
         $this->load($params);
 
@@ -64,15 +71,14 @@ class CatatanHarianSearch extends CatatanHarian
 
         // if(Yii::$app->user->identity->access_role =='Dosen' || Yii::$app->user->identity->access_role =='Staf')
         // {
-            $query->andWhere([
-                // 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
-                'user_id' => Yii::$app->user->identity->id
-            ]);
+        $query->andWhere([
+            // 'u.jenis_pegawai' => Yii::$app->user->identity->access_role, 
+            'sp.pegawai_dinilai' => Yii::$app->user->identity->NIY
+        ]);
         // }
 
         // $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
-        // if(in_array(Yii::$app->user->identity->access_role, $roles))
-        // {
+        // if(in_array(Yii::$app->user->identity->access_role, $roles)) {
             
         // }
 

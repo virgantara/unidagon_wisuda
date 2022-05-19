@@ -92,6 +92,7 @@ class CatatanHarian extends \yii\db\ActiveRecord
         return $this->hasOne(SkpItem::className(), ['id' => 'skp_item_id']);
     }
 
+
     public static function sumPoinCatatanHarian($user_id)
     {
         $query = CatatanHarian::find()->where(['user_id'=>$user_id]);
