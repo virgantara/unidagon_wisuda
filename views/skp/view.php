@@ -384,7 +384,10 @@ else
                 'attribute' => 'target_biaya',
                 'readonly' => $model->status_skp == 2,
                 'contentOptions' => ['class' => 'text-right'],
-                'format' => 'currency',
+                // 'format' => 'currency',
+                'value' => function($data){
+                    return \app\helpers\MyHelper::formatRupiah($data->target_biaya);
+                },
                 'editableOptions' => [
                     'inputType' => \kartik\editable\Editable::INPUT_TEXT,
                     'asPopover' => false

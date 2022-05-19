@@ -359,7 +359,7 @@ class SkpController extends Controller
         {
             $unker = $jabatan->unker;
 
-            if(in_array($access_role,['Kaprodi','Dekan']) && !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat))
+            if(in_array($access_role,['Kaprodi','Dekan','Kepala UPT','Kepala','Kepala TU']) && !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat))
             {
                 $niyAsesor = !empty($unker) && !empty($unker->parent) && !empty($unker->parent->pejabat) ? $unker->parent->pejabat->NIY : null;
 
@@ -1050,26 +1050,20 @@ class SkpController extends Controller
                 // store a default json response as desired by editable
                 $out = json_encode(['output'=>'', 'message'=>'']);
 
-                $posted = current($_POST['Skp']);
-                $post = ['Skp' => $posted];
+                $model->status_skp = $_POST['Skp']['status_skp'];
+                if($model->save(false, ['status_skp']))
+                {
+                    $out = json_encode(['output'=>'', 'message'=>'']);
+                }
 
-                // load model like any single model validation
-                if ($model->load($post)) {
-                // can save model or do something before saving model
-                    // print_r($post);exit;
-                    if($model->save())
-                    {
-                        $out = json_encode(['output'=>'', 'message'=>'']);
-                    }
-
-                    else
-                    {
-                        $error = \app\helpers\MyHelper::logError($model);
-                        $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
-                    }
+                else
+                {
+                    $error = \app\helpers\MyHelper::logError($model);
+                    $out = json_encode(['output'=>'', 'message'=>'Oops, '.$error]);   
+                }
 
                     
-                }
+                
             }
 
             
@@ -1188,19 +1182,19 @@ class SkpController extends Controller
                 
                 $model->jabatan_penilai_id = !empty($jabatanPenilai) ? $jabatanPenilai->ID : null;  
 
-                if(!empty($unker->parent) && !empty($unker->parent->pejabat))
-                {
-                    $niyAtasanAsesor = $unker->parent->pejabat->NIY;
+                // if(!empty($unker->parent) && !empty($unker->parent->pejabat))
+                // {
+                    // $niyAtasanAsesor = $unker->parent->pejabat->NIY;
 
-                    $jabatanAtasanPenilai = Jabatan::find()->where([
-                        'jabatan_id' => $unker->parent->jabatan_id,
-                        'NIY' => $niyAtasanAsesor
-                    ])->one();
+                    // $jabatanAtasanPenilai = Jabatan::find()->where([
+                    //     'jabatan_id' => $unker->parent->jabatan_id,
+                    //     'NIY' => $niyAtasanAsesor
+                    // ])->one();
 
-                    $atasanPejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAtasanAsesor])->one();
-                    $model->jabatan_atasan_penilai_id = !empty($jabatanAtasanPenilai) ? $jabatanAtasanPenilai->ID : null;
-                    $model->atasan_pejabat_penilai = $niyAtasanAsesor;    
-                }
+                    // $atasanPejabatPenilai = \app\models\User::find()->where(['NIY' => $niyAtasanAsesor])->one();
+                $model->jabatan_atasan_penilai_id = $model->jabatan_penilai_id;//!empty($jabatanAtasanPenilai) ? $jabatanAtasanPenilai->ID : null;
+                $model->atasan_pejabat_penilai = $model->pejabat_penilai;//$niyAtasanAsesor;    
+                // }
             }
             
 
