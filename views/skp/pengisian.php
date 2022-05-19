@@ -61,6 +61,8 @@ else
 <?= Html::a('<i class="fa fa-print"></i> Print Rencana SKP', ['print-rencana', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
                 <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
 
+                <?= Html::a('<i class="fa fa-search"></i> Realisasi', ['realisasi', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+
                 
             </div>
 

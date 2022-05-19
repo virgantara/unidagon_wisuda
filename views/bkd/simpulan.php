@@ -21,8 +21,9 @@ if($session->has('bkd_periode'))
   $ed = $session->get('tgl_akhir');  
 }
 
+$this->title = "Simpulan BKD"
 ?>
-<h1>Klaim Kegiatan BKD Periode <?=$bkd_periode;?> (<?=MyHelper::convertTanggalIndo($sd);?> - <?=MyHelper::convertTanggalIndo($ed);?>)</h1>
+<h1><?=$this->title;?></h1>
 <p>
 <?php
 use yii\widgets\ActiveForm;
@@ -48,7 +49,7 @@ use yii\widgets\ActiveForm;
  <?php ActiveForm::end(); ?>
 </p>  
 <ul class="nav nav-tabs">
-    <li role="presentation" class="active">
+    <li role="presentation" class="">
       <a href="<?=Url::to(['bkd/klaim','step'=>1]);?>"   >Pelaksanaan Pendidikan</a>
     </li>
     <li role="presentation" class="">
@@ -60,134 +61,10 @@ use yii\widgets\ActiveForm;
     <li role="presentation" class="">
       <a href="<?=Url::to(['bkd/klaim','step'=>4]);?>"  >Pelaksanaan Penunjang</a>
     </li>
-    <li role="presentation" class="">
+    <li role="presentation" class="active">
       <a href="<?=Url::to(['bkd/klaim','step'=>5]);?>"  >Simpulan</a>
     </li>
 </ul>
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Pengajaran</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_pengajaran' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-pengajaran">
-					<thead>
-						<tr>
-							<th>No</th>
-							<th>Kode MK</th>
-							<th>Nama MK</th>
-							<th>SKS</th>
-							<th>Kelas</th>
-							<th>Prodi</th>
-							<th>TA</th>
-							<th>SKS BKD</th>
-							<th class="klaim">Klaim</th>
-						</tr>
-					</thead>
-					<tbody>
-						
-					</tbody>
-					
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Publikasi Karya/HKI</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_publikasi' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-publikasi">
-					<thead>
-						<tr>
-							<th>No</th>
-							<th>Judul</th>
-							<th>Jenis Publikasi</th>
-							<th>Tanggal terbit</th>
-							<th>Tautan</th>
-							<th>Vol/Nomor/Hal</th>
-							<th>Penerbit</th>
-							<th>DOI</th>
-							<th>ISSN</th>
-							<th>SKS BKD</th>
-							<th>Klaim</th>
-						</tr>
-					</thead>
-					<tbody>
-						
-					</tbody>
-					
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Pengabdian</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_pengabdian' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-pengabdian">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Judul</th>
-                            <th>SKIM</th>
-                            <th>Tahun Kegiatan</th>
-                            <th>Tempat Kegiatan</th>
-                            <th>SKS BKD</th>
-                            <th>Klaim</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                    </tbody>
-                    
-                </table>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Penunjang</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_penunjang' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-penunjang">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Kegiatan</th>
-                            <th>SKS BKD</th>
-                            <th>Klaim</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                    </tbody>
-                    
-                </table>
-			</div>
-		</div>
-	</div>
-</div>
-
-
 
 <?php 
 
@@ -588,7 +465,7 @@ $(document).on("click",".btn-claim-publikasi",function(e){
     obj.id = $(this).data("item")
     obj.is_claimed = "0";
     if($(this).is(":checked"))
-    	obj.is_claimed = "1"
+        obj.is_claimed = "1"
 
     obj.tahun_id = $(this).data("ta")
 
@@ -626,7 +503,7 @@ $(document).on("click",".btn-claim",function(e){
     obj.id = $(this).data("item")
     obj.is_claimed = "0";
     if($(this).is(":checked"))
-    	obj.is_claimed = "1"
+        obj.is_claimed = "1"
 
     obj.tahun_id = $(this).data("ta");
     obj.sks = $(this).data("sks")
@@ -698,7 +575,7 @@ function fetchJadwal(tahun, callback){
 }
 
 function getPublikasi(tahun){
-	
+    
     var obj = new Object;
     obj.tahun = tahun;
 
@@ -719,7 +596,7 @@ function getPublikasi(tahun){
             $("#tabel-publikasi > tbody").empty()
             var total_sks = 0
             $.each(res, function(i,obj){
-            	let isClaimed = obj.is_claimed == 1 ? "checked" : "";
+                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
                 row += "<tr>"
                 row += "<td>"+(i+1)+"</td>"
                 row += "<td>"+obj.judul_publikasi_paten+"</td>"
@@ -910,7 +787,7 @@ function getPenunjang(tahun){
 
 
 function getJadwal(tahun){
-	var obj = new Object
+    var obj = new Object
     obj.tahun = tahun
 
     $.ajax({
@@ -929,7 +806,7 @@ function getJadwal(tahun){
             $("#tabel-pengajaran > tbody").empty()
             var total_sks = 0
             $.each(res, function(i,obj){
-            	let isClaimed = obj.is_claimed == 1 ? "checked" : "";
+                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
                 row += "<tr>"
                 row += "<td>"+(i+1)+"</td>"
                 row += "<td>"+obj.kode_mk+"</td>"

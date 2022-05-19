@@ -459,12 +459,38 @@ class BkdController extends AppController
         die();
     }
 
-    public function actionKlaim()
+    public function actionKlaim($step=1)
     {
         $list_bkd_periode = BkdPeriode::find()->orderBy(['tahun_id'=>SORT_DESC])->all();
-        return $this->render('klaim',[
-          'list_bkd_periode' => $list_bkd_periode
-        ]);
+        
+        switch($step){
+          case 1:
+            return $this->render('klaim_pendidikan',[
+              'list_bkd_periode' => $list_bkd_periode
+            ]);
+          break;
+          case 2:
+            return $this->render('klaim_penelitian',[
+              'list_bkd_periode' => $list_bkd_periode
+            ]);
+          break;
+          case 3:
+            return $this->render('klaim_pengabdian',[
+              'list_bkd_periode' => $list_bkd_periode
+            ]);
+          break;
+          case 4:
+            return $this->render('klaim_penunjang',[
+              'list_bkd_periode' => $list_bkd_periode
+            ]);
+          break;
+          case 5:
+            return $this->render('simpulan',[
+              'list_bkd_periode' => $list_bkd_periode
+            ]);
+          break;
+        }
+        
     }
 
     public function actionAjaxClaimPenghargaan()

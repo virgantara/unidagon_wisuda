@@ -20,9 +20,9 @@ if($session->has('bkd_periode'))
   $sd = $session->get('tgl_awal');
   $ed = $session->get('tgl_akhir');  
 }
-
+$this->title = "Pelaksanaan Pengabdian"
 ?>
-<h1>Klaim Kegiatan BKD Periode <?=$bkd_periode;?> (<?=MyHelper::convertTanggalIndo($sd);?> - <?=MyHelper::convertTanggalIndo($ed);?>)</h1>
+<h1><?=$this->title;?></h1>
 <p>
 <?php
 use yii\widgets\ActiveForm;
@@ -48,13 +48,13 @@ use yii\widgets\ActiveForm;
  <?php ActiveForm::end(); ?>
 </p>  
 <ul class="nav nav-tabs">
-    <li role="presentation" class="active">
+    <li role="presentation" class="">
       <a href="<?=Url::to(['bkd/klaim','step'=>1]);?>"   >Pelaksanaan Pendidikan</a>
     </li>
     <li role="presentation" class="">
       <a href="<?=Url::to(['bkd/klaim','step'=>2]);?>"  >Pelaksanaan Penelitian</a>
     </li>
-    <li role="presentation" class="">
+    <li role="presentation" class="active">
       <a href="<?=Url::to(['bkd/klaim','step'=>3]);?>"  >Pelaksanaan Pengabdian</a>
     </li>
     <li role="presentation" class="">
@@ -64,71 +64,6 @@ use yii\widgets\ActiveForm;
       <a href="<?=Url::to(['bkd/klaim','step'=>5]);?>"  >Simpulan</a>
     </li>
 </ul>
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Pengajaran</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_pengajaran' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-pengajaran">
-					<thead>
-						<tr>
-							<th>No</th>
-							<th>Kode MK</th>
-							<th>Nama MK</th>
-							<th>SKS</th>
-							<th>Kelas</th>
-							<th>Prodi</th>
-							<th>TA</th>
-							<th>SKS BKD</th>
-							<th class="klaim">Klaim</th>
-						</tr>
-					</thead>
-					<tbody>
-						
-					</tbody>
-					
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Publikasi Karya/HKI</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_publikasi' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-publikasi">
-					<thead>
-						<tr>
-							<th>No</th>
-							<th>Judul</th>
-							<th>Jenis Publikasi</th>
-							<th>Tanggal terbit</th>
-							<th>Tautan</th>
-							<th>Vol/Nomor/Hal</th>
-							<th>Penerbit</th>
-							<th>DOI</th>
-							<th>ISSN</th>
-							<th>SKS BKD</th>
-							<th>Klaim</th>
-						</tr>
-					</thead>
-					<tbody>
-						
-					</tbody>
-					
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
 
 <div class="row">
 	<div class="col-md-12">
@@ -159,35 +94,6 @@ use yii\widgets\ActiveForm;
 		</div>
 	</div>
 </div>
-
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Penunjang</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_penunjang' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-penunjang">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Kegiatan</th>
-                            <th>SKS BKD</th>
-                            <th>Klaim</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                    </tbody>
-                    
-                </table>
-			</div>
-		</div>
-	</div>
-</div>
-
-
 
 <?php 
 
@@ -353,44 +259,6 @@ if(!doneTour) {
 
 }
 
-$(document).on("click",".btn-claim-pembicara",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    obj.tahun_id = $(this).data("ta")
-    if($(this).is(":checked"))
-        obj.is_claimed = "1"
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim-pembicara']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
 $(document).on("click",".btn-claim-pengelolaJurnal",function(e){
     e.preventDefault()
 
@@ -468,44 +336,6 @@ $(document).on("click",".btn-claim-organisasi",function(e){
 
 })
 
-$(document).on("click",".btn-claim-penunjang-lain",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-        obj.is_claimed = "1"
-
-    obj.tahun_id = $(this).data("ta")
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim-penunjang-lain']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
 $(document).on("click",".btn-claim-pengabdian",function(e){
     e.preventDefault()
 
@@ -542,206 +372,6 @@ $(document).on("click",".btn-claim-pengabdian",function(e){
     });
 
 })
-
-$(document).on("click",".btn-claim-penghargaan",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-        obj.is_claimed = "1"
-
-    obj.tahun_id = $(this).data("ta")
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim-penghargaan']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
-$(document).on("click",".btn-claim-publikasi",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-    	obj.is_claimed = "1"
-
-    obj.tahun_id = $(this).data("ta")
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim-publikasi']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
-$(document).on("click",".btn-claim",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-    	obj.is_claimed = "1"
-
-    obj.tahun_id = $(this).data("ta");
-    obj.sks = $(this).data("sks")
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
-function fetchJadwal(tahun, callback){
-    let obj = new Object;
-    // obj.prodi_id = id;
-    obj.tahun = tahun;
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['pengajaran/ajax-jadwal']).'\',
-        async: true,
-        beforeSend : function(){
-            Swal.showLoading()
-        },
-        error : function(e){
-
-            Swal.fire({
-              title: \'Oops!\',
-              icon: \'error\',
-              text: e.responseText
-            }).then((result) => {
-              if (result.value) {
-                 
-              }
-            });
-            Swal.hideLoading();
-        },
-        success: function(res){
-            
-            var res = $.parseJSON(res);
-            if(res)
-                callback(null, res)
-            else
-                callback(res, null)
-        }
-
-    });
-}
-
-function getPublikasi(tahun){
-	
-    var obj = new Object;
-    obj.tahun = tahun;
-
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['publikasi/ajax-list']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            var row = ""
-            $("#tabel-publikasi > tbody").empty()
-            var total_sks = 0
-            $.each(res, function(i,obj){
-            	let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                row += "<tr>"
-                row += "<td>"+(i+1)+"</td>"
-                row += "<td>"+obj.judul_publikasi_paten+"</td>"
-                row += "<td>"+obj.nama_jenis_publikasi+"</td>"
-                row += "<td>"+obj.tanggal_terbit+"</td>"
-                row += "<td><a href=\'"+obj.tautan+"\' target=\'_blank\'>Link</a></td>"
-                row += "<td>"+obj.volume+" / "+obj.nomor+" / "+obj.halaman+"</td>"
-                row += "<td>"+obj.penerbit+"</td>"
-                row += "<td><a href=\'"+obj.doi+"\' target=\'_blank\'>Link</a></td>"
-                row += "<td>"+obj.issn+"</td>"
-                row += "<td></td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+tahun+"\' data-item=\'"+obj.id+"\' class=\'btn-claim-publikasi\'/></td>"
-                row += "</tr>"
-
-            })
-
-            $("#tabel-publikasi > tbody").append(row)
-                
-        }
-
-    });
-}
 
 function getPengabdian(tahun){
     
@@ -866,101 +496,10 @@ function getPengabdian(tahun){
 }
 
 
-
-function getPenunjang(tahun){
-    $("#tabel-penunjang > tbody").empty()
-    var obj = new Object;
-    obj.tahun = tahun;
-    var counter = 0;
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd-dosen/ajax-list-penunjang']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            // console.log(res)
-            var row = ""
-            var total_sks = 0
-            $.each(res, function(i,obj){
-                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                counter++;
-                row += "<tr>"
-                row += "<td>"+(counter)+"</td>"
-                row += "<td>"+obj.nama_kegiatan+"</td>"
-                row += "<td>"+obj.sks_bkd+"</td>"
-                row += "<td><a href=\'javascript:void(0)\' data-item=\'"+obj.id+"\' class=\'remove_bkd\'><i class=\'fa fa-trash\'></i></a></td>"
-                row += "</tr>"
-
-            })
-
-            $("#tabel-penunjang > tbody").append(row)
-                
-        }
-
-    });
-
-   
-}
-
-
-function getJadwal(tahun){
-	var obj = new Object
-    obj.tahun = tahun
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['pengajaran/ajax-local-jadwal']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            var row = ""
-            $("#tabel-pengajaran > tbody").empty()
-            var total_sks = 0
-            $.each(res, function(i,obj){
-            	let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                row += "<tr>"
-                row += "<td>"+(i+1)+"</td>"
-                row += "<td>"+obj.kode_mk+"</td>"
-                row += "<td>"+obj.matkul+"</td>"
-                row += "<td>"+obj.sks+"</td>"
-                row += "<td>"+obj.kelas+"</td>"
-                row += "<td>"+obj.jurusan+"</td>"
-                row += "<td>"+obj.tahun_akademik+"</td>"
-                row += "<td>"+obj.sks+"</td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+obj.tahun_akademik+"\' data-sks=\'"+obj.sks+"\' data-item=\'"+obj.ID+"\' class=\'btn-claim\'/></td>"
-                row += "</tr>"
-
-                total_sks += eval(obj.sks)
-            })
-
-            $("#tabel-pengajaran > tbody").append(row)
-                
-        }
-
-    });
-}
-
 $(document).on("change","#ganti-periode",function(e){
     e.preventDefault()
 
-    getJadwal($(this).val())
-    getPublikasi($(this).val())
     getPengabdian($(this).val())
-    getPenunjang($(this).val())
-
-  
 
 })
 
