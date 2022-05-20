@@ -181,7 +181,17 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             //'updated_at',
             //'created_at',
-    ['class' => 'yii\grid\ActionColumn']
+    [
+        'class' => 'yii\grid\ActionColumn',
+        'visibleButtons' => [
+            'update' => function ($data) {
+                return $data->status_skp != 2;
+            },
+            'delete' => function ($data) {
+                return $data->status_skp != 2;
+            },
+        ]
+    ]
 ];?>    
 <?= GridView::widget([
         'dataProvider' => $dataProvider,

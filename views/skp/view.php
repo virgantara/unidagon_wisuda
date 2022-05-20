@@ -84,6 +84,21 @@ else
             </div>
 
             <div class="panel-body ">
+                <p>
+                    <?php 
+                    if($model->status_skp == 2){
+                                ?>
+                                <div class="alert alert-info">
+                                    <i class="fa fa-warning"></i> Perhatian
+                                    <ul>
+                                        <li>SKP Anda telah disetujui</li>
+                                        <li>Anda sudah bisa mengisi <?=Html::a('<b>Catatan Harian</b>',['catatan-harian/index']);?></li>
+                                        <li>Apabila ingin mengubah, silakan mengajukan pembatalan <b>Status SKP</b> kepada Pejabat Penilai Anda</li>
+                                    </ul>
+                                </div>
+                                <?php  
+                            } ?>
+                </p>
             <table class="table table-hover">
                 <tbody>
                     <tr>
@@ -150,9 +165,9 @@ else
                                 'value' => $model->status_skp,
                                 // 'displayValue' => 'oke',
                                 'displayValueConfig'=> [
-                                    '1' => '<span class="label label-warning">Menunggu persetujuan atasan</span>',
-                                    '2' => '<span class="label label-success">Disetujui atasan</span>',
-                                    '3' => '<span class="label label-danger">Dikembalikan</span>',
+                                    '1' => '<span style="font-size:100%" class="label label-warning">Menunggu persetujuan atasan</span>',
+                                    '2' => '<span style="font-size:100%" class="label label-success">Disetujui atasan</span>',
+                                    '3' => '<span style="font-size:100%" class="label label-danger">Dikembalikan</span>',
                                 ],
                                 'inputType' => Editable::INPUT_DROPDOWN_LIST,
 
@@ -160,7 +175,10 @@ else
                                 'size'=>'md',
                                 'options' => ['class'=>'form-control']
                             ]);
+
+                            
                              ?>
+                            
                         </th>
                         <th></th>
                         <th></th>
@@ -179,7 +197,7 @@ else
     <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
-                <h3 class="panel-title">Catatan</h3>
+                <h3 class="panel-title">Catatan Keberatan dan Rekomendasi</h3>
             </div>
             <div class="panel-body ">
                 <table class="table">
@@ -304,10 +322,11 @@ else
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
 <div class="panel-body ">
-
+    <?php if($model->status_skp != 2): ?>
     <p>
         <?= Html::a('<i class="fa fa-plus"></i> Item', '#', ['class' => 'btn btn-success','id'=>'btn-add']) ?>
     </p>
+    <?php endif ?>
     <?php
     $gridColumns = [
     [
@@ -420,11 +439,11 @@ else
                         return Url::to(['skp-item/delete','id'=>$model->id]); 
                     }
                 },
-                // 'visibleButtons' => [
-                //     'delete' => function ($data) use ($model) {
-                //         return $model->status_skp != 2;
-                //     },
-                // ]
+                'visibleButtons' => [
+                    'delete' => function ($data) use ($model) {
+                        return $model->status_skp != 2;
+                    },
+                ]
             ]
 ];?>    
 <?= GridView::widget([
