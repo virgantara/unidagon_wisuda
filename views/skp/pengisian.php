@@ -321,16 +321,19 @@ yii\bootstrap\Modal::begin([
             <table class="table table-bordered">
                 <tr>
                     <th width="40%">Item</th>
-                    <th width="20%">Satuan</th>
-                    <th width="20%" class="text-center">Target</th>
-                    <th width="20%">Realisasi</th>
+                    <th width="15%">Satuan</th>
+                    <th width="15%" class="text-center">Target</th>
+                    <th width="30%">Realisasi</th>
                 </tr>
                 <tr>
                     <td><b>Kuantitas/Output</b></td>
                     <td><span id="span_target_satuan"></span></td>
                     <td class="text-center"><span id="span_target_qty"></span></td>
                     
-                    <td><?= Html::textInput('realisasi_qty','',['class'=>'form-control','id'=>'realisasi_qty','readonly'=>'readonly']) ?></td>
+                    <td>
+                        <?= Html::textInput('realisasi_qty','',['class'=>'form-control','id'=>'realisasi_qty','readonly'=>'readonly']) ?>
+                        <small>* Diambil dari <?=Html::a('<b>Catatan Harian</b>',['catatan-harian/index']);?></small>
+                    </td>
                 </tr>
                 <tr>
                     <td><b>Kualitas/Mutu</b></td>

@@ -27,7 +27,17 @@ $list_skp = ArrayHelper::map(\app\models\Skp::find()->where([
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
 <div class="panel-body ">
-
+    <p>
+        <div class="alert alert-info">
+             
+            <h2><i class="fa fa-warning"></i> Info</h2>
+            <ul>
+                <li>Catatan Harian wajib diisi</li>
+                <li>Catatan Harian digunakan untuk pemenuhan Realisasi dari SKP</li>
+                <li>Siapkan bukti catatan harian dalam bentuk tautan/link</li>
+            </ul>
+        </div>
+    </p>
     <p>
         <?= Html::a('Create Catatan Harian', ['create'], ['class' => 'btn btn-success','id' => 'btn-add']) ?>
     </p>
