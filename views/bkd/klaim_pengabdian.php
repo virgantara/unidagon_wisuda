@@ -69,37 +69,42 @@ use yii\widgets\ActiveForm;
 </ul>
 
 <?php 
-foreach($list_komponen as $komponen):
+foreach($list_komponen_utama as $komponen_utama):
  ?>
 
 <div class="row">
 	<div class="col-md-12">
 		<div class="panel">
 			<div class="panel-heading">
-				<div class="pull-left"><?=$komponen->nama;?> - <?=$komponen->subunsur;?></div>
-                <div class="pull-right"><a href="javascript:void(0)" data-item="<?=$komponen->id;?>" class="btn btn-primary btn_tarik_pengabdian"><i class="fa fa-refresh"></i> Tarik</a></div>
+				<div class="pull-left"><?=$komponen_utama['nama'];?></div>
+                <div class="pull-right"><a href="javascript:void(0)" data-item="<?=$komponen_utama['nama'];?>" class="btn btn-primary btn_tarik_pengabdian"><i class="fa fa-refresh"></i> Tarik</a></div>
 			</div>
 			<div class="panel-body">
-				<table class="table" id="tabel-pengabdian-<?=$komponen->id;?>">
+				<table class="table" id="tabel-pengabdian-<?=$komponen_utama['nama'];?>">
                     <thead>
                         <tr>
                             <th width="5%">No</th>
-                            <th width="35%">Nama Kegiatan</th>
-                            <th width="15%">Status</th>
+                            <th width="30%">Nama Kegiatan</th>
+                            <th width="35%">Unsur</th>
+                            <th width="10%">Status</th>
                             <th width="10%">Beban Tugas</th>
                             <th width="10%">Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php 
-                        if(!empty($results[$komponen->id])):
-                            foreach($results[$komponen->id] as $q => $item): 
 
-                                $color = $list_status_color[$item['status_bkd']];
+                        foreach($list_komponen[$komponen_utama['nama']] as $komponen):
+
+                            if(!empty($results[$komponen->id])):
+                                foreach($results[$komponen->id] as $q => $item): 
+
+                                    $color = $list_status_color[$item['status_bkd']];
                         ?>
                         <tr>
                             <td><?=$q+1;?></td>
                             <td><?=$item['deskripsi'];?></td>
+                            <td><?=$item['subunsur'];?></td>
                             <td>
 
                                 <div class="btn-group">
@@ -117,8 +122,9 @@ foreach($list_komponen as $komponen):
                             <td><a href='javascript:void(0)' data-item='"+obj.id+"' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
                         </tr>
                         <?php 
-                            endforeach; 
-                        endif;
+                                endforeach; 
+                            endif;
+                        endforeach; 
                         ?>
                     </tbody>
                     
@@ -183,7 +189,7 @@ $(document).on("click",".btn_tarik_pengabdian",function(e){
     e.preventDefault()
 
     var obj = new Object
-    obj.komponen_kegiatan_id = $(this).data("item")
+    obj.nama_komponen_kegiatan = $(this).data("item")
     obj.is_claimed = "0";
     obj.tahun_id = $("#ganti-periode").val()
     if($(this).is(":checked"))
@@ -208,8 +214,7 @@ $(document).on("click",".btn_tarik_pengabdian",function(e){
                   icon: \'success\',
                   text: res.message
                 }).then(res=>{
-                    getPengabdian(obj.tahun_id, obj.komponen_kegiatan_id)
-                    
+                    window.location.reload()
                 })
                 
             }
