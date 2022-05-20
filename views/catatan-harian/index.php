@@ -27,17 +27,17 @@ $list_skp = ArrayHelper::map(\app\models\Skp::find()->where([
                 <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
             </div>
 <div class="panel-body ">
-    <p>
-        <div class="alert alert-info">
-             
-            <h2><i class="fa fa-warning"></i> Info</h2>
-            <ul>
-                <li>Catatan Harian wajib diisi</li>
-                <li>Catatan Harian digunakan untuk pemenuhan Realisasi dari SKP</li>
-                <li>Siapkan bukti catatan harian dalam bentuk tautan/link</li>
-            </ul>
-        </div>
-    </p>
+    
+    <div class="alert alert-info">
+         
+        <h2><i class="fa fa-warning"></i> Info</h2>
+        <ul>
+            <li>Catatan Harian wajib diisi</li>
+            <li>Catatan Harian digunakan untuk pemenuhan Realisasi dari SKP</li>
+            <li>Siapkan bukti catatan harian dalam bentuk tautan/link</li>
+        </ul>
+    </div>
+
     <p>
         <?= Html::a('Create Catatan Harian', ['create'], ['class' => 'btn btn-success','id' => 'btn-add']) ?>
     </p>
@@ -66,7 +66,6 @@ $list_skp = ArrayHelper::map(\app\models\Skp::find()->where([
             //     }
             // ],
             'deskripsi:html',
-            
             'tanggal',
             [
                 'attribute' => 'tautan',
@@ -210,7 +209,14 @@ yii\bootstrap\Modal::begin([
                         
                     </td>
                 </tr>
-                
+                <tr id="tr_kelas_diampu" style="display:none;">
+                    <td width="30%">Kelas yang diampu *<br>
+                        (Khusus pengajaran)
+                    </td>
+                    <td width="70%">
+                        <?=Html::dropDownList('kelas_diampu','',[],['class'=>'form-control','id'=>'list_kelas']);?>
+                    </td>
+                </tr>
                 <tr>
                     <td>Tanggal Kegiatan <span style="color:red">*</span></td>
                     <td>
@@ -351,6 +357,70 @@ yii\bootstrap\Modal::end();
 $this->registerJs(' 
 
 
+$(document).on("change", "#skp_item_id", function(e){
+                
+    var obj = new Object
+    obj.id = $(this).val()
+    $.ajax({
+        url: "'.Url::to(["skp-item/ajax-get-unsur-utama"]).'",
+        type : "POST",
+        async : true,
+        data: {
+            dataPost : obj
+        },
+        error : function(e){
+            console.log(e.responseText)
+        },
+        beforeSend: function(){
+            Swal.showLoading()
+        },
+        success: function (data) {
+            Swal.close()
+            var hasil = $.parseJSON(data)
+            if(hasil.code == 200 && hasil.items.kode == "AJAR"){
+                getJadwalDosen()
+                $("#tr_kelas_diampu").show()            
+            }
+
+            else{
+                $("#tr_kelas_diampu").hide()
+            }
+        }
+    })
+
+    
+});
+
+
+
+function getJadwalDosen(){
+    var obj = new Object
+    $.ajax({
+        url: "'.Url::to(["pengajaran/ajax-jadwal"]).'",
+        type : "POST",
+        async : true,
+        data: {
+            dataPost : obj
+        },
+        error : function(e){
+            console.log(e.responseText)
+        },
+        beforeSend: function(){
+            Swal.showLoading()
+        },
+        success: function (data) {
+            Swal.close()
+            var hasil = $.parseJSON(data)
+            $("#list_kelas").empty()
+            var row = ""
+            $.each(hasil, function(i,obj){
+                row += "<option value=\'"+obj.id+"\'>["+obj.kode_mk+"] - "+obj.nama_mk+" - "+obj.kelas+"</option>"
+            })
+            
+            $("#list_kelas").append(row)
+        }
+    })
+}
 
 $("#modal").on("shown.bs.modal", function (e) {
    $("#skp_item_id").val("")

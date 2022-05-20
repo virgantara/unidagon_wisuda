@@ -62,6 +62,50 @@ class SkpItemController extends Controller
         ];
     }
 
+    public function actionAjaxGetUnsurUtama()
+    {
+        $results = [
+            'code' => 400,
+            'message' => 'Bad request'
+        ];
+
+        if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
+            $results = [
+                'code' => 404,
+                'message' => 'Data not found'
+            ];
+
+            $dataPost = $_POST['dataPost'];
+            $model = SkpItem::findOne($dataPost['id']);
+
+            if(!empty($model)){
+
+
+            
+                $rows = (new \yii\db\Query())
+                    ->select(['uu.kode'])
+                    ->from('skp_item si')
+                    ->join('LEFT JOIN','skp s','s.id = si.skp_id')
+                    ->join('LEFT JOIN','komponen_kegiatan kk','si.komponen_kegiatan_id = kk.id')
+                    ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+                    ->where([
+                        'si.id' => $model->id,
+                    ])
+                    ->one();
+
+                $results = [
+                    'code' => 200,
+                    'message' => 'success',
+                    'items' => $rows
+                ];
+            }
+
+        }
+
+        echo json_encode($results);
+        exit;
+    }
+
     public function actionAjaxClaimPengabdian()
     {
         $results = [

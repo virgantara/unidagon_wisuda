@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\SisterFiles;
 use app\models\Pengajaran;
+use app\models\BkdPeriode;
 use app\models\Verify;
 use app\models\PengajaranSearch;
 use yii\web\Controller;
@@ -116,13 +117,33 @@ class PengajaranController extends AppController
         $client = new Client(['baseUrl' => $api_baseurl]);
         $client_token = Yii::$app->params['client_token'];
         $headers = ['x-access-token'=>$client_token];
-        $dataPost = $_POST['dataPost'];
+        // $dataPost = $_POST['dataPost'];
         $results = [];
         // foreach($listTahun as $tahun)
         // {
+
+        $session = Yii::$app->session;
+        $tahun_id = '';
+        $sd = '';
+        $ed = '';
+        $bkd_periode = null;
+        if($session->has('bkd_periode'))
+        {
+          $tahun_id = $session->get('bkd_periode');
+          // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+          $sd = $session->get('tgl_awal');
+          $ed = $session->get('tgl_akhir');  
+          $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        }
+        else{
+          $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+          $tahun_id = $bkd_periode->tahun_id;
+          $sd = $bkd_periode->tanggal_bkd_awal;
+          $ed = $bkd_periode->tanggal_bkd_akhir;
+        }
         $params = [
             'uuid' => Yii::$app->user->identity->uuid,
-            'tahun' => $dataPost['tahun']
+            'tahun' => $tahun_id
         ];
 
         $response = $client->get('/jadwal/dosen/uuid', $params,$headers)->send();
