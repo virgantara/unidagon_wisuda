@@ -20,7 +20,10 @@ if($session->has('bkd_periode'))
   $sd = $session->get('tgl_awal');
   $ed = $session->get('tgl_akhir');  
 }
-$this->title = "Pelaksanaan Pengabdian"
+$this->title = "Pelaksanaan Pengabdian";
+
+$list_status = \app\helpers\MyHelper::getListStatusBKD();
+$list_status_color = \app\helpers\MyHelper::getListStatusBKDColor();
 ?>
 <h1><?=$this->title;?></h1>
 <p>
@@ -65,28 +68,58 @@ use yii\widgets\ActiveForm;
     </li>
 </ul>
 
+<?php 
+foreach($list_komponen as $komponen):
+ ?>
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="panel">
 			<div class="panel-heading">
-				<div class="pull-left">Pengabdian</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_pengabdian' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
+				<div class="pull-left"><?=$komponen->nama;?> - <?=$komponen->subunsur;?></div>
+                <div class="pull-right"><a href="javascript:void(0)" data-item="<?=$komponen->id;?>" class="btn btn-primary btn_tarik_pengabdian"><i class="fa fa-refresh"></i> Tarik</a></div>
 			</div>
 			<div class="panel-body">
-				<table class="table" id="tabel-pengabdian">
+				<table class="table" id="tabel-pengabdian-<?=$komponen->id;?>">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Judul</th>
-                            <th>SKIM</th>
-                            <th>Tahun Kegiatan</th>
-                            <th>Tempat Kegiatan</th>
-                            <th>SKS BKD</th>
-                            <th>Klaim</th>
+                            <th width="5%">No</th>
+                            <th width="35%">Nama Kegiatan</th>
+                            <th width="15%">Status</th>
+                            <th width="10%">Beban Tugas</th>
+                            <th width="10%">Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        
+                        <?php 
+                        if(!empty($results[$komponen->id])):
+                            foreach($results[$komponen->id] as $q => $item): 
+
+                                $color = $list_status_color[$item['status_bkd']];
+                        ?>
+                        <tr>
+                            <td><?=$q+1;?></td>
+                            <td><?=$item['deskripsi'];?></td>
+                            <td>
+
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-<?=$color;?> btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    <?=(!empty($list_status[$item['status_bkd']]) ? $list_status[$item['status_bkd']] : null);?> <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <?php foreach($list_status as $q=>$status): ?>
+                                    <li><a href="#" data-item="<?=$q;?>" class="btn_ubah_status_bkd" data-key="<?=$item['id'];?>"><?=$status;?></a></li>
+                                    <?php endforeach ?>
+                                  </ul>
+                                </div>
+                            </td>
+                            <td><?=$item['sks'];?></td>
+                            <td><a href='javascript:void(0)' data-item='"+obj.id+"' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
+                        </tr>
+                        <?php 
+                            endforeach; 
+                        endif;
+                        ?>
                     </tbody>
                     
                 </table>
@@ -94,17 +127,63 @@ use yii\widgets\ActiveForm;
 		</div>
 	</div>
 </div>
-
+<?php endforeach ?>
 <?php 
 
 $this->registerJs(' 
 
 
-$(document).on("click","#btn_tarik_penunjang",function(e){
+
+$(document).on("click",".btn_ubah_status_bkd",function(e){
     e.preventDefault()
 
     var obj = new Object
-    obj.id = $(this).data("item")
+    obj.id = $(this).data("key")
+    obj.status_bkd = $(this).data("item");
+
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['bkd-dosen/ajax-update-status']).'\',
+        async: true,
+        beforeSend : function(){
+
+        },
+        success: function(res){
+
+            var res = $.parseJSON(res);
+            if(res.code == 200){
+                Swal.fire({
+                  title: \'Yeay!\',
+                  icon: \'success\',
+                  text: res.message
+                }).then(res=>{
+                    window.location.reload();
+                    
+                })
+                
+            }
+            else{
+                Swal.fire({
+                  title: \'Oops!\',
+                  icon: \'error\',
+                  text: res.message
+                });
+            }
+        }
+
+    });
+
+})
+
+
+$(document).on("click",".btn_tarik_pengabdian",function(e){
+    e.preventDefault()
+
+    var obj = new Object
+    obj.komponen_kegiatan_id = $(this).data("item")
     obj.is_claimed = "0";
     obj.tahun_id = $("#ganti-periode").val()
     if($(this).is(":checked"))
@@ -115,7 +194,7 @@ $(document).on("click","#btn_tarik_penunjang",function(e){
         data : {
             dataPost : obj
         },
-        url : \''.Url::to(['skp-item/ajax-claim-penunjang']).'\',
+        url : \''.Url::to(['skp-item/ajax-claim-pengabdian']).'\',
         async: true,
         beforeSend : function(){
 
@@ -123,8 +202,17 @@ $(document).on("click","#btn_tarik_penunjang",function(e){
         success: function(res){
 
             var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
+            if(res.code == 200){
+                Swal.fire({
+                  title: \'Yeay!\',
+                  icon: \'success\',
+                  text: res.message
+                }).then(res=>{
+                    getPengabdian(obj.tahun_id, obj.komponen_kegiatan_id)
+                    
+                })
+                
+            }
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -166,8 +254,10 @@ $(document).on("click",".remove_bkd",function(e){
                 },
                 success: function(res){
                     var res = $.parseJSON(res);
-                    if(res.code == 200)
-                        $("#ganti-periode").trigger("change")
+                    if(res.code == 200){
+
+                        window.location.reload();
+                    }
                     else{
                         Swal.fire({
                           title: \'Oops!\',
@@ -259,132 +349,20 @@ if(!doneTour) {
 
 }
 
-$(document).on("click",".btn-claim-pengelolaJurnal",function(e){
-    e.preventDefault()
 
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-        obj.is_claimed = "1"
-
-    obj.tahun_id = $(this).data("ta")
-
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim-pengelola-jurnal']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
-$(document).on("click",".btn-claim-organisasi",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-        obj.is_claimed = "1"
-
-    obj.tahun_id = $(this).data("ta")
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim-organisasi']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
-$(document).on("click",".btn-claim-pengabdian",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.tahun_id = $(this).data("ta")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-        obj.is_claimed = "1"
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim-pengabdian']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
-function getPengabdian(tahun){
+function getPengabdian(tahun,komponen_kegiatan_id){
     
     var obj = new Object;
     obj.tahun = tahun;
+    obj.komponen_kegiatan_id = komponen_kegiatan_id
     var counter = 0;
-    $("#tabel-pengabdian > tbody").empty()
+    $("#tabel-pengabdian-"+obj.komponen_kegiatan_id+" > tbody").empty()
     $.ajax({
         type : \'POST\',
         data : {
             dataPost : obj
         },
-        url : \''.Url::to(['pengabdian/ajax-list']).'\',
+        url : \''.Url::to(['bkd-dosen/ajax-list-pengabdian']).'\',
         async: true,
         beforeSend : function(){
 
@@ -397,113 +375,33 @@ function getPengabdian(tahun){
             $.each(res, function(i,obj){
                 counter++;
 
-                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                var obj = obj.item
                 row += "<tr>"
                 row += "<td>"+(counter)+"</td>"
-                row += "<td>"+obj.judul_penelitian_pengabdian+"</td>"
-                row += "<td>"+obj.nama_skim+"</td>"
-                row += "<td>"+obj.tahun_kegiatan+"</td>"
-                row += "<td>"+obj.tempat_kegiatan+"</td>"
-                row += "<td>"+obj.nilai+"</td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#ganti-periode").val()+"\' data-item=\'"+obj.ID+"\' class=\'btn-claim-pengabdian\'/></td>"
-                row += "</tr>"
-
-            })
-
-            $("#tabel-pengabdian > tbody").append(row)
-                
-        }
-
-    });
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['pengelola-jurnal/ajax-list']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            var row = ""
-            
-            var total_sks = 0
-            $.each(res, function(i,obj){
-
-                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                counter++;
-
-                var obj = obj.item
-                row += "<tr>"
-                row += "<td>"+(counter)+"</td>"
-                row += "<td>Menjadi "+obj.peran_dalam_kegiatan +" pada "+obj.nama_media_publikasi+"</td>"
-                row += "<td></td>"
-                row += "<td>"+obj.tgl_sk_tugas+" s/d "+obj.tgl_sk_tugas_selesai+"</td>"
-                row += "<td></td>"
+                row += "<td>"+obj.nama_kegiatan+"</td>"
+                row += "<td>"+obj.status_bkd+"</td>"
                 row += "<td>"+obj.sks_bkd+"</td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#ganti-periode").val()+"\' data-sks=\'"+obj.sks_bkd+"\' data-item=\'"+obj.id+"\' class=\'btn-claim-pengelolaJurnal\'/></td>"
+                row += "<td><a href=\'javascript:void(0)\' data-item=\'"+obj.id+"\' class=\'remove_bkd\'><i class=\'fa fa-trash\'></i></a></td>"
                 row += "</tr>"
 
             })
 
-            $("#tabel-pengabdian > tbody").append(row)
+            $("#tabel-pengabdian-"+obj.komponen_kegiatan_id+" > tbody").append(row)
                 
         }
 
     });
 
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['pembicara/ajax-list']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            var row = ""
-            
-            var total_sks = 0
-            $.each(res, function(i,obj){
-
-                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                counter++;
-
-                row += "<tr>"
-                row += "<td>"+(counter)+"</td>"
-                row += "<td><b>"+obj.peran_dalam_kegiatan +"</b> dalam <b>"+obj.nama_pertemuan_ilmiah+"</b> oleh "+obj.penyelenggara_kegiatan+" tanggal "+obj.nama_pertemuan_ilmiah+"</td>"
-                row += "<td></td>"
-                row += "<td>"+obj.tanggal+"</td>"
-                row += "<td></td>"
-                row += "<td>"+obj.sks_bkd+"</td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+$("#ganti-periode").val()+"\' data-sks=\'"+obj.sks_bkd+"\' data-item=\'"+obj.id+"\' class=\'btn-claim-pembicara\'/></td>"
-                row += "</tr>"
-
-            })
-
-            $("#tabel-pengabdian > tbody").append(row)
-                
-        }
-
-    });
+    
 }
 
 
 $(document).on("change","#ganti-periode",function(e){
     e.preventDefault()
 
-    getPengabdian($(this).val())
+    window.location.reload();
 
 })
 
- $("#ganti-periode").trigger("change")
 
 
 ', \yii\web\View::POS_READY);

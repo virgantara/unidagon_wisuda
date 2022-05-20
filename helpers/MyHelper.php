@@ -9,6 +9,28 @@ use Yii;
 class MyHelper
 {	
 
+	public static function getListStatusBKDColor(){
+		$list = [
+            '0' => 'warning',
+            '1' => 'success',
+            '2' => 'primary',
+            '3' => 'danger'
+        ];
+
+        return $list;
+	}
+
+	public static function getListStatusBKD(){
+		$list = [
+            '0' => 'Belum Selesai',
+            '1' => 'Selesai',
+            '2' => 'Berlanjut',
+            '3' => 'Gagal'
+        ];
+
+        return $list;
+	}
+
 	public static function listRoleStaf()
 	{
 		$list_staf = ['Staf','Staf TU','Tendik','Staf Biro','Staf UPT'];

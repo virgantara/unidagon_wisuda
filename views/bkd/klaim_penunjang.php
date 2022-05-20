@@ -78,7 +78,7 @@ use yii\widgets\ActiveForm;
                             <th>No</th>
                             <th>Kegiatan</th>
                             <th>SKS BKD</th>
-                            <th>Klaim</th>
+                            <th>Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -209,7 +209,6 @@ function getPenunjang(tahun){
             var row = ""
             var total_sks = 0
             $.each(res, function(i,obj){
-                let isClaimed = obj.is_claimed == 1 ? "checked" : "";
                 counter++;
                 row += "<tr>"
                 row += "<td>"+(counter)+"</td>"

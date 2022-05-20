@@ -61,7 +61,7 @@ else
 <?= Html::a('<i class="fa fa-print"></i> Print Rencana SKP', ['print-rencana', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
                 <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success','target'=>'_blank']) ?>
 
-                <?= Html::a('<i class="fa fa-search"></i> Realisasi', ['realisasi', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('<i class="fa fa-search"></i> Lihat Realisasi', ['realisasi', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
                 
             </div>
@@ -164,8 +164,14 @@ else
             
             'nama',
             [
+                'header' => 'Unsur Utama',
+                'format' => 'raw',
+                'value' => function($data){
+                    return !empty($data->komponenKegiatan) && !empty($data->komponenKegiatan->unsur) ? $data->komponenKegiatan->unsur->nama : null;
+                }
+            ],
+            [
                 'attribute' => 'komponen_kegiatan_id',
-                'contentOptions' => ['width' => '40%'],
                 'format' => 'raw',
                 'value' => function($data){
                     return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - <b>'.$data->komponenKegiatan->subunsur.'</b>' : null;
