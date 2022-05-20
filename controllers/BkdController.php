@@ -484,11 +484,23 @@ class BkdController extends AppController
         switch($step){
           case 1:
 
-            $query = KomponenKegiatan::find();
-            $query->joinWith(['unsur as u']);    
-            $query->where(['u.kode' => 'AJAR']);
-            $list_komponen = $query->all();
+            $rows = (new \yii\db\Query())
+              ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'AJAR',
+                  // 'kk.id' => $komponen->id,
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id
+              ])
+              ->andWhere([
+                    'IN','kk.kode',['B1','B2']
+                ])
+              ->all();
 
+            $results = $rows;
             return $this->render('klaim_pendidikan',[
               'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
@@ -505,7 +517,7 @@ class BkdController extends AppController
           case 3:
             $query = KomponenKegiatan::find();
             $query->alias('t');
-            $query->select(['t.id','t.nama']);
+            $query->select(['t.nama']);
             $query->joinWith(['unsur as u']);    
             $query->where(['u.kode' => 'ABDIMAS']);
             $query->orderBy(['t.nama' => SORT_ASC]);

@@ -214,7 +214,7 @@ yii\bootstrap\Modal::begin([
                         (Khusus pengajaran)
                     </td>
                     <td width="70%">
-                        <?=Html::dropDownList('kelas_diampu','',[],['class'=>'form-control','id'=>'list_kelas']);?>
+                        <?=Html::dropDownList('jadwal_id','',[],['class'=>'form-control','id'=>'list_kelas']);?>
                     </td>
                 </tr>
                 <tr>

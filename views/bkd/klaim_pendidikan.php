@@ -20,7 +20,10 @@ if($session->has('bkd_periode'))
   $sd = $session->get('tgl_awal');
   $ed = $session->get('tgl_akhir');  
 }
-$this->title = 'Pelaksanaan Pendidikan'
+$this->title = 'Pelaksanaan Pendidikan';
+
+$list_status = \app\helpers\MyHelper::getListStatusBKD();
+$list_status_color = \app\helpers\MyHelper::getListStatusBKDColor();
 ?>
 <h1><?=$this->title;?></h1>
 <p>
@@ -68,26 +71,52 @@ use yii\widgets\ActiveForm;
 	<div class="col-md-12">
 		<div class="panel">
 			<div class="panel-heading">
-				<div class="pull-left">Pengajaran</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_pengajaran' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
+				<div class="pull-left">A. Melaksanakan perkuliahan (tutorial, tatap muka, dan/atau daring) dan membimbing, menguji serta menyelenggarakan pendidikan di laboratorium, praktik keguruan bengkel/ studio/ kebun (tatap muka dan/atau daring) pada institusi pendidikan sesuai penugasan</div>
+                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_pengajaran' class="btn btn-primary"><i class="fa fa-refresh"></i> Tarik</a></div>
 			</div>
 			<div class="panel-body">
 				<table class="table" id="tabel-pengajaran">
 					<thead>
 						<tr>
 							<th>No</th>
-							<th>Kode MK</th>
-							<th>Nama MK</th>
-							<th>SKS</th>
-							<th>Kelas</th>
-							<th>Prodi</th>
-							<th>TA</th>
-							<th>SKS BKD</th>
-							<th class="klaim">Klaim</th>
+							<th>Kegiatan</th>
+							<!-- <th>Rencana Pertemuan</th> -->
+							<th>sks MK Terhitung</th>
+							<th>sks BKD</th>
+							<th>Status</th>
+                            <th>Opsi</th>
 						</tr>
 					</thead>
 					<tbody>
-						
+						<?php 
+
+                        foreach($results as $q => $item): 
+
+                            $color = $list_status_color[$item['status_bkd']];
+                        ?>
+                        <tr>
+                            <td><?=$q+1;?></td>
+                            <td><?=$item['deskripsi'];?></td>
+                            <td></td>
+                            <td><?=$item['sks'];?></td>
+                            <td>
+
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-<?=$color;?> btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    <?=(!empty($list_status[$item['status_bkd']]) ? $list_status[$item['status_bkd']] : null);?> <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <?php foreach($list_status as $q=>$status): ?>
+                                    <li><a href="#" data-item="<?=$q;?>" class="btn_ubah_status_bkd" data-key="<?=$item['id'];?>"><?=$status;?></a></li>
+                                    <?php endforeach ?>
+                                  </ul>
+                                </div>
+                            </td>
+                            <td><a href='javascript:void(0)' data-item='"+obj.id+"' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
+                        </tr>
+                        <?php 
+                        endforeach; 
+                        ?>
 					</tbody>
 					
 				</table>
@@ -102,22 +131,19 @@ use yii\widgets\ActiveForm;
 $this->registerJs(' 
 
 
-$(document).on("click","#btn_tarik_penunjang",function(e){
+$(document).on("click",".btn_ubah_status_bkd",function(e){
     e.preventDefault()
 
     var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    obj.tahun_id = $("#ganti-periode").val()
-    if($(this).is(":checked"))
-        obj.is_claimed = "1"
+    obj.id = $(this).data("key")
+    obj.status_bkd = $(this).data("item");
 
     $.ajax({
         type : \'POST\',
         data : {
             dataPost : obj
         },
-        url : \''.Url::to(['skp-item/ajax-claim-penunjang']).'\',
+        url : \''.Url::to(['bkd-dosen/ajax-update-status']).'\',
         async: true,
         beforeSend : function(){
 
@@ -125,8 +151,68 @@ $(document).on("click","#btn_tarik_penunjang",function(e){
         success: function(res){
 
             var res = $.parseJSON(res);
+            if(res.code == 200){
+                Swal.fire({
+                  title: \'Yeay!\',
+                  icon: \'success\',
+                  text: res.message
+                }).then(res=>{
+                    window.location.reload();
+                    
+                })
+                
+            }
+            else{
+                Swal.fire({
+                  title: \'Oops!\',
+                  icon: \'error\',
+                  text: res.message
+                });
+            }
+        }
+
+    });
+
+})
+
+$(document).on("click","#btn_tarik_pengajaran",function(e){
+    e.preventDefault()
+
+    var obj = new Object
+    
+    if(!$("#ganti-periode").val()){
+        Swal.fire({
+          title: \'Oops!\',
+          icon: \'error\',
+          text: "Silakan Pilih Periode BKD" 
+        })
+
+        return
+    }
+    obj.tahun_id = "'.(!empty($tahun_id) ? $tahun_id : "").'"
+    
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['skp-item/ajax-claim-pengajaran']).'\',
+        async: true,
+        beforeSend : function(){
+            Swal.showLoading()
+        },
+        error : function(e){
+            Swal.fire({
+              title: \'Oops!\',
+              icon: \'error\',
+              text: e.responseText 
+            })
+        },
+        success: function(res){
+            Swal.close()
+            var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#ganti-periode").trigger("change")
+                window.location.reload()
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -169,7 +255,7 @@ $(document).on("click",".remove_bkd",function(e){
                 success: function(res){
                     var res = $.parseJSON(res);
                     if(res.code == 200)
-                        $("#ganti-periode").trigger("change")
+                        window.location.reload()
                     else{
                         Swal.fire({
                           title: \'Oops!\',
@@ -285,7 +371,7 @@ $(document).on("click",".btn-claim",function(e){
         success: function(res){
             var res = $.parseJSON(res);
             if(res.code == 200)
-                $("#ganti-periode").trigger("change")
+                window.location.reload()
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -384,12 +470,13 @@ function getJadwal(tahun){
 $(document).on("change","#ganti-periode",function(e){
     e.preventDefault()
 
-    getJadwal($(this).val())
+    window.location.reload()
+    // getJadwal($(this).val())
   
 
 })
 
- $("#ganti-periode").trigger("change")
+ // $("#ganti-periode").trigger("change")
 
 
 ', \yii\web\View::POS_READY);

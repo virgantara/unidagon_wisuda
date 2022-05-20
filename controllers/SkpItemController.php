@@ -62,7 +62,7 @@ class SkpItemController extends Controller
         ];
     }
 
-    public function actionAjaxGetUnsurUtama()
+    public function actionAjaxClaimPengajaran()
     {
         $results = [
             'code' => 400,
@@ -70,36 +70,105 @@ class SkpItemController extends Controller
         ];
 
         if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
-            $results = [
-                'code' => 404,
-                'message' => 'Data not found'
-            ];
-
             $dataPost = $_POST['dataPost'];
-            $model = SkpItem::findOne($dataPost['id']);
-
-            if(!empty($model)){
-
-
             
+            $session = Yii::$app->session;
+            $bkd_periode = null;
+            if($session->has('bkd_periode')) {
+                $tahun_id = $session->get('bkd_periode');
+                // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+                $sd = $session->get('tgl_awal');
+                $ed = $session->get('tgl_akhir');  
+                $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+            }
+            else{
+                $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+                $tahun_id = $bkd_periode->tahun_id;
+                $sd = $bkd_periode->tanggal_bkd_awal;
+                $ed = $bkd_periode->tanggal_bkd_akhir;
+            }
+            if(!empty($bkd_periode)){
                 $rows = (new \yii\db\Query())
-                    ->select(['uu.kode'])
+                    ->select(['si.komponen_kegiatan_id','si.id as skp_item_id','si.nama as nama_kegiatan','kk.angka_kredit as ak_bkd','kk.angka_kredit_pak as ak_pak'])
                     ->from('skp_item si')
                     ->join('LEFT JOIN','skp s','s.id = si.skp_id')
                     ->join('LEFT JOIN','komponen_kegiatan kk','si.komponen_kegiatan_id = kk.id')
                     ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
                     ->where([
-                        'si.id' => $model->id,
+                        'uu.kode' => 'AJAR',
+                        's.periode_id' => $bkd_periode->tahun_id,
+                        's.pegawai_dinilai' => Yii::$app->user->identity->NIY
                     ])
-                    ->one();
+                    ->andWhere([
+                        'IN','kk.kode',['B1','B2']
+                    ])
+                    ->andWhere(['<>','si.realisasi_qty',0])
+                    ->all();
+
+                $counter = 0;
+                $counterFailed = 0;
+                $errors = '';
+                foreach($rows as $item) {
+
+                    $bkd = BkdDosen::findOne([
+                        'tahun_id' => $bkd_periode->tahun_id,
+                        'dosen_id' => Yii::$app->user->identity->id,
+                        'komponen_id' => $item['komponen_kegiatan_id'],
+                        'kondisi' => $item['skp_item_id']
+                    ]);
+
+                    if(empty($bkd)){
+                        $bkd = new BkdDosen;
+                        $bkd->tahun_id = $bkd_periode->tahun_id;
+                        $bkd->dosen_id = Yii::$app->user->identity->id;
+                        $bkd->komponen_id = $item['komponen_kegiatan_id'];
+                        $bkd->kondisi = $item['skp_item_id'];
+                    }
+
+                    $bkd->skp_item_id = $item['skp_item_id'];
+                    $bkd->deskripsi = $item['nama_kegiatan'];
+                    $bkd->sks = $item['ak_bkd'];
+                    $bkd->sks_pak = $item['ak_pak'];
+
+                    $transaction = Yii::$app->db->beginTransaction();
+                        // exit;
+                    
+                    try {
+                        if($bkd->save()){
+                            $counter++;
+                            $transaction->commit();
+                        }
+
+                        else{
+                            throw new \Exception;
+                        }
+                    }
+
+                    catch(\Exception $e) {
+                        $errors .= $item['nama_kegiatan'].' '.$e->getMessage();
+                        $transaction->rollBack();
+                        $counterFailed++;
+                    }
+                }
+
+                $message = 'No data was update';
+                if($counter > 0){
+                    $message = $counter.' data have been updated';
+                }
 
                 $results = [
                     'code' => 200,
-                    'message' => 'success',
-                    'items' => $rows
+                    'message' => $message,
+                    'error' => $errors
                 ];
             }
-
+            else{
+                $results = [
+                    'code' => 404,
+                    'message' => 'Periode BKD belum aktif',
+                    'error' => ''
+                ];   
+            }
         }
 
         echo json_encode($results);
@@ -289,6 +358,50 @@ class SkpItemController extends Controller
                     'code' => 200,
                     'message' => $message,
                     'error' => $errors
+                ];
+            }
+
+        }
+
+        echo json_encode($results);
+        exit;
+    }
+
+    public function actionAjaxGetUnsurUtama()
+    {
+        $results = [
+            'code' => 400,
+            'message' => 'Bad request'
+        ];
+
+        if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
+            $results = [
+                'code' => 404,
+                'message' => 'Data not found'
+            ];
+
+            $dataPost = $_POST['dataPost'];
+            $model = SkpItem::findOne($dataPost['id']);
+
+            if(!empty($model)){
+
+
+            
+                $rows = (new \yii\db\Query())
+                    ->select(['uu.kode'])
+                    ->from('skp_item si')
+                    ->join('LEFT JOIN','skp s','s.id = si.skp_id')
+                    ->join('LEFT JOIN','komponen_kegiatan kk','si.komponen_kegiatan_id = kk.id')
+                    ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+                    ->where([
+                        'si.id' => $model->id,
+                    ])
+                    ->one();
+
+                $results = [
+                    'code' => 200,
+                    'message' => 'success',
+                    'items' => $rows
                 ];
             }
 

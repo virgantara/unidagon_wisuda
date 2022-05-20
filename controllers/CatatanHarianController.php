@@ -3,8 +3,9 @@
 namespace app\controllers;
 
 use Yii;
-
+use yii\httpclient\Client;
 use app\models\User;
+use app\models\BkdPeriode;
 use app\models\CatatanHarian;
 use app\models\CatatanHarianSearch;
 use yii\web\Controller;
@@ -165,27 +166,80 @@ class CatatanHarianController extends Controller
                 if(!empty($skpItem))
                 {
 
-                    $model = CatatanHarian::find()->where([
-                        'skp_item_id' => $dataPost['skp_item_id'],
-                        'user_id' => $dataPost['user_id'],
-                        'deskripsi' => trim($dataPost['deskripsi'])
-                    ])->one();
+                    if(!empty($skpItem->komponenKegiatan) && in_array($skpItem->komponenKegiatan->kode, ['B1','B2'])){
+                        $api_baseurl = Yii::$app->params['api_baseurl'];
+                        $client = new Client(['baseUrl' => $api_baseurl]);
+                        $client_token = Yii::$app->params['client_token'];
+                        $headers = ['x-access-token'=>$client_token];
+                        
+                        $jadwal_id = $dataPost['jadwal_id'];
+                        $params = [
+                            'jadwal_id' => $jadwal_id,
+                        ];
 
-                    if(empty($model)){
-                        $model = new CatatanHarian;
+                        $response = $client->get('/jadwal/dosen/jurnal', $params,$headers)->send();
+                        if ($response->isOk) {
+                            $items = $response->data['values'];
+                            $jumlah_item = count($items);
+                            foreach ($items as $key => $value) {
+                                $deskripsi = $skpItem->nama.' pertemuan ke-'.$value['pertemuan_ke'].' materi '.$value['materi'];
+                                $model = CatatanHarian::find()->where([
+                                    'skp_item_id' => $skpItem->id,
+                                    'user_id' => Yii::$app->user->identity->id,
+                                    'kondisi' => $skpItem->id.'_'.$value['pertemuan_ke']
+                                ])->one();
+
+                                if(empty($model)){
+                                    $model = new CatatanHarian;
+                                    $model->user_id = Yii::$app->user->identity->id;
+                                    $model->skp_item_id = $skpItem->id;
+                                    $model->kondisi = $skpItem->id.'_'.$value['pertemuan_ke'];
+                                }
+
+                                $model->deskripsi = $deskripsi;
+                                $model->tanggal = date('Y-m-d',strtotime($value['waktu']));                                
+                                if($jumlah_item > 0)
+                                    $model->poin = $skpItem->target_ak / $jumlah_item;
+
+                                if(!$model->save())
+                                {
+                                    $errors .= MyHelper::logError($model);
+                                    throw new \Exception;
+                                }
+
+                                             
+                            }
+
+                            $transaction->commit();                  
+                            
+                            
+                        }
+
                     }
-                    
-                    $model->attributes = $dataPost;
-                    
-                    $model->poin = $skpItem->target_ak;
 
-                    if(!$model->save())
-                    {
-                        $errors .= MyHelper::logError($model);
-                        throw new \Exception;
+                    else{
+                        $model = CatatanHarian::find()->where([
+                            'skp_item_id' => $dataPost['skp_item_id'],
+                            'user_id' => $dataPost['user_id'],
+                            'deskripsi' => trim($dataPost['deskripsi'])
+                        ])->one();
+
+                        if(empty($model)){
+                            $model = new CatatanHarian;
+                        }
+                        
+                        $model->attributes = $dataPost;
+                        
+                        $model->poin = $skpItem->target_ak;
+
+                        if(!$model->save())
+                        {
+                            $errors .= MyHelper::logError($model);
+                            throw new \Exception;
+                        }
+
+                        $transaction->commit();
                     }
-
-                    $transaction->commit();
                     $results = [
                         'code' => 200,
                         'message' => 'Data successfully added'
