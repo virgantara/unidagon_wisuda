@@ -79,7 +79,13 @@ class SkpItemController extends Controller
             
             if(!empty($periode)){
 
-                foreach($list_komponen_utama as $ku){
+                $counter = 0;
+                $counterFailed = 0;
+                $errors = '';
+                
+                foreach($list_komponen_utama as $i => $ku){
+                    
+
                     $komponen_kegiatan_id = $ku->id;    
 
                     $rows = (new \yii\db\Query())
@@ -97,65 +103,70 @@ class SkpItemController extends Controller
                         ->andWhere(['<>','si.realisasi_qty',0])
                         ->all();
 
-                    $counter = 0;
-                    $counterFailed = 0;
-                    $errors = '';
-
+                    
+                    
                     foreach($rows as $item) {
 
-                        $bkd = BkdDosen::findOne([
-                            'tahun_id' => $periode->tahun_id,
-                            'dosen_id' => Yii::$app->user->identity->id,
-                            'komponen_id' => $item['komponen_kegiatan_id'],
-                            'kondisi' => $item['skp_item_id']
-                        ]);
+                        $list_catatan_harian = CatatanHarian::find()->where([
+                            'skp_item_id' => $item['skp_item_id']
+                        ])->all();
 
-                        if(empty($bkd)){
-                            $bkd = new BkdDosen;
-                            $bkd->tahun_id = $periode->tahun_id;
-                            $bkd->dosen_id = Yii::$app->user->identity->id;
-                            $bkd->komponen_id = $item['komponen_kegiatan_id'];
-                            $bkd->kondisi = $item['skp_item_id'];
-                        }
+                        foreach($list_catatan_harian as $ch){
+                            $bkd = BkdDosen::findOne([
+                                'tahun_id' => $periode->tahun_id,
+                                'dosen_id' => Yii::$app->user->identity->id,
+                                'komponen_id' => $item['komponen_kegiatan_id'],
+                                'kondisi' => $item['skp_item_id'].'_'.$ch->id,
+                            ]);
 
-                        $bkd->skp_item_id = $item['skp_item_id'];
-                        $bkd->deskripsi = $item['nama_kegiatan'];
-                        $bkd->sks = $item['ak_bkd'];
-                        $bkd->sks_pak = $item['ak_pak'];
-
-                        $transaction = Yii::$app->db->beginTransaction();
-                            // exit;
-                        
-                        try {
-                            if($bkd->save()){
-                                $counter++;
-                                $transaction->commit();
+                            if(empty($bkd)){
+                                $bkd = new BkdDosen;
+                                $bkd->tahun_id = $periode->tahun_id;
+                                $bkd->dosen_id = Yii::$app->user->identity->id;
+                                $bkd->komponen_id = $item['komponen_kegiatan_id'];
+                                $bkd->kondisi = $item['skp_item_id'].'_'.$ch->id;
                             }
 
-                            else{
-                                throw new \Exception;
-                            }
-                        }
+                            $bkd->skp_item_id = $item['skp_item_id'];
+                            $bkd->deskripsi = $item['nama_kegiatan'];
+                            $bkd->sks = $item['ak_bkd'];
+                            $bkd->sks_pak = $item['ak_pak'];
 
-                        catch(\Exception $e) {
-                            $errors .= $item['nama_kegiatan'].' '.$e->getMessage();
-                            $transaction->rollBack();
-                            $counterFailed++;
+                            $transaction = Yii::$app->db->beginTransaction();
+                                // exit;
+                            
+                            try {
+                                if($bkd->save()){
+                                    $counter++;
+                                    $transaction->commit();
+                                }
+
+                                else{
+                                    throw new \Exception;
+                                }
+                            }
+
+                            catch(\Exception $e) {
+                                $errors .= $item['nama_kegiatan'].' '.$e->getMessage();
+                                $transaction->rollBack();
+                                $counterFailed++;
+                            }
                         }
                     }
 
-                    $message = 'No data was claimed';
-                    if($counter > 0){
-                        $message = $counter.' data have been updated';
-                    }
-
-                    $results = [
-                        'code' => 200,
-                        'message' => $message,
-                        'error' => $errors
-                    ];   
+                    
                 }
-                
+
+                $message = 'No data was claimed. '.$counterFailed.' failed';
+                if($counter > 0){
+                    $message = $counter.' data have been updated';
+                }
+
+                $results = [
+                    'code' => 200,
+                    'message' => $message,
+                    'error' => $errors
+                ];   
             }
 
         }

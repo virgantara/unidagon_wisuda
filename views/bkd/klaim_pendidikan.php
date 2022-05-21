@@ -108,7 +108,7 @@ use yii\widgets\ActiveForm;
                             <td>
 
                                 <div class="btn-group">
-                                  <button type="button" class="btn btn-<?=$color;?> btn-sm dropdown-toggle" data-toggle="dropdown">
+                                  <button type="button" class="btn btn-<?=$color;?>  dropdown-toggle" data-toggle="dropdown">
                                     <?=(!empty($list_status[$item['status_bkd']]) ? $list_status[$item['status_bkd']] : null);?> <span class="caret"></span>
                                   </button>
                                   <ul class="dropdown-menu" role="menu">
@@ -179,7 +179,7 @@ foreach($list_komponen_utama as $i => $komponen_utama):
                             <td>
 
                                 <div class="btn-group">
-                                  <button type="button" class="btn btn-<?=$color;?> btn-sm dropdown-toggle" data-toggle="dropdown">
+                                  <button type="button" class="btn btn-<?=$color;?>  dropdown-toggle" data-toggle="dropdown">
                                     <?=(!empty($list_status[$item['status_bkd']]) ? $list_status[$item['status_bkd']] : null);?> <span class="caret"></span>
                                   </button>
                                   <ul class="dropdown-menu" role="menu">
@@ -191,7 +191,7 @@ foreach($list_komponen_utama as $i => $komponen_utama):
                             </td>
                             <td></td>
                             <td><?=$item['sks'];?></td>
-                            <td><a href='javascript:void(0)' data-item='"+obj.id+"' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
+                            <td><a href='javascript:void(0)' data-item='<?=$item['id'];?>' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
                         </tr>
                         <?php 
                                 endforeach; 
