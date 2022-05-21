@@ -500,11 +500,65 @@ class BkdController extends AppController
                 ])
               ->all();
 
-            $results = $rows;
+            $results_pengajaran = $rows;
+            $query = KomponenKegiatan::find();
+            $query->alias('t');
+            $query->select(['t.nama']);
+            $query->joinWith(['unsur as u']);    
+            $query->where(['u.kode' => 'AJAR']);
+            // $query->andWhere([
+            //     'NOT IN','t.kode',['B1','B2']
+            // ]);
+            $query->orderBy(['t.nama' => SORT_ASC]);
+            $query->groupBy(['t.nama']);
+            $list_komponen_utama = $query->all();
+            // print_r($list_komponen_utama);exit;
+            foreach($list_komponen_utama as $i => $ku){
+              if($i == 0) continue;
+              
+              $query = KomponenKegiatan::find();
+              $query->alias('t');
+              $query->select(['t.id','t.nama']);
+              $query->joinWith(['unsur as u']);    
+              $query->where([
+                'u.kode' => 'AJAR',
+                't.nama' => $ku['nama']
+              ]);
+              // $query->andWhere([
+              //     'NOT IN','t.kode',['B1','B2']
+              // ]);
+              $query->orderBy(['nama' => SORT_ASC]);
+              $list_komponen[$ku['nama']] = $query->all();  
+
+              foreach($list_komponen[$ku['nama']] as $komponen){
+
+
+                $rows = (new \yii\db\Query())
+                  ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+                  ->from('bkd_dosen bd')
+                  ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+                  ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+                  ->where([
+                      'uu.kode' => 'AJAR',
+                      'kk.id' => $komponen->id,
+                      'bd.tahun_id' => $bkd_periode->tahun_id,
+                      'bd.dosen_id' => Yii::$app->user->identity->id
+                  ])
+                  ->all();
+
+                foreach($rows as $row){
+                  $results[$komponen->id][] = $row;
+                }
+              }
+            }
+            
+            
             return $this->render('klaim_pendidikan',[
               'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
-              'results' => $results
+              'list_komponen_utama' => $list_komponen_utama,
+              'results' => $results,
+              'results_pengajaran' => $results_pengajaran
             ]);
           break;
           case 2:

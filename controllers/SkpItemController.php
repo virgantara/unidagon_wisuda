@@ -62,6 +62,108 @@ class SkpItemController extends Controller
         ];
     }
 
+    public function actionAjaxClaimPendidikan()
+    {
+        $results = [
+            'code' => 400,
+            'message' => 'Bad request'
+        ];
+
+        if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
+            $dataPost = $_POST['dataPost'];
+            $periode = BkdPeriode::findOne($dataPost['tahun_id']);
+            $list_komponen_utama = KomponenKegiatan::find()->where([
+                'nama' => $dataPost['nama_komponen_kegiatan']
+            ])->all();
+
+            
+            if(!empty($periode)){
+
+                foreach($list_komponen_utama as $ku){
+                    $komponen_kegiatan_id = $ku->id;    
+
+                    $rows = (new \yii\db\Query())
+                        ->select(['si.komponen_kegiatan_id','si.id as skp_item_id','si.nama as nama_kegiatan','kk.angka_kredit as ak_bkd','kk.angka_kredit_pak as ak_pak'])
+                        ->from('skp_item si')
+                        ->join('LEFT JOIN','skp s','s.id = si.skp_id')
+                        ->join('LEFT JOIN','komponen_kegiatan kk','si.komponen_kegiatan_id = kk.id')
+                        ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+                        ->where([
+                            'uu.kode' => 'AJAR',
+                            'kk.id' => $komponen_kegiatan_id,
+                            's.periode_id' => $periode->tahun_id,
+                            's.pegawai_dinilai' => Yii::$app->user->identity->NIY
+                        ])
+                        ->andWhere(['<>','si.realisasi_qty',0])
+                        ->all();
+
+                    $counter = 0;
+                    $counterFailed = 0;
+                    $errors = '';
+
+                    foreach($rows as $item) {
+
+                        $bkd = BkdDosen::findOne([
+                            'tahun_id' => $periode->tahun_id,
+                            'dosen_id' => Yii::$app->user->identity->id,
+                            'komponen_id' => $item['komponen_kegiatan_id'],
+                            'kondisi' => $item['skp_item_id']
+                        ]);
+
+                        if(empty($bkd)){
+                            $bkd = new BkdDosen;
+                            $bkd->tahun_id = $periode->tahun_id;
+                            $bkd->dosen_id = Yii::$app->user->identity->id;
+                            $bkd->komponen_id = $item['komponen_kegiatan_id'];
+                            $bkd->kondisi = $item['skp_item_id'];
+                        }
+
+                        $bkd->skp_item_id = $item['skp_item_id'];
+                        $bkd->deskripsi = $item['nama_kegiatan'];
+                        $bkd->sks = $item['ak_bkd'];
+                        $bkd->sks_pak = $item['ak_pak'];
+
+                        $transaction = Yii::$app->db->beginTransaction();
+                            // exit;
+                        
+                        try {
+                            if($bkd->save()){
+                                $counter++;
+                                $transaction->commit();
+                            }
+
+                            else{
+                                throw new \Exception;
+                            }
+                        }
+
+                        catch(\Exception $e) {
+                            $errors .= $item['nama_kegiatan'].' '.$e->getMessage();
+                            $transaction->rollBack();
+                            $counterFailed++;
+                        }
+                    }
+
+                    $message = 'No data was claimed';
+                    if($counter > 0){
+                        $message = $counter.' data have been updated';
+                    }
+
+                    $results = [
+                        'code' => 200,
+                        'message' => $message,
+                        'error' => $errors
+                    ];   
+                }
+                
+            }
+
+        }
+
+        echo json_encode($results);
+        exit;
+    }
+
     public function actionAjaxClaimPengajaran()
     {
         $results = [

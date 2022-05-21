@@ -323,6 +323,20 @@ yii\bootstrap\Modal::begin([
                     </td>
                     
                 </tr>
+                <tr id="tr_kelas_diampu_update" style="display:none;">
+                    <td width="30%">Kelas yang diampu *<br>
+                        (Khusus pengajaran)
+                    </td>
+                    <td width="70%">
+                        <?=Html::dropDownList('jadwal_id','',[],['class'=>'form-control','id'=>'list_kelas_update']);?>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>Deskripsi <span style="color:red">*</span></td>
+                    <td><?= Html::textInput('deskripsi','',['class'=>'form-control','id'=>'deskripsi_update']) ?></td>
+                    
+                </tr>
                 <tr>
                     <td>Tautan <span style="color:red">*</span></td>
                     <td><?= Html::textInput('tautan','',['class'=>'form-control','id'=>'tautan_update']) ?>
@@ -378,7 +392,7 @@ $(document).on("change", "#skp_item_id", function(e){
             Swal.close()
             var hasil = $.parseJSON(data)
             if(hasil.code == 200 && hasil.items.kode == "AJAR"){
-                getJadwalDosen()
+                getJadwalDosen("")
                 $("#tr_kelas_diampu").show()            
             }
 
@@ -391,9 +405,43 @@ $(document).on("change", "#skp_item_id", function(e){
     
 });
 
+$(document).on("change", "#skp_item_id_update", function(e){
+                
+    var obj = new Object
+    obj.id = $(this).val()
+    $.ajax({
+        url: "'.Url::to(["skp-item/ajax-get-unsur-utama"]).'",
+        type : "POST",
+        async : true,
+        data: {
+            dataPost : obj
+        },
+        error : function(e){
+            console.log(e.responseText)
+        },
+        beforeSend: function(){
+            Swal.showLoading()
+        },
+        success: function (data) {
+            Swal.close()
+            var hasil = $.parseJSON(data)
+            if(hasil.code == 200 && hasil.items.kode == "AJAR"){
+                getJadwalDosen("_update")
+                $("#tr_kelas_diampu_update").show()            
+            }
+
+            else{
+                $("#tr_kelas_diampu_update").hide()
+            }
+        }
+    })
+
+    
+});
 
 
-function getJadwalDosen(){
+
+function getJadwalDosen(param){
     var obj = new Object
     $.ajax({
         url: "'.Url::to(["pengajaran/ajax-jadwal"]).'",
@@ -411,13 +459,13 @@ function getJadwalDosen(){
         success: function (data) {
             Swal.close()
             var hasil = $.parseJSON(data)
-            $("#list_kelas").empty()
+            $("#list_kelas"+param).empty()
             var row = ""
             $.each(hasil, function(i,obj){
                 row += "<option value=\'"+obj.id+"\'>["+obj.kode_mk+"] - "+obj.nama_mk+" - "+obj.kelas+"</option>"
             })
             
-            $("#list_kelas").append(row)
+            $("#list_kelas"+param).append(row)
         }
     })
 }

@@ -400,13 +400,6 @@ function getPengabdian(tahun,komponen_kegiatan_id){
 }
 
 
-$(document).on("change","#ganti-periode",function(e){
-    e.preventDefault()
-
-    window.location.reload();
-
-})
-
 
 
 ', \yii\web\View::POS_READY);

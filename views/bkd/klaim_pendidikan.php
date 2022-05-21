@@ -92,7 +92,7 @@ use yii\widgets\ActiveForm;
 
                         $total_sks_mk = 0;
                         $total_sks_bkd = 0;
-                        foreach($results as $q => $item): 
+                        foreach($results_pengajaran as $q => $item): 
 
                             $color = $list_status_color[$item['status_bkd']];
 
@@ -138,7 +138,74 @@ use yii\widgets\ActiveForm;
 	</div>
 </div>
 
+<?php 
+foreach($list_komponen_utama as $i => $komponen_utama):
+    if($i == 0) continue;
+?>
 
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <div class="pull-left"><?=$komponen_utama['nama'];?></div>
+                <div class="pull-right"><a href="javascript:void(0)" data-item="<?=$komponen_utama['nama'];?>" class="btn btn-primary btn_tarik_pendidikan"><i class="fa fa-refresh"></i> Tarik</a></div>
+            </div>
+            <div class="panel-body">
+                <table class="table" id="tabel-pendidikan-<?=$komponen_utama['nama'];?>">
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="30%">Nama Kegiatan</th>
+                            <th width="10%">Status</th>
+                            <th width="35%">Jumlah Kegiatan</th>
+                            <th width="10%">Beban Tugas</th>
+                            <th width="10%">Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+
+                        foreach($list_komponen[$komponen_utama['nama']] as $komponen):
+
+                            if(!empty($results[$komponen->id])):
+                                foreach($results[$komponen->id] as $q => $item): 
+
+                                    $color = $list_status_color[$item['status_bkd']];
+                        ?>
+                        <tr>
+                            <td><?=$q+1;?></td>
+                            <td><?=$item['deskripsi'];?></td>
+                            
+                            <td>
+
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-<?=$color;?> btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    <?=(!empty($list_status[$item['status_bkd']]) ? $list_status[$item['status_bkd']] : null);?> <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <?php foreach($list_status as $q=>$status): ?>
+                                    <li><a href="#" data-item="<?=$q;?>" class="btn_ubah_status_bkd" data-key="<?=$item['id'];?>"><?=$status;?></a></li>
+                                    <?php endforeach ?>
+                                  </ul>
+                                </div>
+                            </td>
+                            <td></td>
+                            <td><?=$item['sks'];?></td>
+                            <td><a href='javascript:void(0)' data-item='"+obj.id+"' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
+                        </tr>
+                        <?php 
+                                endforeach; 
+                            endif;
+                        endforeach; 
+                        ?>
+                    </tbody>
+                    
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endforeach ?>
 <?php 
 
 $this->registerJs(' 
@@ -239,6 +306,49 @@ $(document).on("click","#btn_tarik_pengajaran",function(e){
 
 })
 
+
+$(document).on("click",".btn_tarik_pendidikan",function(e){
+    e.preventDefault()
+
+    var obj = new Object
+    obj.nama_komponen_kegiatan = $(this).data("item")
+    obj.tahun_id = $("#ganti-periode").val()
+    
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['skp-item/ajax-claim-pendidikan']).'\',
+        async: true,
+        beforeSend : function(){
+
+        },
+        success: function(res){
+
+            var res = $.parseJSON(res);
+            if(res.code == 200){
+                Swal.fire({
+                  title: \'Yeay!\',
+                  icon: \'success\',
+                  text: res.message
+                }).then(res=>{
+                    window.location.reload()
+                })
+                
+            }
+            else{
+                Swal.fire({
+                  title: \'Oops!\',
+                  icon: \'error\',
+                  text: res.message
+                });
+            }
+        }
+
+    });
+
+})
 
 $(document).on("click",".remove_bkd",function(e){
     e.preventDefault()
@@ -345,8 +455,8 @@ if(!doneTour) {
           icon: \'warning\',
           showCancelButton: true,
           width:\'35%\',
-          confirmButtonColor: \'#3085d6\',
-          cancelButtonColor: \'#d33\',
+          confirmButtonColor: \'#d33\',
+          cancelButtonColor: \'#3085d6\',
           confirmButtonText: \'Ya, ulangi lagi!\',
           cancelButtonText: \'Tidak, sudah cukup\'
         }).then((result) => {
@@ -359,138 +469,6 @@ if(!doneTour) {
     });
 
 }
-$(document).on("click",".btn-claim",function(e){
-    e.preventDefault()
-
-    var obj = new Object
-    obj.id = $(this).data("item")
-    obj.is_claimed = "0";
-    if($(this).is(":checked"))
-    	obj.is_claimed = "1"
-
-    obj.tahun_id = $(this).data("ta");
-    obj.sks = $(this).data("sks")
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['bkd/ajax-claim']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            if(res.code == 200)
-                window.location.reload()
-            else{
-                Swal.fire({
-                  title: \'Oops!\',
-                  icon: \'error\',
-                  text: res.message
-                });
-            }
-        }
-
-    });
-
-})
-
-function fetchJadwal(tahun, callback){
-    let obj = new Object;
-    // obj.prodi_id = id;
-    obj.tahun = tahun;
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['pengajaran/ajax-jadwal']).'\',
-        async: true,
-        beforeSend : function(){
-            Swal.showLoading()
-        },
-        error : function(e){
-
-            Swal.fire({
-              title: \'Oops!\',
-              icon: \'error\',
-              text: e.responseText
-            }).then((result) => {
-              if (result.value) {
-                 
-              }
-            });
-            Swal.hideLoading();
-        },
-        success: function(res){
-            
-            var res = $.parseJSON(res);
-            if(res)
-                callback(null, res)
-            else
-                callback(res, null)
-        }
-
-    });
-}
-
-function getJadwal(tahun){
-	var obj = new Object
-    obj.tahun = tahun
-
-    $.ajax({
-        type : \'POST\',
-        data : {
-            dataPost : obj
-        },
-        url : \''.Url::to(['pengajaran/ajax-local-jadwal']).'\',
-        async: true,
-        beforeSend : function(){
-
-        },
-        success: function(res){
-            var res = $.parseJSON(res);
-            var row = ""
-            $("#tabel-pengajaran > tbody").empty()
-            var total_sks = 0
-            $.each(res, function(i,obj){
-            	let isClaimed = obj.is_claimed == 1 ? "checked" : "";
-                row += "<tr>"
-                row += "<td>"+(i+1)+"</td>"
-                row += "<td>"+obj.kode_mk+"</td>"
-                row += "<td>"+obj.matkul+"</td>"
-                row += "<td>"+obj.sks+"</td>"
-                row += "<td>"+obj.kelas+"</td>"
-                row += "<td>"+obj.jurusan+"</td>"
-                row += "<td>"+obj.tahun_akademik+"</td>"
-                row += "<td>"+obj.sks+"</td>"
-                row += "<td><input type=\'checkbox\' "+isClaimed+" data-ta=\'"+obj.tahun_akademik+"\' data-sks=\'"+obj.sks+"\' data-item=\'"+obj.ID+"\' class=\'btn-claim\'/></td>"
-                row += "</tr>"
-
-                total_sks += eval(obj.sks)
-            })
-
-            $("#tabel-pengajaran > tbody").append(row)
-                
-        }
-
-    });
-}
-
-$(document).on("change","#ganti-periode",function(e){
-    e.preventDefault()
-
-    window.location.reload()
-    // getJadwal($(this).val())
-  
-
-})
-
- // $("#ganti-periode").trigger("change")
-
 
 ', \yii\web\View::POS_READY);
 
