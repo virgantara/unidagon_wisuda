@@ -173,6 +173,27 @@ class CatatanHarianController extends Controller
                         $headers = ['x-access-token'=>$client_token];
                         
                         $jadwal_id = $dataPost['jadwal_id'];
+                        
+                        $params = [
+                            'uuid' => Yii::$app->user->identity->uuid,
+                            'tahun' => $skpItem->skp->periode_id,
+                            'jadwal_id' => $jadwal_id
+                        ];
+
+                        $response = $client->get('/jadwal/dosen/uuid', $params,$headers)->send();
+                        
+                        $data_jadwal = [];
+                        if ($response->isOk) {
+                            $tmp = $response->data['values'];
+                            $status = $response->data['status'];
+                            if($status == 200) {
+                                if(count($tmp) > 0) {
+                                    $data_jadwal = $tmp[0];
+                                }
+                            }
+                        }
+
+
                         $params = [
                             'jadwal_id' => $jadwal_id,
                         ];
@@ -196,6 +217,13 @@ class CatatanHarianController extends Controller
                                     $model->kondisi = $skpItem->id.'_'.$value['pertemuan_ke'];
                                 }
 
+                                if(!empty($data_jadwal)){
+                                    $model->kode_mk = $data_jadwal['kode_mk'];
+                                    $model->nama_mk = $data_jadwal['nama_mk'];
+                                    $model->sks_mk = $data_jadwal['sks_mk'];
+                                    $model->sks_bkd = $data_jadwal['sks_mk'] * $skpItem->komponenKegiatan->angka_kredit;
+                                    $model->jadwal_id = $jadwal_id;
+                                }
                                 $model->deskripsi = $deskripsi;
                                 $model->tanggal = date('Y-m-d',strtotime($value['waktu']));                                
                                 if($jumlah_item > 0)

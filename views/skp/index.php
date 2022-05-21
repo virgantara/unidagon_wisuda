@@ -175,6 +175,7 @@ else
                         if($model->status_skp == 2){
                             return Html::a('<i class="fa fa-pencil"></i> Isi Formulir', $url, [
                                        'title' => 'Isi Kinerja',
+                                       'data-pjax' => 0,
                                        'class' => 'btn btn-info'
                             ]);
                         }
@@ -187,6 +188,7 @@ else
                         if($model->status_skp == 2){
                             return Html::a('<i class="fa fa-search"></i> Lihat Realisasi', $url, [
                                        'title' => 'Preview Realisasi',
+                                       'data-pjax' => 0,
                                        'class' => 'btn btn-primary'
                             ]);
                         }

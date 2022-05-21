@@ -362,7 +362,13 @@ yii\bootstrap\Modal::begin([
                                 'groupSeparator' => '.',
                                 'radixPoint' => ','
                             ]
-                        ]) ?></td>
+                        ]) ?>
+                        <?= Html::hiddenInput('kode_mk','',['class'=>'form-control','id'=>'kode_mk']) ?>
+                        <?= Html::hiddenInput('nama_mk','',['class'=>'form-control','id'=>'nama_mk']) ?>
+                        <?= Html::hiddenInput('sks_mk','',['class'=>'form-control','id'=>'sks_mk']) ?>
+                        <?= Html::hiddenInput('sks_bkd','',['class'=>'form-control','id'=>'sks_bkd']) ?>
+                        <?= Html::hiddenInput('jadwal_id','',['class'=>'form-control','id'=>'jadwal_id']) ?>        
+                    </td>
                 </tr>
                
             </table>
@@ -425,6 +431,11 @@ $(document).on("click", ".btn_isi_capaian", function(e){
             $("#realisasi_mutu").val(hasil.realisasi_mutu)
             $("#realisasi_biaya-disp").val(hasil.realisasi_biaya)
             $("#realisasi_waktu").val(hasil.realisasi_waktu)
+            $("#kode_mk").val(hasil.kode_mk)
+            $("#nama_mk").val(hasil.nama_mk)
+            $("#sks_mk").val(hasil.sks_mk)
+            $("#sks_bkd").val(hasil.sks_bkd)
+            $("#jadwal_id").val(hasil.jadwal_id)
             $("#modal").modal("show")
             
         }

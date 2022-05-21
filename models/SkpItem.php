@@ -27,7 +27,16 @@ use Yii;
  * @property float|null $realisasi_biaya
  * @property float|null $capaian
  * @property float|null $capaian_skp
+ * @property string|null $kode_mk
+ * @property string|null $nama_mk
+ * @property string|null $jadwal_id
+ * @property float|null $sks_mk
+ * @property float|null $sks_bkd
+ * @property string|null $updated_at
+ * @property string|null $created_at
  *
+ * @property BkdDosen[] $bkdDosens
+ * @property CatatanHarian[] $catatanHarians
  * @property KomponenKegiatan $komponenKegiatan
  * @property Skp $skp
  */
@@ -47,11 +56,14 @@ class SkpItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id','nama','komponen_kegiatan_id'], 'required'],
+            [['id'], 'required'],
             [['komponen_kegiatan_id'], 'integer'],
-            [['target_ak', 'target_qty', 'target_mutu', 'target_waktu', 'target_biaya', 'realisasi_ak', 'realisasi_qty', 'realisasi_waktu', 'realisasi_biaya', 'capaian', 'capaian_skp'], 'number'],
-            [['id', 'skp_id', 'target_satuan', 'target_waktu_satuan', 'realisasi_satuan', 'realisasi_mutu', 'realisasi_waktu_satuan'], 'string', 'max' => 50],
+            [['target_ak', 'target_qty', 'target_mutu', 'target_waktu', 'target_biaya', 'realisasi_ak', 'realisasi_qty', 'realisasi_waktu', 'realisasi_biaya', 'capaian', 'capaian_skp', 'sks_mk', 'sks_bkd'], 'number'],
+            [['updated_at', 'created_at'], 'safe'],
+            [['id', 'skp_id', 'target_satuan', 'target_waktu_satuan', 'realisasi_satuan', 'realisasi_mutu', 'realisasi_waktu_satuan', 'kode_mk'], 'string', 'max' => 50],
             [['nama'], 'string', 'max' => 255],
+            [['nama_mk'], 'string', 'max' => 100],
+            [['jadwal_id'], 'string', 'max' => 10],
             [['id'], 'unique'],
             [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
             [['skp_id'], 'exist', 'skipOnError' => true, 'targetClass' => Skp::className(), 'targetAttribute' => ['skp_id' => 'id']],
@@ -64,27 +76,54 @@ class SkpItem extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'skp_id' => 'SKP',
-            'komponen_kegiatan_id' => 'Komponen Kegiatan',
-            'nama' => 'Nama Kegiatan',
-            'target_ak' => 'Target AK',
-            'target_qty' => 'Target Qty',
-            'target_satuan' => 'Target Satuan',
-            'target_mutu' => 'Target Mutu',
-            'target_waktu' => 'Target Waktu',
-            'target_waktu_satuan' => 'Target Waktu Satuan',
-            'target_biaya' => 'Target Biaya',
-            'realisasi_ak' => 'Realisasi AK',
-            'realisasi_qty' => 'Realisasi Qty',
-            'realisasi_satuan' => 'Realisasi Satuan',
-            'realisasi_mutu' => 'Realisasi Mutu',
-            'realisasi_waktu' => 'Realisasi Waktu',
-            'realisasi_waktu_satuan' => 'Realisasi Waktu Satuan',
-            'realisasi_biaya' => 'Realisasi Biaya',
-            'capaian' => 'Perhitungan',
-            'capaian_skp' => 'Nilai Capaian SKP',
+            'id' => Yii::t('app', 'ID'),
+            'skp_id' => Yii::t('app', 'SKP'),
+            'komponen_kegiatan_id' => Yii::t('app', 'Komponen Kegiatan ID'),
+            'nama' => Yii::t('app', 'Nama'),
+            'target_ak' => Yii::t('app', 'Target Ak'),
+            'target_qty' => Yii::t('app', 'Target Qty'),
+            'target_satuan' => Yii::t('app', 'Target Satuan'),
+            'target_mutu' => Yii::t('app', 'Target Mutu'),
+            'target_waktu' => Yii::t('app', 'Target Waktu'),
+            'target_waktu_satuan' => Yii::t('app', 'Target Waktu Satuan'),
+            'target_biaya' => Yii::t('app', 'Target Biaya'),
+            'realisasi_ak' => Yii::t('app', 'Realisasi Ak'),
+            'realisasi_qty' => Yii::t('app', 'Realisasi Qty'),
+            'realisasi_satuan' => Yii::t('app', 'Realisasi Satuan'),
+            'realisasi_mutu' => Yii::t('app', 'Realisasi Mutu'),
+            'realisasi_waktu' => Yii::t('app', 'Realisasi Waktu'),
+            'realisasi_waktu_satuan' => Yii::t('app', 'Realisasi Waktu Satuan'),
+            'realisasi_biaya' => Yii::t('app', 'Realisasi Biaya'),
+            'capaian' => Yii::t('app', 'Capaian'),
+            'capaian_skp' => Yii::t('app', 'Capaian Skp'),
+            'kode_mk' => Yii::t('app', 'Kode Mk'),
+            'nama_mk' => Yii::t('app', 'Nama Mk'),
+            'jadwal_id' => Yii::t('app', 'Jadwal ID'),
+            'sks_mk' => Yii::t('app', 'Sks Mk'),
+            'sks_bkd' => Yii::t('app', 'Sks Bkd'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'created_at' => Yii::t('app', 'Created At'),
         ];
+    }
+
+    /**
+     * Gets query for [[BkdDosens]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBkdDosens()
+    {
+        return $this->hasMany(BkdDosen::className(), ['skp_item_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[CatatanHarians]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCatatanHarians()
+    {
+        return $this->hasMany(CatatanHarian::className(), ['skp_item_id' => 'id']);
     }
 
     /**

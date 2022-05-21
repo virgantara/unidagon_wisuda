@@ -75,14 +75,14 @@ use yii\widgets\ActiveForm;
                 <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_pengajaran' class="btn btn-primary"><i class="fa fa-refresh"></i> Tarik</a></div>
 			</div>
 			<div class="panel-body">
-				<table class="table" id="tabel-pengajaran">
+				<table class="table table-striped table-hover table-bordered" id="tabel-pengajaran">
 					<thead>
 						<tr>
 							<th>No</th>
 							<th>Kegiatan</th>
-							<!-- <th>Rencana Pertemuan</th> -->
-							<th>sks MK Terhitung</th>
-							<th>sks BKD</th>
+							<th>Rencana Pertemuan</th>
+							<th class="text-center">sks MK Terhitung</th>
+							<th class="text-center">sks BKD</th>
 							<th>Status</th>
                             <th>Opsi</th>
 						</tr>
@@ -90,15 +90,21 @@ use yii\widgets\ActiveForm;
 					<tbody>
 						<?php 
 
+                        $total_sks_mk = 0;
+                        $total_sks_bkd = 0;
                         foreach($results as $q => $item): 
 
                             $color = $list_status_color[$item['status_bkd']];
+
+                            $total_sks_mk += (float) $item['sks_mk'];
+                            $total_sks_bkd += (float) $item['sks'];
                         ?>
                         <tr>
                             <td><?=$q+1;?></td>
                             <td><?=$item['deskripsi'];?></td>
-                            <td></td>
-                            <td><?=$item['sks'];?></td>
+                            <td><?=$item['rencana'];?></td>
+                            <td class="text-center"><?=$item['sks_mk'];?> sks</td>
+                            <td class="text-center"><?=$item['sks'];?></td>
                             <td>
 
                                 <div class="btn-group">
@@ -118,7 +124,14 @@ use yii\widgets\ActiveForm;
                         endforeach; 
                         ?>
 					</tbody>
-					
+					<tfoot>
+                        <tr>
+                            <td colspan="3" class="text-center alert alert-info" >Total SKS</td>
+                            <td class="text-center alert alert-info"><?=$total_sks_mk;?> sks</td>
+                            <td class="text-center alert alert-info"><?=$total_sks_bkd;?></td>
+                            <td colspan="2" class=" alert alert-info"></td>
+                        </tr>
+                    </tfoot>
 				</table>
 			</div>
 		</div>

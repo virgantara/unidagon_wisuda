@@ -87,7 +87,7 @@ class MenuHelper
 		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_skp">{label}</a>',
 		        'items'=>[
 		        	['label' => 'Form SKP', 'url' => ['/skp/list']],
-		           	['label' => 'Pengisian', 'url' => ['/skp/index']],
+		           	['label' => 'Realisasi', 'url' => ['/skp/index']],
 		           	// ['label' => 'Perilaku Kerja', 'url' => ['/skp/penilaian']],
 		           	['label' => 'Penilaian Perilaku', 'url' => ['/skp/list-penilaian']],
 		           	['label' => 'Riwayat', 'url' => ['/skp/riwayat']],

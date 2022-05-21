@@ -190,7 +190,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'delete' => function ($data) {
                 return $data->status_skp != 2;
             },
-        ]
+        ],
+        'buttons' => [
+            'view' => function ($url, $model){
+              return Html::a('<span class="fa fa-list"></span> View', ['skp/view','id' => $model->id], [
+                        'title' => Yii::t('app', 'View Detail'),
+                        'class' => 'btn btn-primary',
+                        'data-pjax' => 0,
+                        'data-item' => $model->id
+              ]);
+            }
+        ],
     ]
 ];?>    
 <?= GridView::widget([

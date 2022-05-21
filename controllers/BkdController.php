@@ -485,7 +485,7 @@ class BkdController extends AppController
           case 1:
 
             $rows = (new \yii\db\Query())
-              ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+              ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur','bd.rencana','bd.kode_mk','bd.nama_mk','bd.sks_mk'])
               ->from('bkd_dosen bd')
               ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
               ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')

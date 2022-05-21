@@ -89,7 +89,7 @@ class SkpItemController extends Controller
             }
             if(!empty($bkd_periode)){
                 $rows = (new \yii\db\Query())
-                    ->select(['si.komponen_kegiatan_id','si.id as skp_item_id','si.nama as nama_kegiatan','kk.angka_kredit as ak_bkd','kk.angka_kredit_pak as ak_pak'])
+                    ->select(['si.komponen_kegiatan_id','si.id as skp_item_id','si.nama as nama_kegiatan','kk.angka_kredit as ak_bkd','kk.angka_kredit_pak as ak_pak','si.kode_mk','si.nama_mk','si.sks_mk','si.sks_bkd','si.realisasi_qty','si.target_satuan'])
                     ->from('skp_item si')
                     ->join('LEFT JOIN','skp s','s.id = si.skp_id')
                     ->join('LEFT JOIN','komponen_kegiatan kk','si.komponen_kegiatan_id = kk.id')
@@ -127,8 +127,12 @@ class SkpItemController extends Controller
 
                     $bkd->skp_item_id = $item['skp_item_id'];
                     $bkd->deskripsi = $item['nama_kegiatan'];
-                    $bkd->sks = $item['ak_bkd'];
+                    $bkd->sks = $item['sks_bkd'];
+                    $bkd->kode_mk = $item['kode_mk'];
+                    $bkd->nama_mk = $item['nama_mk'];
+                    $bkd->sks_mk = $item['sks_mk'];
                     $bkd->sks_pak = $item['ak_pak'];
+                    $bkd->rencana = $item['realisasi_qty'].' '.$item['target_satuan'];
 
                     $transaction = Yii::$app->db->beginTransaction();
                         // exit;
@@ -419,7 +423,21 @@ class SkpItemController extends Controller
             $model = SkpItem::findOne($dataPost['id']);
             $query = CatatanHarian::find();
             $query->andWhere(['skp_item_id' => $model->id]);
-            $realisasi_qty = $query->count();
+            $list = $query->all();
+            $realisasi_qty = count($list);
+
+            $kode_mk = '';
+            $nama_mk = '';
+            $sks_mk = '';
+            $sks_bkd = '';
+            $jadwal_id = '';
+            if($realisasi_qty > 0){
+                $kode_mk = $list[0]->kode_mk;
+                $nama_mk = $list[0]->nama_mk;
+                $sks_mk = $list[0]->sks_mk;
+                $sks_bkd = $list[0]->sks_bkd;
+                $jadwal_id = $list[0]->jadwal_id;
+            }
 
             $results = [
                 'id' => $model->id,
@@ -436,6 +454,11 @@ class SkpItemController extends Controller
                 'realisasi_mutu' => $model->realisasi_mutu,
                 'realisasi_waktu' => $model->realisasi_waktu,
                 'realisasi_biaya' => $model->realisasi_biaya,
+                'kode_mk' => $kode_mk,
+                'nama_mk' => $nama_mk,
+                'sks_mk' => $sks_mk,
+                'sks_bkd' => $sks_bkd,
+                'jadwal_id' => $jadwal_id,
             ];
 
 
