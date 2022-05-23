@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\DataDiri;
 use app\models\Ewmp;
 use app\models\BkdPeriode;
 use app\models\BkdDosen;
@@ -459,6 +460,235 @@ class BkdController extends AppController
         die();
     }
 
+    private function getListAjar($bkd_periode){
+      $rows = (new \yii\db\Query())
+        ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur','bd.rencana','bd.kode_mk','bd.nama_mk','bd.sks_mk'])
+        ->from('bkd_dosen bd')
+        ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+        ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+        ->where([
+            'uu.kode' => 'AJAR',
+            // 'kk.id' => $komponen->id,
+            'bd.tahun_id' => $bkd_periode->tahun_id,
+            'bd.dosen_id' => Yii::$app->user->identity->id
+        ])
+        ->andWhere([
+              'IN','kk.kode',['B1','B2']
+          ])
+        ->all();
+
+      return $rows;
+    }
+
+    private function getListKomponenUtama($kode='AJAR'){
+      
+      $query = KomponenKegiatan::find();
+      $query->alias('t');
+      $query->select(['t.nama']);
+      $query->joinWith(['unsur as u']);    
+      $query->where(['u.kode' => $kode]);
+      // $query->andWhere([
+      //     'NOT IN','t.kode',['B1','B2']
+      // ]);
+      $query->orderBy(['t.nama' => SORT_ASC]);
+      $query->groupBy(['t.nama']);
+      $list_komponen_utama = $query->all();
+
+      return $list_komponen_utama;
+    }
+
+    private function getListPendidikan($bkd_periode){
+      $results = [];
+      $list_komponen_utama = $this->getListKomponenUtama('AJAR');
+      $list_komponen = [];
+      foreach($list_komponen_utama as $i => $ku){
+        if($i == 0) continue;
+        
+        $query = KomponenKegiatan::find();
+        $query->alias('t');
+        $query->select(['t.id','t.nama']);
+        $query->joinWith(['unsur as u']);    
+        $query->where([
+          'u.kode' => 'AJAR',
+          't.nama' => $ku['nama']
+        ]);
+        // $query->andWhere([
+        //     'NOT IN','t.kode',['B1','B2']
+        // ]);
+        $query->orderBy(['nama' => SORT_ASC]);
+        $list_komponen[$ku['nama']] = $query->all();  
+
+        foreach($list_komponen[$ku['nama']] as $komponen){
+
+
+          $rows = (new \yii\db\Query())
+            ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+            ->from('bkd_dosen bd')
+            ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+            ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+            ->where([
+                'uu.kode' => 'AJAR',
+                'kk.id' => $komponen->id,
+                'bd.tahun_id' => $bkd_periode->tahun_id,
+                'bd.dosen_id' => Yii::$app->user->identity->id
+            ])
+            ->all();
+
+          foreach($rows as $row){
+            $results[$komponen->id][] = $row;
+          }
+        }
+      }
+
+      $hasil = [
+        'list_komponen_utama' => $list_komponen_utama,
+        'list_komponen' => $list_komponen,
+        'results' => $results
+      ];
+      return $hasil;
+    }
+
+    private function getListPenelitian($bkd_periode){
+      $list_komponen_utama = $this->getListKomponenUtama('RISET');
+      $list_komponen = [];
+      $results = [];
+      foreach($list_komponen_utama as $ku){
+        $query = KomponenKegiatan::find();
+        $query->alias('t');
+        $query->select(['t.id','t.nama']);
+        $query->joinWith(['unsur as u']);    
+        $query->where([
+          'u.kode' => 'RISET',
+          't.nama' => $ku['nama']
+        ]);
+        $query->orderBy(['nama' => SORT_ASC]);
+        $list_komponen[$ku['nama']] = $query->all();  
+
+        foreach($list_komponen[$ku['nama']] as $komponen){
+
+
+          $rows = (new \yii\db\Query())
+            ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+            ->from('bkd_dosen bd')
+            ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+            ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+            ->where([
+                'uu.kode' => 'RISET',
+                'kk.id' => $komponen->id,
+                'bd.tahun_id' => $bkd_periode->tahun_id,
+                'bd.dosen_id' => Yii::$app->user->identity->id
+            ])
+            ->all();
+
+          foreach($rows as $row){
+            $results[$komponen->id][] = $row;
+          }
+        }
+      }
+
+      $hasil = [
+        'list_komponen_utama' => $list_komponen_utama,
+        'list_komponen' => $list_komponen,
+        'results' => $results
+
+      ];
+      return $hasil;
+    }
+
+    private function getListPengabdian($bkd_periode){
+      $list_komponen_utama = $this->getListKomponenUtama('ABDIMAS');
+      $list_komponen = [];
+      $results = [];
+      foreach($list_komponen_utama as $ku){
+        $query = KomponenKegiatan::find();
+        $query->alias('t');
+        $query->select(['t.id','t.nama']);
+        $query->joinWith(['unsur as u']);    
+        $query->where([
+          'u.kode' => 'ABDIMAS',
+          't.nama' => $ku['nama']
+        ]);
+        $query->orderBy(['nama' => SORT_ASC]);
+        $list_komponen[$ku['nama']] = $query->all();  
+
+        foreach($list_komponen[$ku['nama']] as $komponen){
+
+
+          $rows = (new \yii\db\Query())
+            ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+            ->from('bkd_dosen bd')
+            ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+            ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+            ->where([
+                'uu.kode' => 'ABDIMAS',
+                'kk.id' => $komponen->id,
+                'bd.tahun_id' => $bkd_periode->tahun_id,
+                'bd.dosen_id' => Yii::$app->user->identity->id
+            ])
+            ->all();
+
+          foreach($rows as $row){
+            $results[$komponen->id][] = $row;
+          }
+        }
+      }
+
+      $hasil = [
+        'list_komponen_utama' => $list_komponen_utama,
+        'list_komponen' => $list_komponen,
+        'results' => $results
+
+      ];
+      return $hasil;
+    }
+
+    private function getListPenunjang($bkd_periode){
+      $list_komponen_utama = $this->getListKomponenUtama('PENUNJANG');
+      $list_komponen = [];
+      $results = [];
+      foreach($list_komponen_utama as $ku){
+        $query = KomponenKegiatan::find();
+        $query->alias('t');
+        $query->select(['t.id','t.nama']);
+        $query->joinWith(['unsur as u']);    
+        $query->where([
+          'u.kode' => 'PENUNJANG',
+          't.nama' => $ku['nama']
+        ]);
+        $query->orderBy(['nama' => SORT_ASC]);
+        $list_komponen[$ku['nama']] = $query->all();  
+
+        foreach($list_komponen[$ku['nama']] as $komponen){
+
+
+          $rows = (new \yii\db\Query())
+            ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+            ->from('bkd_dosen bd')
+            ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+            ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+            ->where([
+                'uu.kode' => 'PENUNJANG',
+                'kk.id' => $komponen->id,
+                'bd.tahun_id' => $bkd_periode->tahun_id,
+                'bd.dosen_id' => Yii::$app->user->identity->id
+            ])
+            ->all();
+
+          foreach($rows as $row){
+            $results[$komponen->id][] = $row;
+          }
+        }
+      }
+
+      $hasil = [
+        'list_komponen_utama' => $list_komponen_utama,
+        'list_komponen' => $list_komponen,
+        'results' => $results
+
+      ];
+      return $hasil;
+    }
+
     public function actionKlaim($step=1)
     {
         $list_bkd_periode = BkdPeriode::find()->orderBy(['tahun_id'=>SORT_DESC])->all();
@@ -484,75 +714,12 @@ class BkdController extends AppController
         switch($step){
           case 1:
 
-            $rows = (new \yii\db\Query())
-              ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur','bd.rencana','bd.kode_mk','bd.nama_mk','bd.sks_mk'])
-              ->from('bkd_dosen bd')
-              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
-              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
-              ->where([
-                  'uu.kode' => 'AJAR',
-                  // 'kk.id' => $komponen->id,
-                  'bd.tahun_id' => $bkd_periode->tahun_id,
-                  'bd.dosen_id' => Yii::$app->user->identity->id
-              ])
-              ->andWhere([
-                    'IN','kk.kode',['B1','B2']
-                ])
-              ->all();
+            $results_pengajaran = $this->getListAjar($bkd_periode);
+            $hasil = $this->getListPendidikan($bkd_periode);
+            $results = $hasil['results'];
+            $list_komponen_utama = $hasil['list_komponen_utama'];
+            $list_komponen = $hasil['list_komponen'];
 
-            $results_pengajaran = $rows;
-            $query = KomponenKegiatan::find();
-            $query->alias('t');
-            $query->select(['t.nama']);
-            $query->joinWith(['unsur as u']);    
-            $query->where(['u.kode' => 'AJAR']);
-            // $query->andWhere([
-            //     'NOT IN','t.kode',['B1','B2']
-            // ]);
-            $query->orderBy(['t.nama' => SORT_ASC]);
-            $query->groupBy(['t.nama']);
-            $list_komponen_utama = $query->all();
-            // print_r($list_komponen_utama);exit;
-            foreach($list_komponen_utama as $i => $ku){
-              if($i == 0) continue;
-              
-              $query = KomponenKegiatan::find();
-              $query->alias('t');
-              $query->select(['t.id','t.nama']);
-              $query->joinWith(['unsur as u']);    
-              $query->where([
-                'u.kode' => 'AJAR',
-                't.nama' => $ku['nama']
-              ]);
-              // $query->andWhere([
-              //     'NOT IN','t.kode',['B1','B2']
-              // ]);
-              $query->orderBy(['nama' => SORT_ASC]);
-              $list_komponen[$ku['nama']] = $query->all();  
-
-              foreach($list_komponen[$ku['nama']] as $komponen){
-
-
-                $rows = (new \yii\db\Query())
-                  ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
-                  ->from('bkd_dosen bd')
-                  ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
-                  ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
-                  ->where([
-                      'uu.kode' => 'AJAR',
-                      'kk.id' => $komponen->id,
-                      'bd.tahun_id' => $bkd_periode->tahun_id,
-                      'bd.dosen_id' => Yii::$app->user->identity->id
-                  ])
-                  ->all();
-
-                foreach($rows as $row){
-                  $results[$komponen->id][] = $row;
-                }
-              }
-            }
-            
-            
             return $this->render('klaim_pendidikan',[
               'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
@@ -562,48 +729,10 @@ class BkdController extends AppController
             ]);
           break;
           case 2:
-            $query = KomponenKegiatan::find();
-            $query->alias('t');
-            $query->select(['t.nama']);
-            $query->joinWith(['unsur as u']);    
-            $query->where(['u.kode' => 'RISET']);
-            $query->orderBy(['t.nama' => SORT_ASC]);
-            $query->groupBy(['t.nama']);
-            $list_komponen_utama = $query->all();
-
-            foreach($list_komponen_utama as $ku){
-              $query = KomponenKegiatan::find();
-              $query->alias('t');
-              $query->select(['t.id','t.nama']);
-              $query->joinWith(['unsur as u']);    
-              $query->where([
-                'u.kode' => 'RISET',
-                't.nama' => $ku['nama']
-              ]);
-              $query->orderBy(['nama' => SORT_ASC]);
-              $list_komponen[$ku['nama']] = $query->all();  
-
-              foreach($list_komponen[$ku['nama']] as $komponen){
-
-
-                $rows = (new \yii\db\Query())
-                  ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
-                  ->from('bkd_dosen bd')
-                  ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
-                  ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
-                  ->where([
-                      'uu.kode' => 'RISET',
-                      'kk.id' => $komponen->id,
-                      'bd.tahun_id' => $bkd_periode->tahun_id,
-                      'bd.dosen_id' => Yii::$app->user->identity->id
-                  ])
-                  ->all();
-
-                foreach($rows as $row){
-                  $results[$komponen->id][] = $row;
-                }
-              }
-            }
+            $hasil = $this->getListPenelitian($bkd_periode);
+            $results = $hasil['results'];
+            $list_komponen_utama = $hasil['list_komponen_utama'];
+            $list_komponen = $hasil['list_komponen'];
             
             
             return $this->render('klaim_penelitian',[
@@ -614,49 +743,10 @@ class BkdController extends AppController
             ]);
           break;
           case 3:
-            $query = KomponenKegiatan::find();
-            $query->alias('t');
-            $query->select(['t.nama']);
-            $query->joinWith(['unsur as u']);    
-            $query->where(['u.kode' => 'ABDIMAS']);
-            $query->orderBy(['t.nama' => SORT_ASC]);
-            $query->groupBy(['t.nama']);
-            $list_komponen_utama = $query->all();
-
-            foreach($list_komponen_utama as $ku){
-              $query = KomponenKegiatan::find();
-              $query->alias('t');
-              $query->select(['t.id','t.nama']);
-              $query->joinWith(['unsur as u']);    
-              $query->where([
-                'u.kode' => 'ABDIMAS',
-                't.nama' => $ku['nama']
-              ]);
-              $query->orderBy(['nama' => SORT_ASC]);
-              $list_komponen[$ku['nama']] = $query->all();  
-
-              foreach($list_komponen[$ku['nama']] as $komponen){
-
-
-                $rows = (new \yii\db\Query())
-                  ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
-                  ->from('bkd_dosen bd')
-                  ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
-                  ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
-                  ->where([
-                      'uu.kode' => 'ABDIMAS',
-                      'kk.id' => $komponen->id,
-                      'bd.tahun_id' => $bkd_periode->tahun_id,
-                      'bd.dosen_id' => Yii::$app->user->identity->id
-                  ])
-                  ->all();
-
-                foreach($rows as $row){
-                  $results[$komponen->id][] = $row;
-                }
-              }
-            }
-            
+            $hasil = $this->getListPengabdian($bkd_periode);
+            $results = $hasil['results'];
+            $list_komponen_utama = $hasil['list_komponen_utama'];
+            $list_komponen = $hasil['list_komponen'];
             
             return $this->render('klaim_pengabdian',[
               'list_bkd_periode' => $list_bkd_periode,
@@ -666,17 +756,245 @@ class BkdController extends AppController
             ]);
           break;
           case 4:
+            $hasil = $this->getListPenunjang($bkd_periode);
+            $results = $hasil['results'];
+            $list_komponen_utama = $hasil['list_komponen_utama'];
+            $list_komponen = $hasil['list_komponen'];
+            
             return $this->render('klaim_penunjang',[
               'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
+              'list_komponen_utama' => $list_komponen_utama,
               'results' => $results
             ]);
           break;
           case 5:
+            $dataDiri = DataDiri::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
+            $pendidikan_selesai = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'AJAR',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '0'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $pendidikan_lebih = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'AJAR',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '1'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $pendidikan_berlanjut = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'AJAR',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '2'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $penelitian_selesai = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'RISET',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '0'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $penelitian_lebih = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'RISET',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '1'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $penelitian_berlanjut = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'RISET',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '2'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $pengabdian_selesai = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'ABDIMAS',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '0'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $pengabdian_lebih = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'ABDIMAS',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '1'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $pengabdian_berlanjut = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'ABDIMAS',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '2'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $penunjang_selesai = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'PENUNJANG',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '0'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $penunjang_lebih = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'PENUNJANG',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '1'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $penunjang_berlanjut = (new \yii\db\Query())
+              ->select(['SUM(bd.sks) as total'])
+              ->from('bkd_dosen bd')
+              ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+              ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+              ->where([
+                  'uu.kode' => 'PENUNJANG',
+                  'bd.tahun_id' => $bkd_periode->tahun_id,
+                  'bd.dosen_id' => Yii::$app->user->identity->id,
+                  'bd.status_bkd' => '2'
+              ])
+              ->groupBy(['uu.kode'])
+              ->one();
+
+            $total_selesai = $pendidikan_selesai['total']
+            + $penelitian_selesai['total'] 
+            + $pengabdian_selesai['total'] 
+            + $penunjang_selesai['total'] ;
+
+
+            $total_berlanjut = $pendidikan_berlanjut['total'] 
+             + $penelitian_berlanjut['total'] 
+             + $pengabdian_berlanjut['total']
+             + $penunjang_berlanjut['total'];
+
+            $total_lebih = $pendidikan_lebih['total'] 
+             + $penelitian_lebih['total'] 
+             + $pengabdian_lebih['total']
+             + $penunjang_lebih['total'];
+
+            $total_pendidikan_penelitian = $pendidikan_selesai['total']
+            + $penelitian_selesai['total'] 
+            + $pendidikan_berlanjut['total'] 
+             + $penelitian_berlanjut['total'];
+
+            $total_pendidikan_penelitian_lebih = $pendidikan_lebih['total'] 
+             + $penelitian_lebih['total'];
+
+            $total_pengabdian_penunjang = $pengabdian_selesai['total']
+            + $pengabdian_selesai['total'] 
+            + $penunjang_berlanjut['total'] 
+             + $penunjang_berlanjut['total'];
+
+            $total_pengabdian_penunjang_lebih = $pengabdian_lebih['total'] 
+             + $penunjang_lebih['total'];
+
+            $results = [
+              'pendidikan_selesai' => $pendidikan_selesai['total'],
+              'pendidikan_lebih' => $pendidikan_lebih['total'],
+              'pendidikan_berlanjut' => $pendidikan_berlanjut['total'],
+              'penelitian_selesai' => $penelitian_selesai['total'],
+              'penelitian_lebih' => $penelitian_lebih['total'],
+              'penelitian_berlanjut' => $penelitian_berlanjut['total'],
+              'pengabdian_selesai' => $pengabdian_selesai['total'],
+              'pengabdian_lebih' => $pengabdian_lebih['total'],
+              'pengabdian_berlanjut' => $pengabdian_berlanjut['total'],
+              'penunjang_selesai' => $penunjang_selesai['total'],
+              'penunjang_lebih' => $penunjang_lebih['total'],
+              'penunjang_berlanjut' => $penunjang_berlanjut['total'],
+              'total_selesai' => $total_selesai,
+              'total_berlanjut' => $total_berlanjut,
+              'total_lebih' => $total_lebih,
+              'total_pendidikan_penelitian' => $total_pendidikan_penelitian,
+              'total_pendidikan_penelitian_lebih' => $total_pendidikan_penelitian_lebih,
+              'total_pengabdian_penunjang_lebih' => $total_pengabdian_penunjang_lebih,
+              'total_pengabdian_penunjang' => $total_pengabdian_penunjang
+            ];
+
             return $this->render('simpulan',[
-              'list_bkd_periode' => $list_bkd_periode,
-              'list_komponen' => $list_komponen,
-              'results' => $results
+              'results' => $results,
+              'dataDiri' => $dataDiri
             ]);
           break;
         }

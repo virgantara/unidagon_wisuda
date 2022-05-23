@@ -20,9 +20,12 @@ if($session->has('bkd_periode'))
   $sd = $session->get('tgl_awal');
   $ed = $session->get('tgl_akhir');  
 }
+$this->title = "Pelaksanaan Pengabdian";
 
+$list_status = \app\helpers\MyHelper::getListStatusBKD();
+$list_status_color = \app\helpers\MyHelper::getListStatusBKDColor();
 ?>
-<h1>Klaim Kegiatan BKD Periode <?=$bkd_periode;?> (<?=MyHelper::convertTanggalIndo($sd);?> - <?=MyHelper::convertTanggalIndo($ed);?>)</h1>
+<h1><?=$this->title;?></h1>
 <p>
 <?php
 use yii\widgets\ActiveForm;
@@ -64,45 +67,128 @@ use yii\widgets\ActiveForm;
       <a href="<?=Url::to(['bkd/klaim','step'=>5]);?>"  >Simpulan</a>
     </li>
 </ul>
+
+<?php 
+foreach($list_komponen_utama as $komponen_utama):
+ ?>
+
 <div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<div class="pull-left">Penunjang</div>
-                <div class="pull-right"><a href="javascript:void(0)" id='btn_tarik_penunjang' class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</a></div>
-			</div>
-			<div class="panel-body">
-				<table class="table" id="tabel-penunjang">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <div class="pull-left"><?=$komponen_utama['nama'];?></div>
+                <div class="pull-right"><a href="javascript:void(0)" data-item="<?=$komponen_utama['nama'];?>" class="btn btn-primary btn_tarik_penunjang"><i class="fa fa-refresh"></i> Tarik</a></div>
+            </div>
+            <div class="panel-body">
+                <table class="table" id="tabel-penunjang-<?=$komponen_utama['nama'];?>">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Kegiatan</th>
-                            <th>SKS BKD</th>
-                            <th>Opsi</th>
+                            <th width="5%">No</th>
+                            <th width="55%">Nama Kegiatan</th>
+                            <th width="15%">Status</th>
+                            <th width="15%">Beban Tugas</th>
+                            <th width="10%">Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        
+                        <?php 
+
+                        foreach($list_komponen[$komponen_utama['nama']] as $komponen):
+
+                            if(!empty($results[$komponen->id])):
+                                foreach($results[$komponen->id] as $q => $item): 
+
+                                    $color = $list_status_color[$item['status_bkd']];
+                        ?>
+                        <tr>
+                            <td><?=$q+1;?></td>
+                            <td><?=$item['deskripsi'];?> - <b><?=$item['subunsur'];?></b></td>
+                            
+                            <td>
+
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-<?=$color;?>  dropdown-toggle" data-toggle="dropdown">
+                                    <?=(!empty($list_status[$item['status_bkd']]) ? $list_status[$item['status_bkd']] : null);?> <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <?php foreach($list_status as $q=>$status): ?>
+                                    <li><a href="#" data-item="<?=$q;?>" class="btn_ubah_status_bkd" data-key="<?=$item['id'];?>"><?=$status;?></a></li>
+                                    <?php endforeach ?>
+                                  </ul>
+                                </div>
+                            </td>
+                            <td><?=$item['sks'];?></td>
+                            <td><a href='javascript:void(0)' data-item='<?=$item['id'];?>' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
+                        </tr>
+                        <?php 
+                                endforeach; 
+                            endif;
+                        endforeach; 
+                        ?>
                     </tbody>
                     
                 </table>
-			</div>
-		</div>
-	</div>
+            </div>
+        </div>
+    </div>
 </div>
-
-
-
+<?php endforeach ?>
 <?php 
 
 $this->registerJs(' 
 
 
-$(document).on("click","#btn_tarik_penunjang",function(e){
+
+$(document).on("click",".btn_ubah_status_bkd",function(e){
     e.preventDefault()
 
     var obj = new Object
-    obj.id = $(this).data("item")
+    obj.id = $(this).data("key")
+    obj.status_bkd = $(this).data("item");
+
+    $.ajax({
+        type : \'POST\',
+        data : {
+            dataPost : obj
+        },
+        url : \''.Url::to(['bkd-dosen/ajax-update-status']).'\',
+        async: true,
+        beforeSend : function(){
+
+        },
+        success: function(res){
+
+            var res = $.parseJSON(res);
+            if(res.code == 200){
+                Swal.fire({
+                  title: \'Yeay!\',
+                  icon: \'success\',
+                  text: res.message
+                }).then(res=>{
+                    window.location.reload();
+                    
+                })
+                
+            }
+            else{
+                Swal.fire({
+                  title: \'Oops!\',
+                  icon: \'error\',
+                  text: res.message
+                });
+            }
+        }
+
+    });
+
+})
+
+
+$(document).on("click",".btn_tarik_penunjang",function(e){
+    e.preventDefault()
+
+    var obj = new Object
+    obj.nama_komponen_kegiatan = $(this).data("item")
     obj.is_claimed = "0";
     obj.tahun_id = $("#ganti-periode").val()
     if($(this).is(":checked"))
@@ -121,8 +207,16 @@ $(document).on("click","#btn_tarik_penunjang",function(e){
         success: function(res){
 
             var res = $.parseJSON(res);
-            if(res.code == 200)
-                $("#ganti-periode").trigger("change")
+            if(res.code == 200){
+                Swal.fire({
+                  title: \'Yeay!\',
+                  icon: \'success\',
+                  text: res.message
+                }).then(res=>{
+                    window.location.reload()
+                })
+                
+            }
             else{
                 Swal.fire({
                   title: \'Oops!\',
@@ -164,8 +258,10 @@ $(document).on("click",".remove_bkd",function(e){
                 },
                 success: function(res){
                     var res = $.parseJSON(res);
-                    if(res.code == 200)
-                        $("#ganti-periode").trigger("change")
+                    if(res.code == 200){
+
+                        window.location.reload();
+                    }
                     else{
                         Swal.fire({
                           title: \'Oops!\',
@@ -186,13 +282,85 @@ $(document).on("click",".remove_bkd",function(e){
 
 })
 
+var introguide = introJs();
+introguide.setOptions({
+    exitOnOverlayClick: false,
+    steps : [
+        {
+            intro: "Fitur ini berisi kegiatan apapun yang akan diklaim sebagai BKD",
+            title: "Fitur Klaim BKD",
+            element : "h1"
+        },
+        {
+            intro: "Periode BKD yang berjalan. Periode ini hanya bisa diubah oleh bagian Admin Biro SDM",
+            title: "Pilihan Periode",
+            element : "#ganti-periode"
+        },
+        {
+            intro: "Data ini bersumber dari SIAKAD pada tahun periode BKD",
+            title: "Data Pengajaran",
+            element : "#tabel-pengajaran"
+        },
+        {
+            intro: "Anda bisa klaim kegiatan dengan cara mencentang checkbox di bawah ini",
+            title: "Checkbox Klaim",
+            element : ".klaim"
+        },
+        {
+            intro: "Data ini bersumber dari SISTER atau Input manual",
+            title: "Data Penelitian & Publikasi",
+            element : "#tabel-publikasi"
+        },
+        {
+            intro: "Data ini bersumber dari SISTER atau Input manual",
+            title: "Data Pengabdian",
+            element : "#tabel-pengabdian"
+        },
+        {
+            intro: "Data ini bersumber dari SISTER atau Input manual",
+            title: "Data Penunjang",
+            element : "#tabel-penunjang"
+        },
+        
+    ]
+});
+
+var doneTour = localStorage.getItem(\'evt_klaim_bkd\') === \'Completed\';
+
+if(!doneTour) {
+    introguide.start()
+
+    introguide.oncomplete(function () {
+        localStorage.setItem(\'evt_klaim_bkd\', \'Completed\');
+        Swal.fire({
+          title: \'Ulangi Langkah Fitur ini ?\',
+          text: "",
+          icon: \'warning\',
+          showCancelButton: true,
+          width:\'35%\',
+          confirmButtonColor: \'#3085d6\',
+          cancelButtonColor: \'#d33\',
+          confirmButtonText: \'Ya, ulangi lagi!\',
+          cancelButtonText: \'Tidak, sudah cukup\'
+        }).then((result) => {
+          if (result.value) {
+            introguide.start();
+            localStorage.removeItem(\'evt_klaim_bkd\');
+          }
+
+        });
+    });
+
+}
 
 
-function getPenunjang(tahun){
-    $("#tabel-penunjang > tbody").empty()
+function getPengabdian(tahun,komponen_kegiatan_id){
+    
     var obj = new Object;
     obj.tahun = tahun;
+    obj.komponen_kegiatan_id = komponen_kegiatan_id
     var counter = 0;
+    $("#tabel-penunjang-"+obj.komponen_kegiatan_id+" > tbody").empty()
     $.ajax({
         type : \'POST\',
         data : {
@@ -205,40 +373,32 @@ function getPenunjang(tahun){
         },
         success: function(res){
             var res = $.parseJSON(res);
-            // console.log(res)
             var row = ""
+            
             var total_sks = 0
             $.each(res, function(i,obj){
                 counter++;
+
                 row += "<tr>"
                 row += "<td>"+(counter)+"</td>"
                 row += "<td>"+obj.nama_kegiatan+"</td>"
+                row += "<td>"+obj.status_bkd+"</td>"
                 row += "<td>"+obj.sks_bkd+"</td>"
                 row += "<td><a href=\'javascript:void(0)\' data-item=\'"+obj.id+"\' class=\'remove_bkd\'><i class=\'fa fa-trash\'></i></a></td>"
                 row += "</tr>"
 
             })
 
-            $("#tabel-penunjang > tbody").append(row)
+            $("#tabel-penunjang-"+obj.komponen_kegiatan_id+" > tbody").append(row)
                 
         }
 
     });
 
-   
+    
 }
 
-$(document).on("change","#ganti-periode",function(e){
-    e.preventDefault()
 
-  
-    getPenunjang($(this).val())
-
-  
-
-})
-
- $("#ganti-periode").trigger("change")
 
 
 ', \yii\web\View::POS_READY);

@@ -390,7 +390,7 @@ function getPenelitian(tahun,komponen_kegiatan_id){
 
             })
 
-            $("#tabel-pengabdian-"+obj.komponen_kegiatan_id+" > tbody").append(row)
+            $("#tabel-penelitian-"+obj.komponen_kegiatan_id+" > tbody").append(row)
                 
         }
 
