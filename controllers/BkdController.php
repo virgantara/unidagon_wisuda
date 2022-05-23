@@ -953,6 +953,18 @@ class BkdController extends AppController
             $pendidikan_lebih['total'] = !empty($pendidikan_lebih) ? $pendidikan_lebih['total'] : 0;
             $pendidikan_berlanjut['total'] = !empty($pendidikan_berlanjut) ? $pendidikan_berlanjut['total'] : 0;
 
+            $penelitian_selesai['total'] = !empty($penelitian_selesai) ? $penelitian_selesai['total'] : 0;
+            $penelitian_lebih['total'] = !empty($penelitian_lebih) ? $penelitian_lebih['total'] : 0;
+            $penelitian_berlanjut['total'] = !empty($penelitian_berlanjut) ? $penelitian_berlanjut['total'] : 0;
+
+            $pengabdian_selesai['total'] = !empty($pengabdian_selesai) ? $pengabdian_selesai['total'] : 0;
+            $pengabdian_lebih['total'] = !empty($pengabdian_lebih) ? $pengabdian_lebih['total'] : 0;
+            $pengabdian_berlanjut['total'] = !empty($pengabdian_berlanjut) ? $pengabdian_berlanjut['total'] : 0;
+
+            $penunjang_selesai['total'] = !empty($penunjang_selesai) ? $penunjang_selesai['total'] : 0;
+            $penunjang_lebih['total'] = !empty($penunjang_lebih) ? $penunjang_lebih['total'] : 0;
+            $penunjang_berlanjut['total'] = !empty($penunjang_berlanjut) ? $penunjang_berlanjut['total'] : 0;
+
             $total_selesai = $pendidikan_selesai['total']
             + $penelitian_selesai['total'] 
             + $pengabdian_selesai['total'] 
