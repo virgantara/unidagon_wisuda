@@ -792,6 +792,7 @@ class BkdController extends AppController
               ->groupBy(['uu.kode'])
               ->one();
 
+
             $pendidikan_lebih = (new \yii\db\Query())
               ->select(['SUM(bd.sks) as total'])
               ->from('bkd_dosen bd')
@@ -805,6 +806,8 @@ class BkdController extends AppController
               ])
               ->groupBy(['uu.kode'])
               ->one();
+
+
 
             $pendidikan_berlanjut = (new \yii\db\Query())
               ->select(['SUM(bd.sks) as total'])
@@ -945,6 +948,10 @@ class BkdController extends AppController
               ])
               ->groupBy(['uu.kode'])
               ->one();
+
+            $pendidikan_selesai['total'] = !empty($pendidikan_selesai) ? $pendidikan_selesai['total'] : 0;
+            $pendidikan_lebih['total'] = !empty($pendidikan_lebih) ? $pendidikan_lebih['total'] : 0;
+            $pendidikan_berlanjut['total'] = !empty($pendidikan_berlanjut) ? $pendidikan_berlanjut['total'] : 0;
 
             $total_selesai = $pendidikan_selesai['total']
             + $penelitian_selesai['total'] 
