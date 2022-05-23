@@ -21,7 +21,7 @@ use Yii;
  * @property string $kondisi
  * @property string|null $skp_item_id
  * @property string|null $deskripsi
- * @property string|null $status_bkd 0=belum selesai,1=selesai,2=berlanjut,3=gagal
+ * @property string|null $status_bkd 0=selesai,1=beban lebih,2=berlanjut,3=gagal
  * @property string|null $updated_at
  * @property string|null $created_at
  *

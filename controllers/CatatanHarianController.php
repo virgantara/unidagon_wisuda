@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\httpclient\Client;
 use app\models\User;
+use app\models\SkpItem;
 use app\models\BkdPeriode;
 use app\models\CatatanHarian;
 use app\models\CatatanHarianSearch;
@@ -588,22 +589,36 @@ class CatatanHarianController extends Controller
      */
     public function actionIndex()
     {
-        // $roles = ['Dekan','Kaprodi','Kepala','Ketua','Direktur','Rektor','Wakil Rektor'];
-        
-        // if(in_array(Yii::$app->user->identity->access_role, $roles))
-        // {
-        //     return $this->redirect(['list']);
-        // }
 
-        // else{
+        if(Yii::$app->user->isGuest)
+        {
+            $session = Yii::$app->session;
+            $session->remove('token');
+            Yii::$app->user->logout();
+            $url = Yii::$app->params['sso_logout'];
+            return $this->redirect($url);
+        }
+
+        $query = SkpItem::find();
+        $query->alias('t');
+        $query->select(['t.id','t.nama']);
+        $query->joinWith(['skp as s','skp.periode as p']);
+        $query->andWhere([
+            'p.buka' => 'Y',
+            's.pegawai_dinilai' => Yii::$app->user->identity->NIY
+        ]);
+
+        $list_skp_item = $query->all();
+
+
         $searchModel = new CatatanHarianSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'list_skp_item' => $list_skp_item
         ]);
-        // }
     }
 
     /**

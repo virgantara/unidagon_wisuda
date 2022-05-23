@@ -11,8 +11,8 @@ class MyHelper
 
 	public static function getListStatusBKDColor(){
 		$list = [
-            '0' => 'warning',
-            '1' => 'success',
+            '0' => 'success',
+            '1' => 'warning',
             '2' => 'primary',
             '3' => 'danger'
         ];
@@ -22,8 +22,8 @@ class MyHelper
 
 	public static function getListStatusBKD(){
 		$list = [
-            '0' => 'Belum Selesai',
-            '1' => 'Selesai',
+            '0' => 'Selesai',
+            '1' => 'Beban Lebih',
             '2' => 'Berlanjut',
             '3' => 'Gagal'
         ];

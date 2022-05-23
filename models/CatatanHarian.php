@@ -65,7 +65,7 @@ class CatatanHarian extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'skp_item_id' => Yii::t('app', 'Skp Item ID'),
+            'skp_item_id' => Yii::t('app', 'Item Kegiatan SKP'),
             'user_id' => Yii::t('app', 'User ID'),
             'deskripsi' => Yii::t('app', 'Deskripsi'),
             'tanggal' => Yii::t('app', 'Tanggal'),

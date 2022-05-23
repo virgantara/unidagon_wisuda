@@ -54,6 +54,7 @@ $list_skp = ArrayHelper::map(\app\models\Skp::find()->where([
     ],
             [
                 'attribute' => 'skp_item_id',
+                'filter' => ArrayHelper::map($list_skp_item,'id','nama'),
                 'value' => function($data){
                     return !empty($data->skpItem) ? $data->skpItem->nama : '-';
                 }

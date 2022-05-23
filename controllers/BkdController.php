@@ -562,9 +562,54 @@ class BkdController extends AppController
             ]);
           break;
           case 2:
+            $query = KomponenKegiatan::find();
+            $query->alias('t');
+            $query->select(['t.nama']);
+            $query->joinWith(['unsur as u']);    
+            $query->where(['u.kode' => 'RISET']);
+            $query->orderBy(['t.nama' => SORT_ASC]);
+            $query->groupBy(['t.nama']);
+            $list_komponen_utama = $query->all();
+
+            foreach($list_komponen_utama as $ku){
+              $query = KomponenKegiatan::find();
+              $query->alias('t');
+              $query->select(['t.id','t.nama']);
+              $query->joinWith(['unsur as u']);    
+              $query->where([
+                'u.kode' => 'RISET',
+                't.nama' => $ku['nama']
+              ]);
+              $query->orderBy(['nama' => SORT_ASC]);
+              $list_komponen[$ku['nama']] = $query->all();  
+
+              foreach($list_komponen[$ku['nama']] as $komponen){
+
+
+                $rows = (new \yii\db\Query())
+                  ->select(['bd.deskripsi','bd.id','bd.sks','bd.sks_pak','bd.status_bkd','kk.subunsur'])
+                  ->from('bkd_dosen bd')
+                  ->join('LEFT JOIN','komponen_kegiatan kk','bd.komponen_id = kk.id')
+                  ->join('LEFT JOIN','unsur_utama uu','kk.unsur_id = uu.id')
+                  ->where([
+                      'uu.kode' => 'RISET',
+                      'kk.id' => $komponen->id,
+                      'bd.tahun_id' => $bkd_periode->tahun_id,
+                      'bd.dosen_id' => Yii::$app->user->identity->id
+                  ])
+                  ->all();
+
+                foreach($rows as $row){
+                  $results[$komponen->id][] = $row;
+                }
+              }
+            }
+            
+            
             return $this->render('klaim_penelitian',[
               'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
+              'list_komponen_utama' => $list_komponen_utama,
               'results' => $results
             ]);
           break;

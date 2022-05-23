@@ -22,8 +22,8 @@ class CatatanHarianSearch extends CatatanHarian
     public function rules()
     {
         return [
-            [['id', 'skp_item_id', 'user_id', 'approved_by'], 'integer'],
-            [['deskripsi', 'tanggal', 'is_selesai', 'updated_at', 'created_at','skp_nama','skp_item_nama'], 'safe'],
+            [['id', 'user_id', 'approved_by'], 'integer'],
+            [['deskripsi', 'tanggal', 'is_selesai', 'updated_at', 'created_at','skp_nama','skp_item_nama','skp_item_id'], 'safe'],
         ];
     }
 

@@ -84,10 +84,9 @@ foreach($list_komponen_utama as $komponen_utama):
                     <thead>
                         <tr>
                             <th width="5%">No</th>
-                            <th width="30%">Nama Kegiatan</th>
-                            <th width="35%">Unsur</th>
-                            <th width="10%">Status</th>
-                            <th width="10%">Beban Tugas</th>
+                            <th width="55%">Nama Kegiatan</th>
+                            <th width="15%">Status</th>
+                            <th width="15%">Beban Tugas</th>
                             <th width="10%">Opsi</th>
                         </tr>
                     </thead>
@@ -103,12 +102,12 @@ foreach($list_komponen_utama as $komponen_utama):
                         ?>
                         <tr>
                             <td><?=$q+1;?></td>
-                            <td><?=$item['deskripsi'];?></td>
-                            <td><?=$item['subunsur'];?></td>
+                            <td><?=$item['deskripsi'];?> - <b><?=$item['subunsur'];?></b></td>
+                            
                             <td>
 
                                 <div class="btn-group">
-                                  <button type="button" class="btn btn-<?=$color;?> btn-sm dropdown-toggle" data-toggle="dropdown">
+                                  <button type="button" class="btn btn-<?=$color;?>  dropdown-toggle" data-toggle="dropdown">
                                     <?=(!empty($list_status[$item['status_bkd']]) ? $list_status[$item['status_bkd']] : null);?> <span class="caret"></span>
                                   </button>
                                   <ul class="dropdown-menu" role="menu">
@@ -119,7 +118,7 @@ foreach($list_komponen_utama as $komponen_utama):
                                 </div>
                             </td>
                             <td><?=$item['sks'];?></td>
-                            <td><a href='javascript:void(0)' data-item='"+obj.id+"' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
+                            <td><a href='javascript:void(0)' data-item='<?=$item['id'];?>' class='remove_bkd'><i class='fa fa-trash'></i></a></td>
                         </tr>
                         <?php 
                                 endforeach; 

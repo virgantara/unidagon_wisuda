@@ -430,6 +430,7 @@ $(document).on("click", ".btn_isi_capaian", function(e){
             $("#realisasi_qty").val(hasil.realisasi_qty)
             $("#realisasi_mutu").val(hasil.realisasi_mutu)
             $("#realisasi_biaya-disp").val(hasil.realisasi_biaya)
+            $("#realisasi_biaya").val(hasil.realisasi_biaya)
             $("#realisasi_waktu").val(hasil.realisasi_waktu)
             $("#kode_mk").val(hasil.kode_mk)
             $("#nama_mk").val(hasil.nama_mk)

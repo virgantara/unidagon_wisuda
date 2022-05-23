@@ -319,7 +319,7 @@ $(document).on("click",".btn_tarik_pendidikan",function(e){
         data : {
             dataPost : obj
         },
-        url : \''.Url::to(['skp-item/ajax-claim-pendidikan']).'\',
+        url : \''.Url::to(['skp-item/ajax-claim-penelitian']).'\',
         async: true,
         beforeSend : function(){
 
