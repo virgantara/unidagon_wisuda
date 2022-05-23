@@ -59,7 +59,7 @@ class SkpItem extends \yii\db\ActiveRecord
             [['id'], 'required'],
             [['komponen_kegiatan_id'], 'integer'],
             [['target_ak', 'target_qty', 'target_mutu', 'target_waktu', 'target_biaya', 'realisasi_ak', 'realisasi_qty', 'realisasi_waktu', 'realisasi_biaya', 'capaian', 'capaian_skp', 'sks_mk', 'sks_bkd'], 'number'],
-            [['updated_at', 'created_at'], 'safe'],
+            [['updated_at', 'created_at','status_simpan'], 'safe'],
             [['id', 'skp_id', 'target_satuan', 'target_waktu_satuan', 'realisasi_satuan', 'realisasi_mutu', 'realisasi_waktu_satuan', 'kode_mk'], 'string', 'max' => 50],
             [['nama'], 'string', 'max' => 255],
             [['nama_mk'], 'string', 'max' => 100],

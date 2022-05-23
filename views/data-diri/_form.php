@@ -30,9 +30,7 @@ $kepakaran_id_parent = !empty($model->kepakaran) && !empty($model->kepakaran->pa
             </div>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); 
-                foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-                  echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
-                }
+                
                 echo $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);
                 
                 ?>

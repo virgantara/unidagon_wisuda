@@ -691,28 +691,36 @@ class BkdController extends AppController
 
     public function actionKlaim($step=1)
     {
-        $list_bkd_periode = BkdPeriode::find()->orderBy(['tahun_id'=>SORT_DESC])->all();
+        // $list_bkd_periode = BkdPeriode::find()->orderBy(['tahun_id'=>SORT_DESC])->all();
         $list_komponen = [];
         $list_komponen_utama = [];
         $results = [];
-        $session = Yii::$app->session;
-        $bkd_periode = null;
-        if($session->has('bkd_periode')) {
-            $tahun_id = $session->get('bkd_periode');
-            // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
-            $sd = $session->get('tgl_awal');
-            $ed = $session->get('tgl_akhir');  
-            $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
-        }
-        else{
-            $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
-            $tahun_id = $bkd_periode->tahun_id;
-            $sd = $bkd_periode->tanggal_bkd_awal;
-            $ed = $bkd_periode->tanggal_bkd_akhir;
-        }
+        // $session = Yii::$app->session;
+        // $bkd_periode = null;
+        // if($session->has('bkd_periode')) {
+        //     $tahun_id = $session->get('bkd_periode');
+        //     // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+        //     $sd = $session->get('tgl_awal');
+        //     $ed = $session->get('tgl_akhir');  
+        //     $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+        // }
+        // else{
+        $bkd_periode = \app\models\BkdPeriode::findOne(['buka' => 'Y']);
+        $tahun_id = $bkd_periode->tahun_id;
+        $sd = $bkd_periode->tanggal_bkd_awal;
+        $ed = $bkd_periode->tanggal_bkd_akhir;
+        
 
         switch($step){
           case 1:
+            $dataDiri = DataDiri::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
+            $results = [];
+            return $this->render('biodata',[
+              'results' => $results,
+              'dataDiri'=> $dataDiri
+            ]);
+          break;
+          case 2:
 
             $results_pengajaran = $this->getListAjar($bkd_periode);
             $hasil = $this->getListPendidikan($bkd_periode);
@@ -721,14 +729,14 @@ class BkdController extends AppController
             $list_komponen = $hasil['list_komponen'];
 
             return $this->render('klaim_pendidikan',[
-              'list_bkd_periode' => $list_bkd_periode,
+              // 'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
               'list_komponen_utama' => $list_komponen_utama,
               'results' => $results,
               'results_pengajaran' => $results_pengajaran
             ]);
           break;
-          case 2:
+          case 3:
             $hasil = $this->getListPenelitian($bkd_periode);
             $results = $hasil['results'];
             $list_komponen_utama = $hasil['list_komponen_utama'];
@@ -736,39 +744,39 @@ class BkdController extends AppController
             
             
             return $this->render('klaim_penelitian',[
-              'list_bkd_periode' => $list_bkd_periode,
-              'list_komponen' => $list_komponen,
-              'list_komponen_utama' => $list_komponen_utama,
-              'results' => $results
-            ]);
-          break;
-          case 3:
-            $hasil = $this->getListPengabdian($bkd_periode);
-            $results = $hasil['results'];
-            $list_komponen_utama = $hasil['list_komponen_utama'];
-            $list_komponen = $hasil['list_komponen'];
-            
-            return $this->render('klaim_pengabdian',[
-              'list_bkd_periode' => $list_bkd_periode,
+              // 'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
               'list_komponen_utama' => $list_komponen_utama,
               'results' => $results
             ]);
           break;
           case 4:
-            $hasil = $this->getListPenunjang($bkd_periode);
+            $hasil = $this->getListPengabdian($bkd_periode);
             $results = $hasil['results'];
             $list_komponen_utama = $hasil['list_komponen_utama'];
             $list_komponen = $hasil['list_komponen'];
             
-            return $this->render('klaim_penunjang',[
-              'list_bkd_periode' => $list_bkd_periode,
+            return $this->render('klaim_pengabdian',[
+              // 'list_bkd_periode' => $list_bkd_periode,
               'list_komponen' => $list_komponen,
               'list_komponen_utama' => $list_komponen_utama,
               'results' => $results
             ]);
           break;
           case 5:
+            $hasil = $this->getListPenunjang($bkd_periode);
+            $results = $hasil['results'];
+            $list_komponen_utama = $hasil['list_komponen_utama'];
+            $list_komponen = $hasil['list_komponen'];
+            
+            return $this->render('klaim_penunjang',[
+              // 'list_bkd_periode' => $list_bkd_periode,
+              'list_komponen' => $list_komponen,
+              'list_komponen_utama' => $list_komponen_utama,
+              'results' => $results
+            ]);
+          break;
+          case 6:
             $dataDiri = DataDiri::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
             $pendidikan_selesai = (new \yii\db\Query())
               ->select(['SUM(bd.sks) as total'])
@@ -963,8 +971,8 @@ class BkdController extends AppController
              + $penelitian_lebih['total'];
 
             $total_pengabdian_penunjang = $pengabdian_selesai['total']
-            + $pengabdian_selesai['total'] 
-            + $penunjang_berlanjut['total'] 
+            + $pengabdian_berlanjut['total'] 
+            + $penunjang_selesai['total'] 
              + $penunjang_berlanjut['total'];
 
             $total_pengabdian_penunjang_lebih = $pengabdian_lebih['total'] 

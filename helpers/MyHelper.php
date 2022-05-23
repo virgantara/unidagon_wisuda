@@ -9,6 +9,21 @@ use Yii;
 class MyHelper
 {	
 
+	public static function getStatusAktif(){
+		return ['aktif'=>'Aktif','cuti'=>'Cuti','tugasbelajar'=>'Tugas Belajar','resign'=>'Resign','nonaktif'=>'Non-Aktif'];
+	}
+	
+	public static function getListTugasDosen(){
+		$list = [
+            'DS' => 'Dosen Biasa (DS)',
+            'DT' => 'Dosen dengan Tugas Tambahan (DT)',
+            'PS' => 'Profesor',
+            'PT' => 'Profesor dengan Tugas Tambahan'
+        ];
+
+        return $list;
+	}
+
 	public static function getListStatusBKDColor(){
 		$list = [
             '0' => 'success',

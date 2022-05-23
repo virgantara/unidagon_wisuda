@@ -71,7 +71,7 @@ class SkpItemController extends Controller
 
         if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
             $dataPost = $_POST['dataPost'];
-            $periode = BkdPeriode::findOne($dataPost['tahun_id']);
+            $periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
             $list_komponen_utama = KomponenKegiatan::find()->where([
                 'nama' => $dataPost['nama_komponen_kegiatan']
             ])->all();
@@ -186,20 +186,21 @@ class SkpItemController extends Controller
             $dataPost = $_POST['dataPost'];
             
             $session = Yii::$app->session;
-            $bkd_periode = null;
-            if($session->has('bkd_periode')) {
-                $tahun_id = $session->get('bkd_periode');
-                // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
-                $sd = $session->get('tgl_awal');
-                $ed = $session->get('tgl_akhir');  
-                $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
-            }
-            else{
-                $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
-                $tahun_id = $bkd_periode->tahun_id;
-                $sd = $bkd_periode->tanggal_bkd_awal;
-                $ed = $bkd_periode->tanggal_bkd_akhir;
-            }
+            // $bkd_periode = null;
+            // if($session->has('bkd_periode')) {
+            //     $tahun_id = $session->get('bkd_periode');
+            //     // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+            //     $sd = $session->get('tgl_awal');
+            //     $ed = $session->get('tgl_akhir');  
+            //     $bkd_periode = \app\models\BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+            // }
+            // else{
+            //     $bkd_periode = \app\models\BkdPeriode::find()->where(['buka' => 'Y'])->one();
+            //     $tahun_id = $bkd_periode->tahun_id;
+            //     $sd = $bkd_periode->tanggal_bkd_awal;
+            //     $ed = $bkd_periode->tanggal_bkd_akhir;
+            // }
+            $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
             if(!empty($bkd_periode)){
                 $rows = (new \yii\db\Query())
                     ->select(['si.komponen_kegiatan_id','si.id as skp_item_id','si.nama as nama_kegiatan','kk.angka_kredit as ak_bkd','kk.angka_kredit_pak as ak_pak','si.kode_mk','si.nama_mk','si.sks_mk','si.sks_bkd','si.realisasi_qty','si.target_satuan'])
@@ -408,7 +409,7 @@ class SkpItemController extends Controller
 
         if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
             $dataPost = $_POST['dataPost'];
-            $periode = BkdPeriode::findOne($dataPost['tahun_id']);
+            $periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
             $list_komponen_utama = KomponenKegiatan::find()->where([
                 'nama' => $dataPost['nama_komponen_kegiatan']
             ])->all();
@@ -516,7 +517,7 @@ class SkpItemController extends Controller
 
         if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
             $dataPost = $_POST['dataPost'];
-            $periode = BkdPeriode::findOne($dataPost['tahun_id']);
+            $periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
             $list_komponen_utama = KomponenKegiatan::find()->where([
                 'nama' => $dataPost['nama_komponen_kegiatan']
             ])->all();

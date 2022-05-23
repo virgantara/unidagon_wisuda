@@ -6,65 +6,34 @@ use app\helpers\MyHelper;
 use app\assets\IntroAsset;
 IntroAsset::register($this);
 
-$list_tahun = ArrayHelper::map($list_bkd_periode,'tahun_id','nama_periode');
+// $list_tahun = ArrayHelper::map($list_bkd_periode,'tahun_id','nama_periode');
 
-$session = Yii::$app->session;
-$tahun_id = '';
-$sd = '';
-$ed = '';
-$bkd_periode = null;
-if($session->has('bkd_periode'))
-{
-  $tahun_id = $session->get('bkd_periode');
-  $bkd_periode = $session->get('bkd_periode_nama');
-  $sd = $session->get('tgl_awal');
-  $ed = $session->get('tgl_akhir');  
-}
+
 $this->title = "Pelaksanaan Pengabdian";
-
+$this->params['breadcrumbs'][] = $this->title;
 $list_status = \app\helpers\MyHelper::getListStatusBKD();
 $list_status_color = \app\helpers\MyHelper::getListStatusBKDColor();
 ?>
 <h1><?=$this->title;?></h1>
-<p>
-<?php
-use yii\widgets\ActiveForm;
-?>
 
-<?php $form = ActiveForm::begin([
-    'action' => ['bkd/ganti-periode'],
-]); ?>
-
-
-<div class="row">
-    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-        <div class="form-group">
-            <?= Html::dropDownList('tahun',$tahun_id, $list_tahun, ['id' => 'ganti-periode','class'=>'form-control','prompt'=>'- Pilih Periode -']) ?>
-            
-        </div>
-        <div class="form-group">
-            <?= Html::submitButton('Update', ['class' => 'btn btn-primary']) ?>
-        </div>
-    </div>
-</div>
-
- <?php ActiveForm::end(); ?>
-</p>  
 <ul class="nav nav-tabs">
     <li role="presentation" class="">
-      <a href="<?=Url::to(['bkd/klaim','step'=>1]);?>"   >Pelaksanaan Pendidikan</a>
+      <a href="<?=Url::to(['bkd/klaim','step'=>1]);?>"   >Biodata</a>
     </li>
     <li role="presentation" class="">
-      <a href="<?=Url::to(['bkd/klaim','step'=>2]);?>"  >Pelaksanaan Penelitian</a>
+      <a href="<?=Url::to(['bkd/klaim','step'=>2]);?>"   >Pelaksanaan Pendidikan</a>
+    </li>
+    <li role="presentation" class="">
+      <a href="<?=Url::to(['bkd/klaim','step'=>3]);?>"  >Pelaksanaan Penelitian</a>
     </li>
     <li role="presentation" class="active">
-      <a href="<?=Url::to(['bkd/klaim','step'=>3]);?>"  >Pelaksanaan Pengabdian</a>
+      <a href="<?=Url::to(['bkd/klaim','step'=>4]);?>"  >Pelaksanaan Pengabdian</a>
     </li>
     <li role="presentation" class="">
-      <a href="<?=Url::to(['bkd/klaim','step'=>4]);?>"  >Pelaksanaan Penunjang</a>
+      <a href="<?=Url::to(['bkd/klaim','step'=>5]);?>"  >Pelaksanaan Penunjang</a>
     </li>
     <li role="presentation" class="">
-      <a href="<?=Url::to(['bkd/klaim','step'=>5]);?>"  >Simpulan</a>
+      <a href="<?=Url::to(['bkd/klaim','step'=>6]);?>"  >Simpulan</a>
     </li>
 </ul>
 
