@@ -232,15 +232,7 @@ $(document).on("click","#btn_tarik_pengajaran",function(e){
 
     var obj = new Object
     
-    if(!$("#ganti-periode").val()){
-        Swal.fire({
-          title: \'Oops!\',
-          icon: \'error\',
-          text: "Silakan Pilih Periode BKD" 
-        })
-
-        return
-    }
+    
     obj.tahun_id = "'.(!empty($tahun_id) ? $tahun_id : "").'"
     
     $.ajax({
@@ -291,7 +283,7 @@ $(document).on("click",".btn_tarik_pendidikan",function(e){
         data : {
             dataPost : obj
         },
-        url : \''.Url::to(['skp-item/ajax-claim-penelitian']).'\',
+        url : \''.Url::to(['skp-item/ajax-claim-pendidikan']).'\',
         async: true,
         beforeSend : function(){
 

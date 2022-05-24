@@ -80,6 +80,8 @@ else
                 <?= Html::a('<i class="fa fa-print"></i> Print Rencana SKP', ['print-rencana', 'id' => $model->id], ['class' => 'btn btn-success '.($model->status_skp != 2 ? 'disabled' : ''),'target'=>'_blank']) ?>
                 <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP', ['print-formulir', 'id' => $model->id], ['class' => 'btn btn-success '.($model->status_skp != 2 ? 'disabled' : ''),'target'=>'_blank']) ?>
 
+                <?= Html::a('<i class="fa fa-print"></i> Print Laporan SKP PTKIS', ['print-ptkis', 'id' => $model->id], ['class' => 'btn btn-primary '.($model->status_skp != 2 ? 'disabled' : ''),'target'=>'_blank']) ?>
+
                 
             </div>
 
