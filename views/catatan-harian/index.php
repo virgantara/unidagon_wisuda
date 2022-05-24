@@ -35,7 +35,7 @@ $list_skp = ArrayHelper::map(\app\models\Skp::find()->where([
             <li>Catatan Harian wajib diisi</li>
             <li>Catatan Harian digunakan untuk pemenuhan Realisasi dari SKP</li>
             <li>Siapkan bukti catatan harian dalam bentuk tautan/link</li>
-            <li>Hanya SKP yang sudah disetujui yang muncul di Catatan Harian</li>
+            <li>Hanya SKP yang <b>Disetujui</b> yang muncul di Catatan Harian</li>
         </ul>
     </div>
 
