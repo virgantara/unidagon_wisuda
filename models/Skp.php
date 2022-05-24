@@ -183,6 +183,25 @@ class Skp extends \yii\db\ActiveRecord
         return $total;
     }
 
+    public function getAvgCapaianSkp()
+    {
+        $capaian_total = 0;
+        $counter=0;
+        foreach($this->skpItems as $item){
+            $counter++;
+
+            $penghitungan = $item->capaian;
+            $capaian_skp = $item->capaian_skp;
+            $capaian_total += $capaian_skp;
+        }
+
+        $avg_capaian_skp = 0;
+        if($counter> 0)
+            $avg_capaian_skp = $capaian_total / $counter;
+
+        return $avg_capaian_skp;
+    }
+
     /**
      * Gets query for [[SkpPerilakus]].
      *

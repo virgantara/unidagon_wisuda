@@ -35,9 +35,9 @@ $font_size = '0.9em';
 ?>
 <table width="100%" border="0">
     <tr>
-        <td width="45%">
+        <td width="47%">
             
-           <table width="100%" border="1" cellpadding="4">
+           <table width="100%" border="1" cellpadding="6">
 
   <tr>
     <td rowspan="11" width="5%">4</td>
@@ -45,79 +45,112 @@ $font_size = '0.9em';
     <td width="15%">Jumlah</td>
   </tr>
   <tr>
-    <td colspan="4">a. Sasaran Kinerja Pegawai&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;92 x 60%</td>
-    <td>55.20</td>
+    <td colspan="4">a. Sasaran Kinerja Pegawai&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?=$model->avgCapaianSkp;?> x 60%</td>
+    <td style="text-align:center;"><?=round($bobot_capaian_skp,2);?></td>
   </tr>
   <tr>
     <td rowspan="9" width="25%">b. Perilaku Kerja</td>
     <td  width="28%" style="font-size:<?=$font_size;?>">1. Orientasi Pelayanan</td>
-    <td  width="10%">76</td>
-    <td  width="17%">Baik sekali</td>
+    <td  width="10%"><?=!empty($skpPerilaku) ? $skpPerilaku->orientasi : null;?></td>
+    <td  width="17%"><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->orientasi : 0)?></td>
     <td width="15%"></td>
   </tr>
   <tr>
     <td style="font-size:<?=$font_size;?>">2. Integritas</td>
-    <td>76</td>
-    <td>Baik sekali</td>
+    <td><?=!empty($skpPerilaku) ? $skpPerilaku->integritas : null;?></td>
+    <td><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->integritas : 0)?></td>
     <td></td>
   </tr>
   <tr>
     <td style="font-size:<?=$font_size;?>">3. Komitmen</td>
-    <td>76</td>
-    <td>Baik sekali</td>
+    <td><?=!empty($skpPerilaku) ? $skpPerilaku->komitmen : null;?></td>
+    <td><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->komitmen : 0)?></td>
     <td></td>
   </tr>
   <tr>
     <td style="font-size:<?=$font_size;?>">4. Disiplin</td>
-    <td>76</td>
-    <td>Baik sekali</td>
+    <td><?=!empty($skpPerilaku) ? $skpPerilaku->disiplin : null;?></td>
+    <td><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->disiplin : 0)?></td>
     <td></td>
   </tr>
   <tr>
     <td  style="font-size:<?=$font_size;?>">5. Kerjasama</td>
-    <td >76</td>
-    <td>Baik sekali</td>
+    <td><?=!empty($skpPerilaku) ? $skpPerilaku->kerjasama : null;?></td>
+    <td><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->kerjasama : 0)?></td>
     <td></td>
   </tr>
   <tr>
     <td style="font-size:<?=$font_size;?>">6. Kepemimpinan</td>
-    <td>76</td>
-    <td>Baik sekali</td>
+    <td><?=!empty($skpPerilaku) ? $skpPerilaku->kepemimpinan : null;?></td>
+    <td><?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->kepemimpinan : 0)?></td>
     <td></td>
   </tr>
   <tr>
     <td style="font-size:<?=$font_size;?>">7. Jumlah</td>
-    <td>76</td>
-    <td>Baik sekali</td>
+    <td style="text-align:center;"><?=!empty($skpPerilaku) ? $skpPerilaku->total : 0;?></td>
+    <td></td>
     <td></td>
   </tr>
   <tr>
     <td style="font-size:<?=$font_size;?>">8. Nilai rata-rata</td>
-    <td>63.33</td>
-    <td>Cukup<br></td>
+    <td style="text-align:center;"><?=!empty($skpPerilaku) ? round($skpPerilaku->rata_rata,2) : 0;?></td>
+    <td>(<?= MyHelper::kesimpulan(!empty($skpPerilaku) ? $skpPerilaku->rata_rata : 0)?>)</td>
     <td></td>
   </tr>
   <tr>
-    <td colspan="3">9. Nilai Perilaku Kerja&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;63.33 x 40%</td>
-    <td>25.33</td>
+    <td colspan="3">9. Nilai Perilaku Kerja&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?=!empty($skpPerilaku) ? round($skpPerilaku->rata_rata,2) : 0;?> x 40%</td>
+    <td style="text-align:center;"><?=!empty($skpPerilaku) ? round($skpPerilaku->rata_rata * 0.4,2) : 0;?></td>
   </tr>
 
 
   <tr>
     <td colspan="5"  style="text-align: center;" rowspan="2">NILAI PRESTASI KERJA</td>
-    <td>80.53</td>
+    <td style="text-align:center;"><?=round($bobot_capaian_skp + $bobot_avg_perilaku,2)?></td>
   </tr>
   <tr>
-    <td>Baik</td>
+    <td>(<?= MyHelper::kesimpulan($total_prestasi)?>)</td>
   </tr>
-
+  <tr>
+    <td colspan="6">5. KEBERATAN DARI DOSEN PTKIS<br>YANG DINILAI (APABILA ADA)
+      <br><br><br><br><br><br><br><br><br><br><br><br><br>
+      <br>
+      <table width="100%">
+          <tr>
+            <td width="100%" style="text-align: center;">Tanggal, ...............</td>
+          </tr>
+      </table>
+      
+    </td>
+  </tr>
 </table>
 
 
         </td>
-        <td width="5%"></td>
-        <td width="45%">
-            
+        <td width="4%"></td>
+        <td width="47%">
+          <table width="100%" border="1" cellpadding="6">
+              <tr>
+                <td width="100%" >6. TANGGAPAN PEJABATA PENILAI<BR>ATAS KEBERATAN
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <table width="100%">
+                      <tr>
+                        <td width="100%" style="text-align: center;">Tanggal, ...............</td>
+                      </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td width="100%" >7. KEPUTUSAN ATASAN PEJABAT<BR>PENILAI ATAS KEBERATAN
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br>
+                  <table width="100%">
+                      <tr>
+                        <td width="100%" style="text-align: center;">Tanggal, ...............</td>
+                      </tr>
+                  </table>
+                </td>
+              </tr>
+          </table>
         </td>
     </tr>
 </table>

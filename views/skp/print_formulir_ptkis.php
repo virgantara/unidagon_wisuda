@@ -33,7 +33,7 @@ else
 ?>
 <table width="100%" border="0">
     <tr>
-        <td width="45%">
+        <td width="47%">
             
             <table width="100%" border="1" cellpadding="2" cellspacing="0">
                 <tr>
@@ -113,8 +113,8 @@ else
 
 
         </td>
-        <td width="5%"></td>
-        <td width="45%">
+        <td width="4%"></td>
+        <td width="47%">
             <br><br><br><br><br><br>
             <table width="100%">
               <tr>

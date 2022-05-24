@@ -188,6 +188,11 @@ class SkpController extends Controller
                  'user' => $model->pegawaiDinilai,
                  'bkd_periode' =>   $bkd_periode,
                  'atasanPejabatPenilai' => $atasanPejabatPenilai, 
+                 'skpPerilaku' => $skpPerilaku,
+                'avg_capaian_skp' => $avg_capaian_skp,
+                'bobot_capaian_skp' => $bobot_capaian_skp,
+                'bobot_avg_perilaku' => $bobot_avg_perilaku,
+                'total_prestasi' => $total_prestasi,
             ]);
 
             $data = ob_get_clean();
