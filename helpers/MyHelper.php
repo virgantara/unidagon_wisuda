@@ -82,6 +82,10 @@ class MyHelper
 			'3' => [
 				'label' => 'danger',
 				'nama' => 'Dikembalikan'
+			],
+			'4' => [
+				'label' => 'info',
+				'nama' => 'Diarsipkan'
 			]
 		];
 	}
