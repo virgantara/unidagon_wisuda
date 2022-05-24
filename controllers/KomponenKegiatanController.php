@@ -55,7 +55,7 @@ class KomponenKegiatanController extends Controller
         {
             $result[] = [
                 'id' => $item->id,
-                'name' => $item->nama.' - '.$item->subunsur
+                'name' => $item->nama.' - '.$item->subunsur.' - [Kredit: '.$item->angka_kredit.']'
             ];
         }
 

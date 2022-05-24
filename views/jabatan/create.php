@@ -10,12 +10,20 @@ $this->title = 'Tambah Data Jabatan';
 $this->params['breadcrumbs'][] = ['label' => 'Jabatan', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="jabatan-create">
+<div class="jabatan-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?=$this->title;?></h3>
+                </div>
+                <div class="panel-body">
+                    <?= $this->render('_form', [
+                        'model' => $model,
+                    ]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

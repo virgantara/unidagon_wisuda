@@ -43,14 +43,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 
             ],
-             [
+            [
                 'attribute'=>'unker_id',
                 'value'=>function($data){
                     return $data->unker->nama;
                 }
             ],
-            'tanggal_awal',
-            'tanggal_akhir',
+            [
+                'attribute'=>'komponen_kegiatan_id',
+                'format' => 'raw',
+                'value'=>function($data){
+                    return !empty($data->komponenKegiatan) ? $data->komponenKegiatan->nama.' - '.$data->komponenKegiatan->subunsur : '';
+                }
+            ],
+            'tanggal_awal:date',
+            'tanggal_akhir:date',
 //            'f_penugasan',
             // 'update_at',
             [

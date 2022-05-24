@@ -3,7 +3,11 @@
 namespace app\controllers;
 
 use Yii;
+
+use app\helpers\MyHelper;
+use app\models\DataDiri;
 use app\models\Jabatan;
+use app\models\KomponenKegiatan;
 use app\models\Verify;
 use app\models\JabatanSearch;
 use yii\web\Controller;
@@ -137,32 +141,53 @@ class JabatanController extends AppController
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
        
-
+        $s3config = Yii::$app->params['s3'];
+        $s3 = new \Aws\S3\S3Client($s3config);
         try 
         {
             $model->NIY = Yii::$app->user->identity->NIY;
             if ($model->load(Yii::$app->request->post())) {
-                $tambah = new Verify();
-                $tambah->NIY = Yii::$app->user->identity->NIY;
-                $tambah->kategori = 3;
-                $tambah->ver = 'Belum Diverifikasi';
-                $tambah->ID_data = $model->ID;
-                $tambah->save();
-
+                
                 $model->f_penugasan = UploadedFile::getInstance($model,'f_penugasan');
                 if($model->f_penugasan){
-                    $file = $model->f_penugasan->name.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_penugasan->extension;
+                    $file = 'SK_TUGAS_'.date('YmdHis').'_'.Yii::$app->user->identity->NIY.'.'.$model->f_penugasan->extension;
 
+                    $f_penugasan = $model->f_penugasan->tempName;
+                    $mime_type = $model->f_penugasan->type;
                     
+                    $key = 'sk/tugas/'.$file;
+                    $errors = '';
+
+                     
+                    $insert = $s3->putObject([
+                         'Bucket' => 'dosen',
+                         'Key'    => $key,
+                         'Body'   => 'This is the Body',
+                         'SourceFile' => $f_penugasan,
+                         'ContentType' => $mime_type
+                    ]);
+
+                    $plainUrl = $s3->getObjectUrl('dosen', $key);
+                    $model->f_penugasan = $plainUrl;
                 }
 
                 $model->ver = 'Sudah Diverifikasi';
+
+                $dataDiri = DataDiri::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
+                $komponenKegiatan = KomponenKegiatan::findOne($model->komponen_kegiatan_id);
+                if(!empty($komponenKegiatan)){
+                    if(MyHelper::startWith($komponenKegiatan->nama, 'J.')){
+                        $dataDiri->tugas_dosen_id = 'DT';
+                        $dataDiri->save(false,['tugas_dosen_id']);
+                    }
+                }
+
                 if($model->save())
                 {
 
-                  $transaction->commit();
-                  Yii::$app->session->setFlash('success', "Data tersimpan");
-                  return $this->redirect(['view', 'id' => $model->ID]);
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Data tersimpan");
+                    return $this->redirect(['view', 'id' => $model->ID]);
                 }
 
                 
@@ -191,18 +216,7 @@ class JabatanController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        // $very = Verify::findOne(['kategori'=>'3','ID_data'=>$id]);
-        //     if(!empty($very)){
-        //     $very->ver = 'Belum Diverifikasi';
-        //     $very->save();
-        //     }else{
-        //       $tambah = new Verify();
-        //       $tambah->NIY = Yii::$app->user->identity->NIY;
-        //       $tambah->kategori = 3;
-        //       $tambah->ver = 'Belum Diverifikasi';
-        //       $tambah->ID_data = $model->ID;
-        //       $tambah->save();
-        // }
+
 
         $s3config = Yii::$app->params['s3'];
         $s3 = new \Aws\S3\S3Client($s3config);
@@ -244,7 +258,15 @@ class JabatanController extends AppController
                      $model->f_penugasan = $f_penugasan;
                 }
 
-               
+                $dataDiri = DataDiri::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
+                $komponenKegiatan = KomponenKegiatan::findOne($model->komponen_kegiatan_id);
+                if(!empty($komponenKegiatan)){
+                    if(MyHelper::startWith($komponenKegiatan->nama, 'J.')){
+                        $dataDiri->tugas_dosen_id = 'DT';
+                        $dataDiri->save(false,['tugas_dosen_id']);
+                    }
+                }
+
                 if($model->validate()){
                     $model->save();
                     $transaction->commit();

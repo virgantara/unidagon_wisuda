@@ -9,6 +9,11 @@ use Yii;
 class MyHelper
 {	
 
+	public static function startWith($str, $prefix)
+	{
+		return strpos($str, $prefix) === 0;
+	}
+
 	public static function getStatusAktif(){
 		return ['aktif'=>'Aktif','cuti'=>'Cuti','tugasbelajar'=>'Tugas Belajar','resign'=>'Resign','nonaktif'=>'Non-Aktif'];
 	}
