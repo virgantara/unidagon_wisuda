@@ -20,17 +20,9 @@ if(!$model->isNewRecord){
 
     <?php $form = ActiveForm::begin(); ?>
     
-    <?php
-    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
-    }
-   
-    ?>
-    <div class="form-group">
-    <label class="control-label">Nama Dosen</label>
+    
     <?= $form->field($model, 'NIY',['options'=>['tag' => false]])->hiddenInput(['id'=>'dosen_id'])->label(false) ?>
    
-    </div>
     <?= $form->field($model, 'unker_id')->dropDownList($listUnit,['prompt'=>'- Pilih Unit Kerja -']) ?>
     <?= $form->field($model, 'jabatan_id')->dropDownList($listJabatan,['prompt'=>'- Pilih Jabatan -']) ?>
 
@@ -45,7 +37,8 @@ if(!$model->isNewRecord){
             'options' => ['placeholder' => 'Pilih tanggal awal ...'],
             'pluginOptions' => [
                 'format' => 'yyyy-mm-dd',
-                'todayHighlight' => true
+                'todayHighlight' => true,
+                'autoclose' => true
             ]
         ]
     ) ?>
@@ -57,7 +50,8 @@ if(!$model->isNewRecord){
             'options' => ['placeholder' => 'Pilih tanggal akhir ...'],
             'pluginOptions' => [
                 'format' => 'yyyy-mm-dd',
-                'todayHighlight' => true
+                'todayHighlight' => true,
+                'autoclose' => true
             ]
         ]
     ) ?>
