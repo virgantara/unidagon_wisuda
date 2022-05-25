@@ -23,127 +23,134 @@ else
 {
     $nama_pegawai = !empty($model->pegawaiDinilai) && !empty($model->pegawaiDinilai->dataDiri) ? $model->pegawaiDinilai->dataDiri->gelar_depan.' '.$model->pegawaiDinilai->dataDiri->nama.' '.$model->pegawaiDinilai->dataDiri->gelar_belakang : '-';
 }
+
+setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
+
+$tgl_awal = strftime('%d %B %Y',strtotime($periode->tanggal_skp_awal));
+$tgl_akhir = strftime('%d %B %Y',strtotime($periode->tanggal_skp_akhir));
+$font_size = '0.65em';
 ?>
 <table width="100%">
   <tr>
     
     <td style="text-align: center;">
-      <span style="font-size: 1.15em">PENILAIAN CAPAIAN SASARAN KINERJA PEGAWAI</span><br>
-      <span style="font-size: 1.15em">UNIVERSITAS DARUSSALAM GONTOR</span><br>
+      <span>PENILAIAN SASARAN KINERJA</span>
     </td>
   </tr>
 </table>
-<br><br>
-<table width="100%">
-    <tbody>
-        <tr>
-            <th colspan="3"><h3>I. Pejabat Penilai</h3></th>
-            <th colspan="3"><h3>II. Pegawai Dinilai</h3></th>
-        </tr>
-        <tr>
-            <th width="10%">Nama</th>
-            <th width="40%">: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->gelar_depan.' '.$model->pejabatPenilai->dataDiri->nama.' '.$model->pejabatPenilai->dataDiri->gelar_belakang : '-'?></th>
-            <th width="10%">Nama</th>
-            <th width="40%">: <?=$nama_pegawai;?></th>
-        </tr>
-        <tr>
-            <th>NIY</th>
-            <th>: <?=!empty($model->pejabatPenilai) ? $model->pejabat_penilai : '-'?></th>
-            <th>NIY</th>
-            <th>: <?=$model->pegawaiDinilai->NIY;?></th>
-        </tr>
-        <tr>
-            <th>Pangkat</th>
-            <th>: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->namaPangkat : '-'?></th>
-            <th>Pangkat</th>
-            <th>:<?php 
-                    if(!in_array($model->pegawaiDinilai->access_role, $list_staf))
-                    {
-                    ?>
-                <?=$model->pegawaiDinilai->dataDiri->namaPangkat;?>
-                <?php } ?></th>
-        </tr>
-        <tr>
-            <th>Jabatan</th>
-            <th>: <?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->namaJabfung : '-'?></th>
-            <th>Jabatan</th>
-            <th>: <?php 
-                    if(!in_array($model->pegawaiDinilai->access_role, $list_staf))
-                    {
-                    ?>
-                <?=$model->pegawaiDinilai->dataDiri->namaJabfung;?>
-                    <?php } ?></th>
-        </tr>
-        <tr>
-            <th>Unit Kerja</th>
-            <th>: <?=!empty($model->jabatanPenilai) && !empty($model->jabatanPenilai->unker) ? $model->jabatanPenilai->unker->nama : '-'?></th>
-            <th>Unit Kerja</th>
-            <th>: <?=!empty($model->jabatanPegawai) && !empty($model->jabatanPegawai->unker) ? $model->jabatanPegawai->unker->nama : '-'?></th>
-        </tr>
-        
-    </tbody>
-</table>
-<br><br>
+<span style="font-size:0.6em">
+Jangka waktu penilaian <?=$tgl_awal?> s/d <?=$tgl_akhir?>
+</span>
+<br>
 <table width="100%" border="1" cellpadding="2" cellspacing="0">
     <thead>
         <tr>
-            <th rowspan="2"  width="5%">No</th>
-            <th rowspan="2"  width="24%">Kegiatan</th>
-            <th rowspan="2"  width="5%">AK</th>
-            <th colspan="4"  width="24%" style="text-align: center;">Target</th>
-            <th colspan="4"  width="24%" style="text-align: center;">Realisasi</th>
-            <th rowspan="2"  width="9%">Penghitungan</th>
-            <th rowspan="2"  width="9%">Capaian SKP</th>
+            <th rowspan="2"  width="4%" style="text-align: center;font-size:<?=$font_size;?>"><br><br>No</th>
+            <th rowspan="2"  width="25%" style="text-align: center;font-size:<?=$font_size;?>"><br><br>I. Kegiatan Tugas Jabatan</th>
+            <th rowspan="2"  width="3%" style="text-align: center;font-size:<?=$font_size;?>"><br><br>AK</th>
+            <th colspan="6"  width="24%" style="text-align: center;font-size:<?=$font_size;?>">Target</th>
+            <th rowspan="2"  width="3%" style="text-align: center;font-size:<?=$font_size;?>"><br><br>AK</th>
+            <th colspan="6"  width="24%" style="text-align: center;font-size:<?=$font_size;?>">Realisasi</th>
+            <th rowspan="2"  width="8%" style="text-align: center;font-size:<?=$font_size;?>"><br><br>Penghitungan</th>
+            <th rowspan="2"  width="9%" style="text-align: center;font-size:<?=$font_size;?>"><br><br>Capaian SKP</th>
         </tr>
         <tr>
-            <th width="6%">Output</th>
-            <th width="6%">Mutu</th>
-            <th width="6%">Waktu</th>
-            <th width="6%">Biaya</th>
-            <th width="6%">Output</th>
-            <th width="6%">Mutu</th>
-            <th width="6%">Waktu</th>
-            <th width="6%">Biaya</th>
+            <th width="6%" colspan="2" style="font-size:0.5em">Kuant/Output</th>
+            <th width="6%" style="font-size:0.5em">Kual/Mutu</th>
+            <th width="6%" colspan="2" style="font-size:<?=$font_size;?>">Waktu</th>
+            <th width="6%" style="font-size:<?=$font_size;?>">Biaya</th>
+            <th width="6%" colspan="2" style="font-size:0.5em">Kuant/Output</th>
+            <th width="6%" style="font-size:0.5em">Kual/Mutu</th>
+            <th width="6%" colspan="2" style="font-size:<?=$font_size;?>">Waktu</th>
+            <th width="6%" style="font-size:<?=$font_size;?>">Biaya</th>
         </tr>
         
     </thead>
     <tbody>
-        
+        <tr>
+            <td width="4%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">1</td>
+            <td width="25%" colspan="2" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">2</td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">3</td>
+            <td width="3%" style="background-color: lightgray;"></td>
+            <td width="3%" style="background-color: lightgray;"></td>
+            <td width="6%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">4</td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">5</td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;"></td>
+            <td width="6%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">6</td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;"></td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">7</td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;"></td>
+            <td width="6%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">8</td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">9</td>
+            <td width="3%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;"></td>
+            <td width="6%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">10</td>
+            <td width="8%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">11</td>
+            <td width="9%" style="background-color: lightgray;font-size: <?=$font_size;?>;text-align: center;">12</td>
+          </tr>
         <?php 
         $capaian_total = 0;
         $counter=0;
-        foreach($model->skpItems as $q => $item)
-        {
-            $counter++;
+        // foreach($model->skpItems as $q => $item)
+        // {
+        //     $counter++;
 
-            $item->hitungSkp();
-            $penghitungan = $item->capaian;
-            $capaian_skp = $item->capaian_skp;
-            $capaian_total += $capaian_skp;
+        //     $item->hitungSkp();
+        //     $penghitungan = $item->capaian;
+        //     $capaian_skp = $item->capaian_skp;
+        //     $capaian_total += $capaian_skp;
 
 
-         ?>
-        
+        ?>
+        <?php 
+          // $counter = 0;
+          $total_ak = 0;
+        foreach($list_unsur as $q => $v):
+            foreach($list_tridharma[$q] as $item):
+                $counter++;
+                $total_ak += $item->target_ak;
+                $penghitungan = $item->capaian;
+                $capaian_skp = $item->capaian_skp;
+          ?>
+          
+          <tr>
+            <td width="29%" colspan="2" style="font-size: <?=$font_size;?>"><?=$v;?></td>
+            <td width="3%"></td>
+            <td width="6%" colspan="2"></td>
+            <td width="6%"></td>
+            <td width="6%" colspan="2"></td>
+            <td width="6%"></td>
+            <td width="3%"></td>
+            <td width="6%"></td>
+            <td width="6%"></td>
+            <td width="6%"></td>
+            <td width="6%"></td>
+            <td width="8%"></td>
+            <td width="9%"></td>
+          </tr>
         <tr>
-            <td width="5%"><?=$q+1;?></td>
-            <td width="24%"><?=$item->nama;?></td>
-            <td width="5%" style="text-align: center;"><?=$item->target_ak;?></td>
-            <td width="6%" style="text-align: center;"><?=$item->target_qty;?> <?=$item->target_satuan;?></td>
-            <td width="6%" style="text-align: center;"><?=$item->target_mutu;?></td>
-            <td width="6%" style="text-align: center;"><?=$item->target_waktu;?> <?=$item->target_waktu_satuan;?></td>
-            <td width="6%" style="text-align: right;"><?=MyHelper::formatRupiah($item->target_biaya);?></td>
-
-            <td width="6%" style="text-align: center;"><?=$item->realisasi_qty;?> <?=$item->target_satuan;?></td>
-            <td width="6%" style="text-align: center;"><?=$item->realisasi_mutu;?></td>
-            <td width="6%" style="text-align: center;"><?=$item->realisasi_waktu;?> <?=$item->target_waktu_satuan;?></td>
-            <td width="6%" style="text-align: right;"><?=MyHelper::formatRupiah($item->realisasi_biaya);?></td>
-            <td width="9%" style="text-align: center;"><?=round($penghitungan,2)?></td>
-            <td width="9%" style="text-align: center;"><?=round($capaian_skp,2)?></td>
+            <td width="4%" style="font-size:<?=$font_size;?>"><?=$counter;?></td>
+            <td width="25%" style="font-size:<?=$font_size;?>"><?=$item->nama;?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_ak;?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_qty;?> </td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_satuan;?></td>
+            <td width="6%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_mutu;?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_waktu;?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_waktu_satuan;?></td>
+            <td width="6%" style="text-align: right;font-size:<?=$font_size;?>"><?=MyHelper::formatRupiah($item->target_biaya);?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->realisasi_ak;?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->realisasi_qty;?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_satuan;?></td>
+            <td width="6%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->realisasi_mutu;?></td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->realisasi_waktu;?> </td>
+            <td width="3%" style="text-align: center;font-size:<?=$font_size;?>"><?=$item->target_waktu_satuan;?></td>
+            <td width="6%" style="text-align: right;font-size:<?=$font_size;?>"><?=MyHelper::formatRupiah($item->realisasi_biaya);?></td>
+            <td width="8%" style="text-align: center;font-size:<?=$font_size;?>"><?=round($penghitungan,2)?></td>
+            <td width="9%" style="text-align: center;font-size:<?=$font_size;?>"><?=round($capaian_skp,2)?></td>
             
         </tr>
     <?php 
-
-    } 
+            endforeach;
+        endforeach;
 
     $avg_capaian_skp = $capaian_total / $counter;
     $kesimpulan = '';
@@ -161,8 +168,14 @@ else
    
     ?>
     <tr>
-        <td colspan="13" width="91%" style="text-align:right;">Nilai Capaian SKP</td>
-        <td width="9%"><?=round($avg_capaian_skp,2);?>
+        <td rowspan="2" colspan="13" width="91%" style="text-align:center; "><br>Nilai Capaian SKP</td>
+        <td width="9%" style="font-size:<?=$font_size;?>;text-align: center;"><?=round($avg_capaian_skp,2);?>
+        
+        </td>
+    
+    </tr>
+    <tr>
+        <td width="9%" style="font-size:<?=$font_size;?>;text-align: center;">
         (<b><?=$kesimpulan;?></b>)
         </td>
     
@@ -173,39 +186,25 @@ else
 
 
 <br><br>
-<table border="0" width="100%" cellpadding="1" cellspacing="0">   
-    
-    <tr>
-      <th  style="text-align: center;" width="50%">
-        <br>
-        <br>
-        <br>
-        Pejabat Penilai,
-        
-        <br>
-        <br>
-        <br>
-        <br>
-        
-        <u><?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->gelar_depan.' '.$model->pejabatPenilai->dataDiri->nama.' '.$model->pejabatPenilai->dataDiri->gelar_belakang : '-'?></u>
-        <br>
-        NIY: <?=!empty($model->pejabatPenilai) ? $model->pejabat_penilai : '-'?>
-      </th>
-      <th  style="text-align: center;" width="50%">
-        <br>
-        <br>
-        Ponorogo, <?=date('d-m-Y')?>
-        <br>
-        Pegawai Dinilai,
-        
-        <br>
-        <br>
-        <br>
-        <br>
-        <u><?=$nama_pegawai;?></u>
-        <br>
-        NIY: <?=$model->pegawaiDinilai->NIY;?>
-      </th>
-    </tr>
-    
+<table width="100%">
+  <tr>
+    <td width="50%" style="text-align:center;font-size:<?=$font_size;?>;">
+      <br><br><br><br><br><br><br><br><br><br>
+    </td>
+    <td width="50%" style="text-align:center;font-size:0.85em;">
+      Ponorogo, <?=$tgl_akhir;?><br>
+      Pejabat Penilai
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center;"></td>
+    <td  style="text-align:center;font-size:0.85em"><?=!empty($model->pejabatPenilai->dataDiri) ? $model->pejabatPenilai->dataDiri->gelar_depan.' '.$model->pejabatPenilai->dataDiri->nama.' '.$model->pejabatPenilai->dataDiri->gelar_belakang : '-'?>
+      <br>
+      <?=!empty($model->pejabatPenilai) ? $model->pejabat_penilai : '-'?>
+
+      <br><br>
+        Catatan:<br><br>
+      * AK bagi dosen yang memangku jabatan tertentu
+    </td>
+  </tr>
 </table>

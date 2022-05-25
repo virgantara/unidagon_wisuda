@@ -247,10 +247,29 @@ class SkpController extends Controller
             $data = ob_get_clean();
             ob_start();
             
-            
-            $pdf->SetFont($fontreg, '', 9);
-            $pdf->SetMargins(10, 10, 10, true); // set the margins
+            $pdf->AddPage('P');
+            // $pdf->resetColumns();
+            // $pdf->setEqualColumns(2, 130);  // KEY PART -  number of cols and width
+            // $pdf->selectColumn();               
+            // $content =' ';
+            $pdf->writeHTML($data);
 
+
+            ob_start();
+            echo $this->renderPartial('print_pencapaian_ptkis', [
+                 'model' => $model,
+                 'user' => $model->pegawaiDinilai,
+                 'periode' =>   $periode,
+                 'atasanPejabatPenilai' => $atasanPejabatPenilai, 
+                 'list_tridharma' => $list_tridharma,
+                'list_unsur' => $list_unsur,
+            ]);
+
+            $data = ob_get_clean();
+            ob_start();
+            
+            
+            
             $pdf->AddPage('P');
             // $pdf->resetColumns();
             // $pdf->setEqualColumns(2, 130);  // KEY PART -  number of cols and width
