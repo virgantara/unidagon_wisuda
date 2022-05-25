@@ -183,6 +183,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'created_at',
     [
         'class' => 'yii\grid\ActionColumn',
+        'template' => '{view} {update} {delete} {print} {print-ptkis}',
         'visibleButtons' => [
             'update' => function ($data) {
                 return $data->status_skp != 2;
@@ -196,6 +197,24 @@ $this->params['breadcrumbs'][] = $this->title;
               return Html::a('<span class="fa fa-list"></span> View', ['skp/view','id' => $model->id], [
                         'title' => Yii::t('app', 'View Detail'),
                         'class' => 'btn btn-primary',
+                        'data-pjax' => 0,
+                        'data-item' => $model->id
+              ]);
+            },
+            'print' => function ($url, $model){
+              return Html::a('<span class="fa fa-print"></span> Print SKP UNIDA', ['skp/print-formulir','id' => $model->id], [
+                        'title' => Yii::t('app', 'Print'),
+                        'class' => 'btn btn-success',
+                        'target' => '_blank',
+                        'data-pjax' => 0,
+                        'data-item' => $model->id
+              ]);
+            },
+            'print-ptkis' => function ($url, $model){
+              return Html::a('<span class="fa fa-print"></span> Print SKP PTKIS', ['skp/print-ptkis','id' => $model->id], [
+                        'title' => Yii::t('app', 'Print'),
+                        'class' => 'btn btn-success',
+                        'target' => '_blank',
                         'data-pjax' => 0,
                         'data-item' => $model->id
               ]);
