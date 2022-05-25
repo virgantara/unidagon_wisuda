@@ -12,6 +12,7 @@ use app\models\SkpPerilaku;
 use app\models\MJabatan;
 use app\models\Jabatan;
 use app\models\BkdPeriode;
+use app\models\SkpPeriode;
 use app\models\SkpItem;
 use app\models\Pengajaran;
 use app\models\SkpSearch;
@@ -74,21 +75,21 @@ class SkpController extends Controller
             $tahun_id = '';
             $sd = '';
             $ed = '';
-            $bkd_periode = null;
-            if($session->has('bkd_periode'))
-            {
-                $tahun_id = $session->get('bkd_periode');
-              // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
-                $sd = $session->get('tgl_awal');
-                $ed = $session->get('tgl_akhir');  
-                $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
-            }
-            else{
-                $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
-                $tahun_id = $bkd_periode->tahun_id;
-                $sd = $bkd_periode->tanggal_bkd_awal;
-                $ed = $bkd_periode->tanggal_bkd_akhir;
-            }
+            $periode = SkpPeriode::findOne(['buka' => 'Y']);
+            // if($session->has('bkd_periode'))
+            // {
+            //     $tahun_id = $session->get('bkd_periode');
+            //   // $session->get('bkd_periode_nama',$bkd_periode->nama_periode);
+            //     $sd = $session->get('tgl_awal');
+            //     $ed = $session->get('tgl_akhir');  
+            //     $bkd_periode = BkdPeriode::find()->where(['tahun_id' => $tahun_id])->one();
+            // }
+            // else{
+            //     $bkd_periode = BkdPeriode::find()->where(['buka' => 'Y'])->one();
+            //     $tahun_id = $bkd_periode->tahun_id;
+            //     $sd = $bkd_periode->tanggal_bkd_awal;
+            //     $ed = $bkd_periode->tanggal_bkd_akhir;
+            // }
 
             $skpPerilaku = $model->skpPerilaku;
        
@@ -136,7 +137,7 @@ class SkpController extends Controller
             echo $this->renderPartial('cover_ptkis', [
                 'user' => $model->pegawaiDinilai,
                 'model' => $model,
-                'bkd_periode' =>   $bkd_periode,
+                'periode' =>   $periode,
             ]);
 
             
@@ -155,7 +156,7 @@ class SkpController extends Controller
             echo $this->renderPartial('print_formulir_ptkis', [
                  'model' => $model,
                  'user' => $model->pegawaiDinilai,
-                 'bkd_periode' =>   $bkd_periode,
+                 'periode' =>   $periode,
                  'atasanPejabatPenilai' => $atasanPejabatPenilai, 
             ]);
 
@@ -186,7 +187,7 @@ class SkpController extends Controller
             echo $this->renderPartial('print_formulir_ptkis2', [
                  'model' => $model,
                  'user' => $model->pegawaiDinilai,
-                 'bkd_periode' =>   $bkd_periode,
+                 'periode' =>   $periode,
                  'atasanPejabatPenilai' => $atasanPejabatPenilai, 
                  'skpPerilaku' => $skpPerilaku,
                 'avg_capaian_skp' => $avg_capaian_skp,
@@ -208,46 +209,54 @@ class SkpController extends Controller
             // $pdf->selectColumn();               
             // $content =' ';
             $pdf->writeHTML($data);
-            // $pdf->writeHTML($content);
+            
+            $list_unsur = [
+                'AJAR' => 'A. Melaksanakan Pendidikan dan Pengajaran',
+                'RISET' => 'B. Melaksanakan Penelitian',
+                'ABDIMAS' => 'C. Melaksanakan Pengabdian Masyarakat',
+                'PENUNJANG' => 'D. Melaksanakan Kegiatan Penunjang Akademik'
+            ];
 
-            // ob_start();
-            // echo $this->renderPartial('print_pencapaian', [
-            //      'model' => $model,
-            // ]);
+            $list_tridharma = [];
+            foreach($list_unsur as $q => $v):
+                $query = SkpItem::find();
+                $query->alias('t');
+                $query->joinWith(['komponenKegiatan as kk','komponenKegiatan.unsur as u']);
+                $query->where([
+                    't.skp_id' => $model->id,
+                    'u.kode' => $q
+                ]);
 
-            // $data = ob_get_clean();
-            // ob_start();
+                $list_tridharma[$q] = $query->all();
+            endforeach;
+            ob_start();
+            echo $this->renderPartial('print_sasaran_kinerja', [
+                'list_tridharma' => $list_tridharma,
+                'list_unsur' => $list_unsur,
+                'model' => $model,
+                 'user' => $model->pegawaiDinilai,
+                 'periode' =>   $periode,
+                 'atasanPejabatPenilai' => $atasanPejabatPenilai, 
+                 'skpPerilaku' => $skpPerilaku,
+                'avg_capaian_skp' => $avg_capaian_skp,
+                'bobot_capaian_skp' => $bobot_capaian_skp,
+                'bobot_avg_perilaku' => $bobot_avg_perilaku,
+                'total_prestasi' => $total_prestasi,
+            ]);
+
+            $data = ob_get_clean();
+            ob_start();
             
             
-            // $pdf->SetFont($fontreg, '', 9);
-            // $pdf->AddPage('L');
-            // // $imgdata = Yii::getAlias('@webroot').'/klorofil/assets/img/logo-ori.png';
-            // // $pdf->Image($imgdata,10,10,15);
-            // $pdf->writeHTML($data);
+            $pdf->SetFont($fontreg, '', 9);
+            $pdf->SetMargins(10, 10, 10, true); // set the margins
 
-            // ob_start();
-            // echo $this->renderPartial('print_perilaku', [
-            //     'model' => $model,
-            //     'pegawaiDinilai' => $pegawaiDinilai,
-            //     'pejabatPenilai' => $pejabatPenilai,
-            //     'atasanPejabatPenilai' => $atasanPejabatPenilai,    
-            //     'skpPerilaku' => $skpPerilaku,
-            //     'avg_capaian_skp' => $avg_capaian_skp,
-            //     'bobot_capaian_skp' => $bobot_capaian_skp,
-            //     'bobot_avg_perilaku' => $bobot_avg_perilaku,
-            //     'total_prestasi' => $total_prestasi,
-            //     'bkd_periode' =>   $bkd_periode,
-            // ]);
-
-            // $data = ob_get_clean();
-            // ob_start();
-            
-            
-            // $pdf->SetFont($fontreg, '', 9);
-            // $pdf->AddPage('P');
-            // // $imgdata = Yii::getAlias('@webroot').'/klorofil/assets/img/logo-ori.png';
-            // // $pdf->Image($imgdata,10,10,15);
-            // $pdf->writeHTML($data);
+            $pdf->AddPage('P');
+            // $pdf->resetColumns();
+            // $pdf->setEqualColumns(2, 130);  // KEY PART -  number of cols and width
+            // $pdf->selectColumn();               
+            // $content =' ';
+            $pdf->writeHTML($data);
 
             $nama = $model->pegawai_dinilai;
             $pdf->Output('skp_'.$nama.''.rand(1,100).'.pdf','I');

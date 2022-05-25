@@ -6,8 +6,8 @@ use yii\helpers\Url;
 
 setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
 
-$tgl_awal = strftime('%d %B %Y',strtotime($bkd_periode->tanggal_bkd_awal));
-$tgl_akhir = strftime('%d %B %Y',strtotime($bkd_periode->tanggal_bkd_akhir));
+$tgl_awal = strftime('%d %B %Y',strtotime($periode->tanggal_skp_awal));
+$tgl_akhir = strftime('%d %B %Y',strtotime($periode->tanggal_skp_akhir));
 
 $list_status_skp = MyHelper::statusSkp();
 /* @var $this yii\web\View */
@@ -142,7 +142,7 @@ $font_size = '0.9em';
               <tr>
                 <td width="100%" >7. KEPUTUSAN ATASAN PEJABAT<BR>PENILAI ATAS KEBERATAN
                   <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-                  <br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br>
                   <table width="100%">
                       <tr>
                         <td width="100%" style="text-align: center;">Tanggal, ...............</td>

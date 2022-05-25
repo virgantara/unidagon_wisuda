@@ -6,8 +6,8 @@ use yii\helpers\Url;
 
 setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
 
-$tgl_awal = strftime('%d %B %Y',strtotime($bkd_periode->tanggal_bkd_awal));
-$tgl_akhir = strftime('%d %B %Y',strtotime($bkd_periode->tanggal_bkd_akhir));
+$tgl_awal = strftime('%d %B %Y',strtotime($periode->tanggal_skp_awal));
+$tgl_akhir = strftime('%d %B %Y',strtotime($periode->tanggal_skp_akhir));
 
 $list_status_skp = MyHelper::statusSkp();
 /* @var $this yii\web\View */
@@ -55,7 +55,7 @@ else
                                 <td width="50%" style="text-align: center;">
                                     9. DIBUAT TANGGAL 
                                     <?php 
-                                    $tgl = date('Y-m-d',strtotime('+4 day',strtotime($bkd_periode->tanggal_bkd_awal)));
+                                    $tgl = date('Y-m-d',strtotime('+4 day',strtotime($periode->tanggal_skp_awal)));
                                     echo strtoupper(strftime('%d %B %Y',strtotime($tgl)));
                                      ?>
 
@@ -71,7 +71,7 @@ else
                                 <td width="50%" style="text-align: center;">
                                     10. DITERIMA TANGGAL 
                                     <?php 
-                                    $tgl = date('Y-m-d',strtotime('+6 day',strtotime($bkd_periode->tanggal_bkd_awal)));
+                                    $tgl = date('Y-m-d',strtotime('+6 day',strtotime($periode->tanggal_skp_awal)));
                                     echo strtoupper(strftime('%d %B %Y',strtotime($tgl)));
                                      ?>
 
@@ -93,7 +93,7 @@ else
                                 <td width="50%" style="text-align: center;">
                                     11. DITERIMA TANGGAL 
                                     <?php 
-                                    $tgl = date('Y-m-d',strtotime('+9 day',strtotime($bkd_periode->tanggal_bkd_awal)));
+                                    $tgl = date('Y-m-d',strtotime('+9 day',strtotime($periode->tanggal_skp_awal)));
                                     echo strtoupper(strftime('%d %B %Y',strtotime($tgl)));
                                      ?>
 
@@ -135,7 +135,7 @@ else
               </tr>
               <tr>
                   <td width="50%">UNIVERSITAS DARUSSALAM GONTOR</td>
-                  <td width="50%">BULAN : <?=$tgl_awal;?> s/d <?=$tgl_akhir;?></td>
+                  <td width="50%" style="font-size:0.9em">BULAN : <?=$tgl_awal;?> s/d <?=$tgl_akhir;?></td>
               </tr>
             </table>
             <table width="100%" border="1" cellpadding="5">

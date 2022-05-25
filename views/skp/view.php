@@ -19,7 +19,12 @@ $list_status_skp = MyHelper::statusSkp();
 
 $list_unsur = ArrayHelper::map(\app\models\UnsurUtama::find()->orderBy(['urutan'=>SORT_ASC])->all(),'id','nama');
 
-$this->title = 'Form SKP Periode '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($model->periode->tanggal_bkd_akhir));
+setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
+
+$tgl_awal = strftime('%d %B %Y',strtotime($model->periode->tanggal_skp_awal));
+$tgl_akhir = strftime('%d %B %Y',strtotime($model->periode->tanggal_skp_akhir));
+
+$this->title = 'Form SKP Periode';
 $this->params['breadcrumbs'][] = ['label' => 'SKP', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -37,6 +42,8 @@ else
 {
     $nama_pegawai = !empty($model->pegawaiDinilai) ? $model->pegawaiDinilai->nama : '-';
 }
+
+$list_periode = \app\models\BkdPeriode::find()->orderBy(['tahun_id'=> SORT_DESC])->all();
 ?>
 <style type="text/css">
   .ui-autocomplete { z-index:2147483647; }
@@ -52,7 +59,7 @@ else
 
 </style>
 <div class="block-header">
-    <h2><?= Html::encode($this->title) ?></h2>
+    <h2><?= Html::encode($this->title) ?>: <?=$tgl_awal.' s/d '.$tgl_akhir;?></h2>
 </div>
 
 <div class="row">
@@ -573,7 +580,21 @@ yii\bootstrap\Modal::begin([
                     </td>
                     
                 </tr>
-                
+                <tr>
+                    <td>Periode BKD*</td>
+                    <td colspan="3">
+                        <?= Select2::widget([
+                            'name' => 'bkd_periode_id',
+                            'data' => ArrayHelper::map($list_periode,'tahun_id','nama_periode'),
+                            'options'=>['tabindex'=>'0','id'=>'bkd_periode_id','placeholder'=>Yii::t('app','- Pilih BKD Periode -')],
+                            'pluginOptions' => [
+                                'allowClear' => true,
+                                'dropdownParent' => '#modal'
+                            ],
+                        ])?>
+                        
+                    </td>
+                </tr>
                 <tr>
                     <td>Kuantitas/Output*</td>
                     <td><?= Html::textInput('target_qty','',['class'=>'form-control']) ?></td>

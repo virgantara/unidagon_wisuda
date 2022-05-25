@@ -168,7 +168,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'periode_id',
                 'value' => function($data){
-                    return date('d-m-Y',strtotime($data->periode->tanggal_bkd_awal)).' s/d '.date('d-m-Y',strtotime($data->periode->tanggal_bkd_akhir));
+                    return date('d-m-Y',strtotime($data->periode->tanggal_skp_awal)).' s/d '.date('d-m-Y',strtotime($data->periode->tanggal_skp_akhir));
                 }
             ],
             [

@@ -340,14 +340,14 @@ yii\bootstrap\Modal::begin([
                     <td></td>
                     <td class="text-center"><span id="span_target_mutu"></span></td>
                     
-                    <td><?= Html::textInput('realisasi_mutu','',['class'=>'form-control','id'=>'realisasi_mutu']) ?></td>
+                    <td><?= Html::textInput('realisasi_mutu','',['class'=>'form-control','id'=>'realisasi_mutu','autocomplete' => 'off']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Waktu</b></td>
                     <td><span id="span_target_waktu_satuan"></span></td>
                     <td class="text-center"><span id="span_target_waktu"></span></td>
                     
-                    <td><?= Html::textInput('realisasi_waktu','',['class'=>'form-control','id'=>'realisasi_waktu']) ?></td>
+                    <td><?= Html::textInput('realisasi_waktu','',['class'=>'form-control','id'=>'realisasi_waktu','autocomplete' => 'off']) ?></td>
                 </tr>
                 <tr>
                     <td><b>Biaya</b></td>
@@ -356,7 +356,7 @@ yii\bootstrap\Modal::begin([
                     
                     <td><?= NumberControl::widget([
                             'name' => 'realisasi_biaya',
-                            'options' => ['id'=>'realisasi_biaya'],
+                            'options' => ['id'=>'realisasi_biaya','autocomplete' => 'off'],
                             'maskedInputOptions' => [
                                 'prefix' => 'Rp ',
                                 'groupSeparator' => '.',

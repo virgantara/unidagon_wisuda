@@ -55,7 +55,7 @@ class Skp extends \yii\db\ActiveRecord
             [['id'], 'unique'],
             [['pegawai_dinilai'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['pegawai_dinilai' => 'NIY']],
             [['pejabat_penilai'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['pejabat_penilai' => 'NIY']],
-            [['periode_id'], 'exist', 'skipOnError' => true, 'targetClass' => BkdPeriode::className(), 'targetAttribute' => ['periode_id' => 'tahun_id']],
+            [['periode_id'], 'exist', 'skipOnError' => true, 'targetClass' => SkpPeriode::className(), 'targetAttribute' => ['periode_id' => 'tahun_id']],
             [['jabatan_pegawai_id'], 'exist', 'skipOnError' => true, 'targetClass' => Jabatan::className(), 'targetAttribute' => ['jabatan_pegawai_id' => 'ID']],
             [['jabatan_penilai_id'], 'exist', 'skipOnError' => true, 'targetClass' => Jabatan::className(), 'targetAttribute' => ['jabatan_penilai_id' => 'ID']],
             [['atasan_pejabat_penilai'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['atasan_pejabat_penilai' => 'NIY']],
@@ -110,7 +110,7 @@ class Skp extends \yii\db\ActiveRecord
      */
     public function getPeriode()
     {
-        return $this->hasOne(BkdPeriode::className(), ['tahun_id' => 'periode_id']);
+        return $this->hasOne(SkpPeriode::className(), ['tahun_id' => 'periode_id']);
     }
 
     /**

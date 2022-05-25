@@ -10,6 +10,7 @@ use Yii;
  * @property string $id
  * @property string|null $skp_id
  * @property int|null $komponen_kegiatan_id
+ * @property int|null $bkd_periode_id
  * @property string|null $nama
  * @property float|null $target_ak
  * @property float|null $target_qty
@@ -39,6 +40,7 @@ use Yii;
  * @property CatatanHarian[] $catatanHarians
  * @property KomponenKegiatan $komponenKegiatan
  * @property Skp $skp
+ * @property BkdPeriode $bkdPeriode
  */
 class SkpItem extends \yii\db\ActiveRecord
 {
@@ -57,9 +59,9 @@ class SkpItem extends \yii\db\ActiveRecord
     {
         return [
             [['id'], 'required'],
-            [['komponen_kegiatan_id'], 'integer'],
+            [['komponen_kegiatan_id', 'bkd_periode_id'], 'integer'],
             [['target_ak', 'target_qty', 'target_mutu', 'target_waktu', 'target_biaya', 'realisasi_ak', 'realisasi_qty', 'realisasi_waktu', 'realisasi_biaya', 'capaian', 'capaian_skp', 'sks_mk', 'sks_bkd'], 'number'],
-            [['updated_at', 'created_at','status_simpan'], 'safe'],
+            [['updated_at', 'created_at'], 'safe'],
             [['id', 'skp_id', 'target_satuan', 'target_waktu_satuan', 'realisasi_satuan', 'realisasi_mutu', 'realisasi_waktu_satuan', 'kode_mk'], 'string', 'max' => 50],
             [['nama'], 'string', 'max' => 255],
             [['nama_mk'], 'string', 'max' => 100],
@@ -67,6 +69,7 @@ class SkpItem extends \yii\db\ActiveRecord
             [['id'], 'unique'],
             [['komponen_kegiatan_id'], 'exist', 'skipOnError' => true, 'targetClass' => KomponenKegiatan::className(), 'targetAttribute' => ['komponen_kegiatan_id' => 'id']],
             [['skp_id'], 'exist', 'skipOnError' => true, 'targetClass' => Skp::className(), 'targetAttribute' => ['skp_id' => 'id']],
+            [['bkd_periode_id'], 'exist', 'skipOnError' => true, 'targetClass' => BkdPeriode::className(), 'targetAttribute' => ['bkd_periode_id' => 'tahun_id']],
         ];
     }
 
@@ -78,9 +81,10 @@ class SkpItem extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'skp_id' => Yii::t('app', 'SKP'),
-            'komponen_kegiatan_id' => Yii::t('app', 'Komponen Kegiatan ID'),
+            'komponen_kegiatan_id' => Yii::t('app', 'Komponen Kegiatan'),
+            'bkd_periode_id' => Yii::t('app', 'Periode BKD'),
             'nama' => Yii::t('app', 'Nama'),
-            'target_ak' => Yii::t('app', 'Target Ak'),
+            'target_ak' => Yii::t('app', 'Target AK'),
             'target_qty' => Yii::t('app', 'Target Qty'),
             'target_satuan' => Yii::t('app', 'Target Satuan'),
             'target_mutu' => Yii::t('app', 'Target Mutu'),
@@ -144,6 +148,16 @@ class SkpItem extends \yii\db\ActiveRecord
     public function getSkp()
     {
         return $this->hasOne(Skp::className(), ['id' => 'skp_id']);
+    }
+
+    /**
+     * Gets query for [[BkdPeriode]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBkdPeriode()
+    {
+        return $this->hasOne(BkdPeriode::className(), ['tahun_id' => 'bkd_periode_id']);
     }
 
     public function hitungSkp()
