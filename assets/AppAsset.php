@@ -18,6 +18,7 @@ class AppAsset extends AssetBundle
         'assets/css/jquery-ui.css',
         'assets/css/source_sans_pro.css',
         'assets/css/main.css',
+        'assets/css/progress_step.css',
     ];
     public $js = [
         'assets/vendor/jquery/jquery.min.js',

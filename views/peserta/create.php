@@ -21,9 +21,37 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+    <?php 
+
+    switch($step){
+        case 1:
+            echo $this->render('_form', [
+                'model' => $model,
+            ]);
+        break;
+        case 2:
+            echo $this->render('_form2', [
+                'model' => $model,
+            ]);
+        break;
+        case 3:
+            echo $this->render('_form3', [
+                'model' => $model,
+                'list_syarat' => $list_syarat,
+                'list_bukti_peserta'=> $list_bukti_peserta
+            ]);
+        break;
+        case 4:
+            echo $this->render('_form4', [
+                'model' => $model,
+                'list_syarat' => $list_syarat,
+                'list_bukti_peserta'=> $list_bukti_peserta
+            ]);
+        break;
+    }
+     
+
+    ?>
     	   </div>
         </div>
     </div>

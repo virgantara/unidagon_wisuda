@@ -7,6 +7,8 @@ use app\models\User;
 use app\models\Periode;
 use app\models\Peserta;
 use app\models\PesertaSearch;
+use app\models\Syarat;
+use app\models\PesertaSyarat;
 
 use app\helpers\MyHelper;
 use yii\web\Controller;
@@ -270,8 +272,20 @@ class PesertaController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
+        $model = $this->findModel($id);
+        $list_syarat = Syarat::find()->where(['is_aktif'=> 'Y'])->all();
+        $list_bukti_peserta = [];
+        foreach($list_syarat as $syarat){
+            $ps = PesertaSyarat::findOne([
+                'peserta_id' => $model->id,
+                'syarat_id' => $syarat
+            ]);
+            $list_bukti_peserta[$syarat->id] = $ps; 
+        }
+        return $this->render('view_new', [
+            'model' => $model,
+            'list_syarat' => $list_syarat,
+            'list_bukti_peserta' => $list_bukti_peserta
         ]);
     }
 
@@ -280,17 +294,113 @@ class PesertaController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($step=1)
     {
-        $model = new Peserta();
+        if(Yii::$app->user->isGuest){
+            return $this->redirect(['site/logout']);
+        }
+
+        $list_syarat = Syarat::find()->where(['is_aktif'=> 'Y'])->all();
+        $list_bukti_peserta = [];
+        $api_baseurl = Yii::$app->params['api_baseurl'];
+        $client = new Client(['baseUrl' => $api_baseurl]);
+        $client_token = Yii::$app->params['client_token'];
+        $headers = ['x-access-token'=>$client_token];
+
+        $model = Peserta::findOne(['nim' => Yii::$app->user->identity->nim]);
+        $periode = Periode::findOne(['status_aktivasi' => 'Y']);
+
+        if(empty($model)){
+            $model = new Peserta();
+            $model->periode_id = $periode->id_periode;
+            
+            $params = [
+                'nim' => Yii::$app->user->identity->nim
+            ];
+            $response = $client->get('/m/profil/nim', $params,$headers)->send();
+            
+            if ($response->isOk) {
+                $tmp = $response->data['values'];
+                if(count($tmp) > 0){
+                    $tmp = $tmp[0];
+                    $model->nim = $tmp['nim_mhs'];
+                    $model->nama_lengkap = $tmp['nama_mahasiswa'];
+                    $model->fakultas = $tmp['nama_fakultas'];
+                    $model->prodi = $tmp['nama_prodi'];    
+                    $model->tempat_lahir = $tmp['tempat_lahir'];
+                    $model->tanggal_lahir = $tmp['tgl_lahir'];
+                    $model->jenis_kelamin = $tmp['jenis_kelamin'];
+                    $model->status_warga = $tmp['sw'];
+                    $model->warga_negara = $tmp['wn'];
+                    $model->alamat = $tmp['alamat'].' RT '.$tmp['rt'].'/RW '.$tmp['rw'].', '.$tmp['dusun'].', '.$tmp['desa'].', '.$tmp['kecamatan'].', '.$tmp['kab'].', '.$tmp['prov'];
+                    $model->no_telp = $tmp['telepon'];
+                }
+                
+            }
+        }
+        
+        $model->scenario = 'sce_form'.$step;
+
+        switch($step){
+            case 1:
+            break;
+            case 2:
+                $params = [
+                    'nim' => Yii::$app->user->identity->nim
+                ];
+                $response = $client->get('/m/ortu', $params,$headers)->send();
+                if ($response->isOk) {
+                    $tmp = $response->data['values'];
+                    foreach($tmp as $item){
+                        if($item['hub'] == 'AYAH'){
+                            $model->nama_ayah = $item['nm'];
+                            $model->pekerjaan_ayah = $item['label'];
+                        }
+
+                        if($item['hub'] == 'IBU'){
+                            $model->nama_ibu = $item['nm'];
+                            $model->pekerjaan_ibu = $item['label'];
+                        }                        
+                    }
+                }
+            break;
+            case 3 :
+            case 4:
+                
+
+                foreach($list_syarat as $syarat){
+                    $ps = PesertaSyarat::findOne([
+                        'peserta_id' => $model->id,
+                        'syarat_id' => $syarat
+                    ]);
+                    $list_bukti_peserta[$syarat->id] = $ps; 
+                }
+            break;
+        }
+
+
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['view', 'id' => $model->id]);
+
+            if($step == 4){
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
+            else{
+                $step++;
+
+                return $this->redirect(['create', 'step' => $step]);
+            }
+                 
         }
+
 
         return $this->render('create', [
             'model' => $model,
+            'step' => $step,
+            'list_syarat' => $list_syarat,
+            'list_bukti_peserta' => $list_bukti_peserta
         ]);
     }
 

@@ -1,5 +1,5 @@
 <?php
-
+use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -8,92 +8,73 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="peserta-form">
+<form id="form">
+    <ul id="progressbar">
+        <li class="active" id="step1">
+            <strong>Biodata</strong>
+        </li>
+        <li id="step2"><strong>Data Orang Tua</strong></li>
+        <li id="step3"><strong>Bukti Wisuda</strong></li>
+        <li id="step4"><strong>Konfirmasi</strong></li>
+    </ul>
+    
+    
+</form>
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active">
+        <a href="#" aria-controls="one" role="tab" data-toggle="tab">Biodata</a>
+    </li>
+    <li role="presentation" class="">
+        <a href="<?=Url::to(['peserta/create','step'=>2])?>" >Data Orang Tua</a>
+    </li>
+    <li role="presentation" class="">
+        <a href="<?=Url::to(['peserta/create','step'=>3])?>">Bukti Wisuda</a>
+    </li>
+    <li role="presentation" class="">
+        <a href="<?=Url::to(['peserta/create','step'=>4])?>">Konfirmasi</a>
+    </li>
+</ul>
+<?php $form = ActiveForm::begin(); ?>
+<?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
+<div class="col-lg-6 col-md-12 col-sm-12">
 
-    <?php $form = ActiveForm::begin(); ?>
+    
 
-    <?= $form->field($model, 'nim',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'nim')->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'nama_lengkap',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'nama_lengkap')->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'fakultas',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'fakultas')->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'prodi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'prodi')->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'tempat_lahir',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'tempat_lahir')->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'tanggal_lahir',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+   
+     <?= $form->field($model, 'tanggal_lahir')->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'jenis_kelamin',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
 
-    <?= $form->field($model, 'status_warga',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    
 
-    <?= $form->field($model, 'warga_negara',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'alamat',['options' => ['tag' => false]])->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'no_telp',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'nama_ayah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'pekerjaan_ayah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'nama_ibu',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'pekerjaan_ibu',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'pas_photo',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'ijazah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'akta_kelahiran',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'kwitansi_jilid',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'surat_bebas_pinjaman',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'resume_skripsi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'surat_bebas_tunggakan',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'transkrip',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'skl_tahfidz',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'kwitansi_wisuda',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'tanda_keluar_asrama',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'surat_jalan',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'skripsi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'abstrak',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'kode_pendaftaran',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'kampus',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'status_validasi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'kmi',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'bukti_revisi_bahasa',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'bukti_layouter',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'bukti_perpus',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
-
-    <?= $form->field($model, 'created',['options' => ['tag' => false]])->textInput() ?>
-
-    <?= $form->field($model, 'periode_id',['options' => ['tag' => false]])->textInput() ?>
-
-    <?= $form->field($model, 'drive_path',['options' => ['tag' => false]])->textarea(['rows' => 6]) ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
-
+    
 </div>
+<div class="col-lg-6 col-md-12 col-sm-12">
+
+    <?= $form->field($model, 'jenis_kelamin')->textInput(['class'=>'form-control','readonly' => true]) ?>
+
+    <?= $form->field($model, 'status_warga')->textInput(['class'=>'form-control','readonly' => true]) ?>
+
+    <?= $form->field($model, 'warga_negara')->textInput(['class'=>'form-control','readonly' => true]) ?>
+
+    <?= $form->field($model, 'alamat')->textInput(['class'=>'form-control','readonly' => true]) ?>
+
+    <?= $form->field($model, 'no_telp')->textInput(['class'=>'form-control','readonly' => true]) ?>
+</div>
+<div class="row">
+    <div class="col-md-12">
+    <div class="pull-right">
+        <?= Html::submitButton('Next <i class="fa fa-arrow-right"></i>', ['class' => 'btn btn-success']) ?>    
+    </div>
+    </div>
+</div>
+<?php ActiveForm::end(); ?>

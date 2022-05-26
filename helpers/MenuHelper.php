@@ -49,6 +49,7 @@ class MenuHelper
 		        'items'=>[
 		           	['label' => 'Periode', 'url' => ['/periode/index']],
 		           	['label' => 'Riwayat Pendaftaran', 'url' => ['/peserta/riwayat']],
+		           	['label' => 'Syarat Wisuda', 'url' => ['/syarat/index']],
 		           	['label' => 'Setting', 'url' => ['/setting/index']],
 	               
 		        ]

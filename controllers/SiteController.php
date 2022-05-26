@@ -106,8 +106,11 @@ class SiteController extends Controller
         }
 
         else{
+            $setting = Setting::findOne(['kode_setting' => 'MAKLUMAT']);
+            $periode = Periode::findOne(['status_aktivasi' => 'Y']);
             return $this->render('index',[
-            
+                'setting' => $setting,
+                'periode' => $periode,
                 // 'user' => $user  
             ]);    
         }
@@ -129,7 +132,7 @@ class SiteController extends Controller
     {
         $this->layout = 'default';    
         $model = new Peserta;
-        $model->nim = '402019611018';
+        // $model->nim = '402019611018';
         $setting = Setting::findOne(['kode_setting' => 'MAKLUMAT']);
 
 

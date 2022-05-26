@@ -67,7 +67,10 @@ class Peserta extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nim', 'nama_lengkap', 'fakultas', 'prodi', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_warga', 'warga_negara', 'alamat', 'no_telp', 'nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu', 'kode_pendaftaran', 'kampus', 'kmi'], 'required'],
+            [['nim', 'nama_lengkap', 'fakultas', 'prodi', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_warga', 'warga_negara', 'alamat', 'no_telp','periode_id'], 'required','on'=>'sce_form1'],
+            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required','on'=>'sce_form2'],
+            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required','on'=>'sce_form3'],
+            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required','on'=>'sce_form4'],
             [['alamat', 'drive_path'], 'string'],
             [['created', 'updated_at'], 'safe'],
             [['periode_id'], 'integer'],
@@ -86,7 +89,7 @@ class Peserta extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'nim' => Yii::t('app', 'Nim'),
+            'nim' => Yii::t('app', 'NIM'),
             'nama_lengkap' => Yii::t('app', 'Nama Lengkap'),
             'fakultas' => Yii::t('app', 'Fakultas'),
             'prodi' => Yii::t('app', 'Prodi'),
