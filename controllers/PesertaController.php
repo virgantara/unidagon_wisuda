@@ -40,6 +40,11 @@ class PesertaController extends Controller
                         'actions' => ['create','update','view'],
                         'allow' => true,
                         'roles' => ['member']
+                    ],
+                    [
+                        'actions' => ['create','update','view'],
+                        'allow' => true,
+                        'roles' => ['member']
                     ]
                 ]
             ],

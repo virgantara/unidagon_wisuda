@@ -25,10 +25,18 @@ class MenuHelper
 		        'url' => ['site/index'],
 		    ];
 
+		    $menuItems[] = [
+		     	'template' => '<a href="{url}">{label}</a>',
+		        'label' => '<i class="lnr lnr-user"></i><span>Wisuda</span>', 
+		        'url' => ['peserta/create'],
+		        'visible' => Yii::$app->user->can('member'),
+		    ];		
+
 			$menuItems[] = [
 		     	'template' => '<a href="{url}">{label}</a>',
 		        'label' => '<i class="lnr lnr-user"></i><span>Peserta</span>', 
 		        'url' => ['peserta/index'],
+		        'visible' => Yii::$app->user->can('admin'),
 		    ];		    
 
 		    $menuItems[] = [

@@ -13,36 +13,75 @@ $this->title = 'Pendaftaran Wisuda';
     .swal2-content{
         text-align: left;
     }
-</style>
-    <div class="logo text-center"><img src="<?=Yii::getAlias('@klorofil');?>/assets/img/logo_kamp.png" alt="Klorofil Logo" width="30%"></div>
-    <div class="user text-center">
-        <!-- <img src="assets/img/user-medium.png" class="img-circle" alt="Avatar"> -->
-        <h2 class="name">Graduation Registration</h2>
-    </div>
-    <?php 
-    if(empty($setting)){
-    ?>
-    <div class="alert alert-danger">
-        Oops, Mohon maaf. Saat ini belum ada informasi tentang wisuda.
-    </div>
-    <?php } ?>
 
-    <?php $form = ActiveForm::begin([
-        'id' => 'form_registrasi'
-    ]); ?>
-     <?php 
-    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+    .well{
+        background-color: #dbdbdb;
+        border-color: darkgray;
     }
-    ?>
-    <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
-        <div class="input-group">
-            <?= $form->field($model, 'nim',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true,'placeholder' => 'Enter your NIM...','autocomplete' => 'off','id'=>'nim'])->label(false) ?>
-            <span class="input-group-btn">
-                <?= Html::submitButton('<i class="fa fa-arrow-right"></i>', ['class' => 'btn btn-primary','id'=>'btn-submit']) ?>
-            </span>
+</style>
+
+<div class="hero-mini">
+        
+    
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 pr-lg-5">
+                <h1>Graduation Registration</h1>
+                <p class="lead">Before registration, make sure your data is valid. <br>You can begin your registration by entering your NIM below</p>
+                <div class="cta">
+                    <?php $form = ActiveForm::begin([
+                            'id' => 'form_registrasi'
+                        ]); ?>
+                         <?php 
+                        foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+                          echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
+                        }
+                        ?>
+                        <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
+                            
+                                <?= $form->field($model, 'username',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true,'placeholder' => 'Enter your NIM...','autocomplete' => 'off','id'=>'nim'])->label(false) ?>
+                                <br>
+                                <button id="btn-submit" class="btn btn-lg btn-info btn-icon icon-left" type="submit"><i class="fa fa-search"></i> Search NIM</button> <input class="btn btn-lg btn-danger btn-icon icon-left" type="reset" value="Reset">
+                              
+                        <?php ActiveForm::end(); ?>                   
+                </div>
+            </div>
+            <div class="col-lg-4 d-lg-block d-none">
+                <img src="https://getstisla.com/landing/undraw_post_online_dkuk.svg" alt="image" class="img-fluid img-flip" width="80%">
+            </div>
         </div>
-    <?php ActiveForm::end(); ?>
+    </div>
+</div>
+
+<section class="download-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <p>
+                <?php 
+                if(empty($setting)){
+                ?>
+                <div class="alert alert-danger">
+                    Oops, Mohon maaf. Saat ini belum ada informasi tentang wisuda.
+                </div>
+                <?php }
+                else{
+                    echo "<div class='well'>";
+                    echo $setting->kode_setting;
+                    echo $setting->konten;
+                    echo "</div>";
+                }
+                 ?>
+                </p>
+
+            </div>
+            
+        </div>
+    </div>
+</section>
+    
+    
+    
 <?php
 
 $this->registerJs('
@@ -60,10 +99,18 @@ $(document).on("click","#btn-submit",function(e){
         url : \''.Url::to(['peserta/ajax-cek-siakad']).'\',
         async: true,
         beforeSend : function(){
-
+            Swal.showLoading()
+        },
+        error: function(e){
+            Swal.close()
+            Swal.fire({
+                title: \'Oops!\',
+                icon: \'error\',
+                text: e.responseText
+            });
         },
         success: function(res){
-
+            Swal.close()
             var res = $.parseJSON(res);
             // console.log(res)
             if(res.code == 200){

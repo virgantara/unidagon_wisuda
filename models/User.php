@@ -71,12 +71,6 @@ class User extends UserIdentity
             ['password', 'required', 'on' => 'create'],
             // use passwordStrengthRule() method to determine password strength
             $this->passwordStrengthRule(),
-            [['foto_path','fakultas', 'prodi','kampus','display_name','nim','username','uuid','is_accept_term','level','class','rank','stars'], 'safe'],
-            ['status', 'required'],
-            ['item_name', 'string', 'min' => 3, 'max' => 64],
-            ['access_role', 'string', 'min' => 3, 'max' => 64],
-            [['foto_path'], 'string', 'max' => 200],
-            [['foto_path'], 'file', 'extensions' => 'png,jpg,jpeg','maxSize' => 1024 * 1024],
             
         ];
     }
@@ -240,16 +234,16 @@ class User extends UserIdentity
      *
      * @return string
      */
-    public function getRoleName()
-    {
-        // if user has some role assigned, return it's name
-        if ($this->role) {
-            return $this->role->item_name;
-        }
+    // public function getRoleName()
+    // {
+    //     // if user has some role assigned, return it's name
+    //     if ($this->role) {
+    //         return $this->role->item_name;
+    //     }
         
-        // user does not have role assigned, but if he is authenticated '@'
-        return '@authenticated';
-    }
+    //     // user does not have role assigned, but if he is authenticated '@'
+    //     return '@authenticated';
+    // }
 
     /**
      * Generates new password reset token.
@@ -300,15 +294,7 @@ class User extends UserIdentity
         $this->account_activation_token = null;
     }
 
-    public function getCatatanHarians()
-    {
-        return $this->hasMany(CatatanHarian::className(), ['user_id' => 'ID']);
-    }
-
-    public function getUnitKerjas()
-    {
-        return $this->hasMany(UnitKerja::className(), ['pejabat_id' => 'ID']);
-    }
+    
 
     public function getAuthAssignments()
     {
@@ -360,301 +346,5 @@ class User extends UserIdentity
         return !empty($this->dataDiri) ? $this->dataDiri->nama : '';
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getHkiAuthors()
-    {
-        return $this->hasMany(HkiAuthor::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getJabatans()
-    {
-        return $this->hasMany(Jabatan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getJurnalAuthors()
-    {
-        return $this->hasMany(JurnalAuthor::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getKegiatans()
-    {
-        return $this->hasMany(Kegiatan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getKonferensis()
-    {
-        return $this->hasMany(Konferensi::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getKonferensiAuthors()
-    {
-        return $this->hasMany(KonferensiAuthor::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getLppmPenelitians()
-    {
-        return $this->hasMany(LppmPenelitian::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getLppmPenelitianAnggotas()
-    {
-        return $this->hasMany(LppmPenelitianAnggota::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getLuaranLainAuthors()
-    {
-        return $this->hasMany(LuaranLainAuthor::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMakalahs()
-    {
-        return $this->hasMany(Makalah::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMakalahAuthors()
-    {
-        return $this->hasMany(MakalahAuthor::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOrganisasis()
-    {
-        return $this->hasMany(Organisasi::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPelatihans()
-    {
-        return $this->hasMany(Pelatihan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPelatihans0()
-    {
-        return $this->hasMany(Pelatihan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPelatihans1()
-    {
-        return $this->hasMany(Pelatihan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPelatihans2()
-    {
-        return $this->hasMany(Pelatihan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPelatihans3()
-    {
-        return $this->hasMany(Pelatihan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPendidikans()
-    {
-        return $this->hasMany(Pendidikan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPendidikans0()
-    {
-        return $this->hasMany(Pendidikan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPendidikans1()
-    {
-        return $this->hasMany(Pendidikan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPendidikans2()
-    {
-        return $this->hasMany(Pendidikan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPenelitians()
-    {
-        return $this->hasMany(Penelitian::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPenelitianAnggotas()
-    {
-        return $this->hasMany(PenelitianAnggota::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPengabdians()
-    {
-        return $this->hasMany(Pengabdian::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPengabdianAnggotas()
-    {
-        return $this->hasMany(PengabdianAnggota::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPengajarans()
-    {
-        return $this->hasMany(Pengajaran::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPenghargaans()
-    {
-        return $this->hasMany(Penghargaan::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProdukAjars()
-    {
-        return $this->hasMany(ProdukAjar::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProdukAjars0()
-    {
-        return $this->hasMany(ProdukAjar::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProdukAjars1()
-    {
-        return $this->hasMany(ProdukAjar::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getResensis()
-    {
-        return $this->hasMany(Resensi::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getResensis0()
-    {
-        return $this->hasMany(Resensi::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getResensis1()
-    {
-        return $this->hasMany(Resensi::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSupports()
-    {
-        return $this->hasMany(Support::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSupports0()
-    {
-        return $this->hasMany(Support::className(), ['NIY' => 'NIY']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSupports1()
-    {
-        return $this->hasMany(Support::className(), ['NIY' => 'NIY']);
-    }
-
-    public function getLogSyncs()
-    {
-        return $this->hasMany(LogSync::className(), ['NIY' => 'NIY']);
-    }
-
-    public function getTendik()
-    {
-        return $this->hasOne(Tendik::className(), ['NIY' => 'NIY']);
-    }
+   
 }

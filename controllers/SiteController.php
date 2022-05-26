@@ -99,7 +99,9 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+
         if(Yii::$app->user->isGuest){
+
             return $this->redirect(['site/registrasi']);
         }
 
@@ -132,19 +134,83 @@ class SiteController extends Controller
         
 
         $this->layout = 'default';    
-        $model = new Peserta;
-        $model->nim = '402019611018';
+        $model = new LoginForm;
+        $model->username = '402019611018';
         $setting = Setting::findOne(['kode_setting' => 'MAKLUMAT']);
         
         if($model->load(Yii::$app->request->post())){
+            $key = $model->username;
             $params = [
-                'nim' => $model->nim
+                'nim' => $key
             ];
-            $response = $client->get('/m/profil/nim', $params,$headers)->send();
+            $response = $client->get('/u/mhs/nim', $params,$headers)->send();
             
             if ($response->isOk) {
                 $tmp = $response->data['values'];
-                exit;
+                
+                $user = User::findOne(['username'=>$key]);
+                $auth = Yii::$app->authManager;
+                $transaction = Yii::$app->db->beginTransaction();
+                
+                try {
+                    if(empty($user)){
+                        $user = new User;
+                        $user->password = $key;
+                        $user->setPassword($user->password);
+                        $user->auth_key = Yii::$app->security->generateRandomString();
+                        $user->username = $key;
+                        $user->status = 10;
+                        $user->created_at = strtotime(date('Y-m-d H:i:s'));
+                        $user->access_role = 'member';
+                        $user->updated_at = strtotime(date('Y-m-d H:i:s'));
+                        $user->email = $tmp['email'];
+                        $user->uuid = $tmp['uuid'];
+                        
+                        if($user->save()){
+                            $role = $auth->getRole('member');
+                            $info = $auth->assign($role, $user->getId());
+
+                            if (!$info) {
+                                Yii::$app->session->setFlash('error', Yii::t('app', 'There was some error while saving user role.'));
+                                throw new \Exception(\app\helpers\MyHelper::logError($user));
+                            }
+
+                            $transaction->commit();
+                            
+                            
+                            if ($user->validate()) {
+                                Yii::$app->session->setFlash('success', Yii::t('app', 'Thank you for your registration. Your username and password is your NIM:'.$key));
+                                Yii::$app->user->login($user, 3600*24*30);
+                                return $this->redirect(['login']);
+                            }
+                            else{
+                                Yii::$app->session->setFlash('error', Yii::t('app', 'There was some error while registration'));
+                            }
+                        }   
+
+                        else{
+                            throw new \Exception(\app\helpers\MyHelper::logError($user));
+                        } 
+
+                    }
+
+                    else{
+
+                        if ($user->validate()) {
+                            Yii::$app->user->login($user, 3600*24*30);
+                            return $this->redirect(['login']);
+                        }
+                        else{
+                            Yii::$app->session->setFlash('error', Yii::t('app', 'There was some error while registration'));
+                        }
+                    }
+                } 
+
+                catch (\Exception $e) {
+                    $transaction->rollBack();
+                    $errors = $e->getMessage();
+                    Yii::$app->session->setFlash('danger',$errors);
+                }
             }
         }
 
@@ -499,23 +565,13 @@ class SiteController extends Controller
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post())) {
-            if($model->login()){
-                $usernya = User::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
-                if($usernya->status_admin == 'user'){
-                    $model = DataDiri::findOne(['NIY'=>Yii::$app->user->identity->NIY]);
-                    return $this->render('homelog',['model'=>$model,]);
-                }
-                Yii::$app->user->logout();
-                Yii::$app->getSession()->setFlash('danger','You are admin dude!!!');
-                return $this->render('login', [
-                    'model' => $model,]);
-            }
-            return $this->render('login', [
-                'model' => $model,]);
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            
+            return $this->goBack();
         } else {
             return $this->render('login', [
-                'model' => $model,]);
+                'model' => $model,
+            ]);
         }
         
     }
@@ -528,11 +584,11 @@ class SiteController extends Controller
     public function actionLogout()
     {
         
-        $session = Yii::$app->session;
-        $session->remove('token');
+        // $session = Yii::$app->session;
+        // $session->remove('token');
         Yii::$app->user->logout();
-        $url = Yii::$app->params['sso_logout'];
-        return $this->redirect($url);
+        // $url = Yii::$app->params['sso_logout'];
+        return $this->redirect(['index']);
     }
 
     /**

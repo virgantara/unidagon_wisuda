@@ -37,25 +37,19 @@ SweetalertAsset::register($this);
         .swal2-popup {
           font-size: 1.6rem !important;
         }
+        .hero-mini {
+  background-image: linear-gradient(to right, #697ded, #5e30c1);
+  padding-top: 40px;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  color: #fff;
     </style>
 </head>
 <body>
 <?php $this->beginBody() ?>
-
-
-    <!-- WRAPPER -->
-    <div id="wrapper">
-        <div class="vertical-align-wrap">
-            <div class="vertical-align-middle">
-                <div class="auth-box lockscreen clearfix">
-                    <div class="content">
-                        <?=$content;?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- END WRAPPER -->
+    
+<?=$content?>
 
 
 <!--End mc_embed_signup-->
