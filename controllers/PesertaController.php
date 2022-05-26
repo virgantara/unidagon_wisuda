@@ -10,7 +10,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-
+// use \Firebase\JWT\JWT;
+use yii\httpclient\Client;
 /**
  * PesertaController implements the CRUD actions for Peserta model.
  */
@@ -50,6 +51,58 @@ class PesertaController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionAjaxCekSiakad()
+    {
+        
+        $results = [];
+        if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
+
+            $dataPost = $_POST['dataPost'];
+            $api_baseurl = Yii::$app->params['api_baseurl'];
+            $client = new Client(['baseUrl' => $api_baseurl]);
+            $client_token = Yii::$app->params['client_token'];
+            $headers = ['x-access-token'=>$client_token];
+
+            $params = [
+                'nim' => $dataPost['nim']
+            ];
+            $response = $client->get('/m/profil/nim', $params,$headers)->send();
+            
+            if ($response->isOk) {
+                $tmp = $response->data['values'];
+                if(!empty($tmp)) {
+                    $results = [
+                        'code' => 200,
+                        'message' => 'Success',
+                        'items' => $tmp[0]
+                    ];
+                }   
+                else {
+
+                    $results = [
+                        'code' => 404,
+                        'message' => 'Your data is not found'
+                    ];    
+                } 
+                   
+            }
+
+            
+        }
+
+        else{
+
+            header('HTTP/1.0 400 Bad Request');
+            $results = [
+                'code' => 400,
+                'message' => 'Bad Request'
+            ];
+        }
+
+        echo json_encode($results);
+        exit;
     }
 
     public function actionRiwayat()

@@ -13,7 +13,10 @@ use app\models\LoginForm;
 
 
 use app\models\User;
+use app\models\Periode;
 use app\models\Peserta;
+use app\models\Setting;
+
 use app\models\PasswordResetRequestForm;
 use app\models\ResetPasswordForm;
 use app\models\ContactForm;
@@ -87,6 +90,68 @@ class SiteController extends Controller
                 'successUrl' => $this->successUrl
             ],
         ];
+    }
+
+    /**
+     * Displays homepage.
+     *
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+        if(Yii::$app->user->isGuest){
+            return $this->redirect(['site/registrasi']);
+        }
+
+        else{
+            return $this->render('index',[
+            
+                // 'user' => $user  
+            ]);    
+        }
+        
+        // if(!parent::handleEmptyUser())
+        // {
+        //     return $this->redirect(Yii::$app->params['sso_login']);
+        // }
+        
+        // $user = \app\models\User::findOne(Yii::$app->user->identity->id);
+       
+        
+
+        
+        
+    }
+
+    public function actionRegistrasi()
+    {
+        $api_baseurl = Yii::$app->params['api_baseurl'];
+        $client = new Client(['baseUrl' => $api_baseurl]);
+        $client_token = Yii::$app->params['client_token'];
+        $headers = ['x-access-token'=>$client_token];
+        
+
+        $this->layout = 'default';    
+        $model = new Peserta;
+        $model->nim = '402019611018';
+        $setting = Setting::findOne(['kode_setting' => 'MAKLUMAT']);
+        
+        if($model->load(Yii::$app->request->post())){
+            $params = [
+                'nim' => $model->nim
+            ];
+            $response = $client->get('/m/profil/nim', $params,$headers)->send();
+            
+            if ($response->isOk) {
+                $tmp = $response->data['values'];
+                exit;
+            }
+        }
+
+        return $this->render('registrasi',[
+            'model' => $model,
+            'setting' => $setting
+        ]);  
     }
 
     public function actionAjaxCariUser() {
@@ -383,40 +448,7 @@ class SiteController extends Controller
         
     }
 
-    /**
-     * Displays homepage.
-     *
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        if(Yii::$app->user->isGuest){
-            $this->layout = 'default';    
-            $model = new Peserta;
-            return $this->render('registrasi',[
-                'model' => $model
-            ]);  
-        }
-
-        else{
-            return $this->render('index',[
-            
-                // 'user' => $user  
-            ]);    
-        }
-        
-        // if(!parent::handleEmptyUser())
-        // {
-        //     return $this->redirect(Yii::$app->params['sso_login']);
-        // }
-        
-        // $user = \app\models\User::findOne(Yii::$app->user->identity->id);
-       
-        
-
-        
-        
-    }
+    
 
     public function actionHomelog()
     {
