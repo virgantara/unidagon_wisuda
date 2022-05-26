@@ -39,7 +39,7 @@ $this->title = 'Pendaftaran Wisuda';
                         ?>
                         <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
                             
-                                <?= $form->field($model, 'username',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true,'placeholder' => 'Enter your NIM...','autocomplete' => 'off','id'=>'nim'])->label(false) ?>
+                                <?= $form->field($model, 'nim',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true,'placeholder' => 'Enter your NIM...','autocomplete' => 'off','id'=>'nim'])->label(false) ?>
                                 <br>
                                 <button id="btn-submit" class="btn btn-lg btn-info btn-icon icon-left" type="submit"><i class="fa fa-search"></i> Search NIM</button> <input class="btn btn-lg btn-danger btn-icon icon-left" type="reset" value="Reset">
                               
@@ -102,7 +102,6 @@ $(document).on("click","#btn-submit",function(e){
             Swal.showLoading()
         },
         error: function(e){
-            Swal.close()
             Swal.fire({
                 title: \'Oops!\',
                 icon: \'error\',
@@ -110,7 +109,7 @@ $(document).on("click","#btn-submit",function(e){
             });
         },
         success: function(res){
-            Swal.close()
+            // Swal.hideLoading()
             var res = $.parseJSON(res);
             // console.log(res)
             if(res.code == 200){
@@ -142,7 +141,10 @@ $(document).on("click","#btn-submit",function(e){
                 raw += "<td>Fakultas</td>"
                 raw += "<td>: "+res.items.nama_fakultas+"</td>"
                 raw += "</tr>"
-
+                raw += "<tr>"
+                raw += "<td>E-mail</td>"
+                raw += "<td>: "+res.items.email+"<br><small style=\'color:red\'>Your WISUDA Account will be sent to this email. You can change your email from your SIAKAD > My Profile > Update Profile</small></td>"
+                raw += "</tr>"
                 raw += "</table>"
                 raw += "</div>"
                 raw += "</div>"
@@ -155,10 +157,57 @@ $(document).on("click","#btn-submit",function(e){
                     showCancelButton: true,
                     confirmButtonColor: \'#3085d6\',
                     cancelButtonColor: \'#d33\',
-                    confirmButtonText: \'Yes, proceed!\'
+                    confirmButtonText: \'Yes, proceed!\',
+                    showLoaderOnConfirm: true,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $("#form_registrasi").submit()
+                        var obj = new Object;
+                        obj.nim = $("#nim").val();
+                        $.ajax({
+                            type : \'POST\',
+                            data : {
+                                dataPost : obj
+                            },
+                            url : \''.Url::to(['peserta/ajax-proceed']).'\',
+                            async: true,
+                            beforeSend : function(){
+                                Swal.fire({
+                                    title : "Please wait",
+                                    html: "Processing your request",
+                                    allowOutsideClick: false,
+                                    showConfirmButton : false,
+                                    onBeforeOpen: () => {
+                                        Swal.showLoading()
+                                    },
+                                    
+                                })
+                            },
+                            error: function(e){
+                                Swal.fire({
+                                    title: \'Oops!\',
+                                    icon: \'error\',
+                                    text: e.responseText
+                                });
+                            },
+                            success: function(data){
+                                
+                                var res = $.parseJSON(data);
+                                console.log(res)
+                                if(res.code == 200){
+                                    Swal.fire({
+                                        title: \'Yeay!\',
+                                        icon: \'success\',
+                                        text: res.message
+                                    }); 
+                                }else{
+                                    Swal.fire({
+                                        title: \'Oops!\',
+                                        icon: \'error\',
+                                        text: res.message
+                                    });
+                                }
+                            }
+                        })
                     }
                 })
                 

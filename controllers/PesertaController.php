@@ -3,9 +3,12 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\User;
 use app\models\Periode;
 use app\models\Peserta;
 use app\models\PesertaSearch;
+
+use app\helpers\MyHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -56,6 +59,125 @@ class PesertaController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionAjaxProceed()
+    {
+        $results = [];
+
+        if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
+            $dataPost = $_POST['dataPost'];
+            
+            $api_baseurl = Yii::$app->params['api_baseurl'];
+            $client = new Client(['baseUrl' => $api_baseurl]);
+            $client_token = Yii::$app->params['client_token'];
+            $headers = ['x-access-token'=>$client_token];
+
+            $nim = $dataPost['nim'];
+
+            $params = [
+                'nim' => $nim
+            ];
+            $response = $client->get('/u/mhs/nim', $params,$headers)->send();
+            
+            if ($response->isOk) {
+                $tmp = $response->data['values'];
+                
+                $user = User::findOne(['username'=>$nim]);
+                $auth = Yii::$app->authManager;
+                $transaction = Yii::$app->db->beginTransaction();
+                
+                try {
+                    if(empty($user)){
+                        $pwd = MyHelper::getRandomString(6,6,true,false,true);
+                        $user = new User;
+                        $user->password = $pwd;
+                        $user->setPassword($user->password);
+                        $user->auth_key = Yii::$app->security->generateRandomString();
+                        $user->username = $nim;
+                        $user->status = 10;
+                        $user->created_at = strtotime(date('Y-m-d H:i:s'));
+                        $user->access_role = 'member';
+                        $user->updated_at = strtotime(date('Y-m-d H:i:s'));
+                        $user->email = $tmp['email'];
+                        $user->uuid = $tmp['uuid'];
+                        $user->nim = $nim;
+                        
+                        if($user->save()){
+                            $role = $auth->getRole('member');
+                            $info = $auth->assign($role, $user->getId());
+
+                            if (!$info) {
+                                $results = [
+                                    'code' => 500,
+                                    'message' => Yii::t('app', 'There was some error while saving user role.')
+                                ];
+                            }
+
+                            if ($user->validate()) {
+                                
+                                
+                                $emailTemplate = $this->renderPartial('//site/email',[
+                                    'user'=>$user,
+                                    'password' => $pwd
+                                ]);
+                            
+                                Yii::$app->mailer->compose()
+                                // ->setTo($user->email)
+                                ->setTo('vinux.edu@gmail.com')
+                                ->setFrom([Yii::$app->params['supportEmail'] => 'Administrator'])
+                                ->setSubject('[Registration] WISUDA UNIDA Gontor')
+                                ->setHtmlBody($emailTemplate)
+                                ->send();
+
+                                $results = [
+                                    'code' => 200,
+                                    'message' => Yii::t('app', 'Your account has been sent to your email. Please check your inbox/spam')
+                                ];
+
+                                $transaction->commit();
+                            }
+                            else{
+
+
+                                $results = [
+                                    'code' => 500,
+                                    'message' => Yii::t('app', 'There was some error while registration')
+                                ];
+                            }
+                        }   
+
+                        else{
+                            throw new \Exception(\app\helpers\MyHelper::logError($user));
+
+                        } 
+
+                    }
+
+                    else{
+                        $results = [
+                            'code' => 200,
+                            'message' => Yii::t('app', 'Your have been registered before. Please check your email inbox/spam')
+                        ];
+                    }
+
+                    
+                } 
+
+                catch (\Exception $e) {
+                    $transaction->rollBack();
+                    $errors = $e->getMessage();
+                    $results = [
+                        'code' => 500,
+                        'message' => Yii::t('app', $errors)
+                    ];
+                }
+            }
+            
+        }
+
+        echo json_encode($results);
+        exit;
     }
 
     public function actionAjaxCekSiakad()

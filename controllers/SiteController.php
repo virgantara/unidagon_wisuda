@@ -127,92 +127,11 @@ class SiteController extends Controller
 
     public function actionRegistrasi()
     {
-        $api_baseurl = Yii::$app->params['api_baseurl'];
-        $client = new Client(['baseUrl' => $api_baseurl]);
-        $client_token = Yii::$app->params['client_token'];
-        $headers = ['x-access-token'=>$client_token];
-        
-
         $this->layout = 'default';    
-        $model = new LoginForm;
-        $model->username = '402019611018';
+        $model = new Peserta;
+        $model->nim = '402019611018';
         $setting = Setting::findOne(['kode_setting' => 'MAKLUMAT']);
-        
-        if($model->load(Yii::$app->request->post())){
-            $key = $model->username;
-            $params = [
-                'nim' => $key
-            ];
-            $response = $client->get('/u/mhs/nim', $params,$headers)->send();
-            
-            if ($response->isOk) {
-                $tmp = $response->data['values'];
-                
-                $user = User::findOne(['username'=>$key]);
-                $auth = Yii::$app->authManager;
-                $transaction = Yii::$app->db->beginTransaction();
-                
-                try {
-                    if(empty($user)){
-                        $user = new User;
-                        $user->password = $key;
-                        $user->setPassword($user->password);
-                        $user->auth_key = Yii::$app->security->generateRandomString();
-                        $user->username = $key;
-                        $user->status = 10;
-                        $user->created_at = strtotime(date('Y-m-d H:i:s'));
-                        $user->access_role = 'member';
-                        $user->updated_at = strtotime(date('Y-m-d H:i:s'));
-                        $user->email = $tmp['email'];
-                        $user->uuid = $tmp['uuid'];
-                        
-                        if($user->save()){
-                            $role = $auth->getRole('member');
-                            $info = $auth->assign($role, $user->getId());
 
-                            if (!$info) {
-                                Yii::$app->session->setFlash('error', Yii::t('app', 'There was some error while saving user role.'));
-                                throw new \Exception(\app\helpers\MyHelper::logError($user));
-                            }
-
-                            $transaction->commit();
-                            
-                            
-                            if ($user->validate()) {
-                                Yii::$app->session->setFlash('success', Yii::t('app', 'Thank you for your registration. Your username and password is your NIM:'.$key));
-                                Yii::$app->user->login($user, 3600*24*30);
-                                return $this->redirect(['login']);
-                            }
-                            else{
-                                Yii::$app->session->setFlash('error', Yii::t('app', 'There was some error while registration'));
-                            }
-                        }   
-
-                        else{
-                            throw new \Exception(\app\helpers\MyHelper::logError($user));
-                        } 
-
-                    }
-
-                    else{
-
-                        if ($user->validate()) {
-                            Yii::$app->user->login($user, 3600*24*30);
-                            return $this->redirect(['login']);
-                        }
-                        else{
-                            Yii::$app->session->setFlash('error', Yii::t('app', 'There was some error while registration'));
-                        }
-                    }
-                } 
-
-                catch (\Exception $e) {
-                    $transaction->rollBack();
-                    $errors = $e->getMessage();
-                    Yii::$app->session->setFlash('danger',$errors);
-                }
-            }
-        }
 
         return $this->render('registrasi',[
             'model' => $model,
