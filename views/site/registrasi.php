@@ -6,7 +6,18 @@ use yii\helpers\Html;
 $this->title = 'Beranda';
 
 ?>
-
+<h1 class="sr-only">Klorofil - Free Bootstrap dashboard</h1>
+                        <div class="logo text-center"><img src="<?=Yii::getAlias('@klorofil');?>/assets/img/logo_kamp.png" alt="Klorofil Logo" width="30%"></div>
+                        <div class="user text-center">
+                            <!-- <img src="assets/img/user-medium.png" class="img-circle" alt="Avatar"> -->
+                            <h2 class="name">Graduation Registration</h2>
+                        </div>
+                        <form action="index.html">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Enter your NIM ...">
+                                <span class="input-group-btn"><button type="submit" class="btn btn-primary"><i class="fa fa-arrow-right"></i></button></span>
+                            </div>
+                        </form>
 <?php
 
 $this->registerJs('

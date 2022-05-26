@@ -9,7 +9,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
-    'name' => 'E-KHIDMAH UNIDA Gontor',
+    'name' => 'WISUDA',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'app\components\Aliases'],
     'aliases' => [

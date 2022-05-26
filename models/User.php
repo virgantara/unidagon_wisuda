@@ -18,8 +18,8 @@ use Yii;
 class User extends UserIdentity
 {
     // the list of status values that can be stored in user table
-    const STATUS_ACTIVE   = 'aktif';
-    const STATUS_INACTIVE = 'nonaktif';
+    const STATUS_ACTIVE   = 10;
+    const STATUS_INACTIVE = 2;
     const STATUS_DELETED  = 0;   
 
    
@@ -42,7 +42,6 @@ class User extends UserIdentity
     /**
      * @var \app\rbac\models\Role
      */
-    public $item_name;
 
     /**
      * Returns the validation rules for attributes.
@@ -136,18 +135,16 @@ class User extends UserIdentity
     public function attributeLabels()
     {
         return [
-            'ID' => Yii::t('app', 'ID'),
+            'id' => Yii::t('app', 'ID'),
             'username' => Yii::t('app', 'Username'),
-            'id_prod' => Yii::t('app','Prodi'),
-            'NIY' => Yii::t('app','NIY'),
             'password' => Yii::t('app', 'Password'),
             'email' => Yii::t('app', 'Email'),
             'status' => Yii::t('app', 'Status'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'item_name' => Yii::t('app', 'Role'),
+            'uuid' => Yii::t('app', 'UUID'),
             'access_role' => Yii::t('app', 'Role'),
-            'is_accept_term' => Yii::t('app', 'Accept Terms and Conditions'),
+            
         ];
     }
 

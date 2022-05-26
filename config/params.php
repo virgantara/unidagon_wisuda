@@ -52,7 +52,7 @@ return [
      * You will send emails to users from this address.
      */
     'supportEmail' => 'pptik@unida.gontor.ac.id',
-     'shortname' => 'SIMPEG',
+     'shortname' => 'WISUDA',
      'icon-framework' => 'fa',
      'owner' => 'Integrated System',
 ];

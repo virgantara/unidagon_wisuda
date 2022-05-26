@@ -45,7 +45,7 @@ SweetalertAsset::register($this);
 <div id="wrapper">
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="brand">
-            <a href="<?=Url::to(['site/homelog']);?>">E-KHIDMAH</a>
+            <a href="<?=Url::to(['site/homelog']);?>">WISUDA</a>
         </div>
         <div class="container-fluid">
             <div class="navbar-btn">
@@ -73,7 +73,7 @@ SweetalertAsset::register($this);
                 <?php 
 
 
-                    $menuItems = \app\helpers\MenuHelper::getMenus();              
+                    $menuItems = \app\helpers\MenuHelper::getMenuItems();              
 
                     echo Menu::widget([
                         'options'=>array('class'=>'nav'),
