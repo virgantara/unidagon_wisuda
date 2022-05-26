@@ -125,8 +125,8 @@ class PesertaController extends Controller
                                 ]);
                             
                                 Yii::$app->mailer->compose()
-                                // ->setTo($user->email)
-                                ->setTo('vinux.edu@gmail.com')
+                                ->setTo($user->email)
+                                // ->setTo('vinux.edu@gmail.com')
                                 ->setFrom([Yii::$app->params['supportEmail'] => 'Administrator'])
                                 ->setSubject('[Registration] WISUDA UNIDA Gontor')
                                 ->setHtmlBody($emailTemplate)
