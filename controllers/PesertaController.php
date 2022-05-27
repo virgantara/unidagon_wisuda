@@ -98,6 +98,12 @@ class PesertaController extends Controller
                             'message' => Yii::t('app', 'An email has been sent to this user')
                         ];
 
+                        $activity = new \wdmg\activity\models\Activity;
+                        $activity->setActivity(
+                            Yii::$app->user->identity->username.' Approved Peserta Wisuda', 
+                            'peserta_wisuda', 
+                            'approval', 2
+                        );
                         $transaction->commit();
                     }
 
@@ -409,6 +415,12 @@ class PesertaController extends Controller
     public function actionIndex()
     {
         $periode = Periode::findOne(['status_aktivasi' => 'Y']);
+
+        if(empty($periode)){
+            Yii::$app->session->setFlash('danger','Mohon maaf, belum ada pendaftaran wisuda yang dibuka');
+            return $this->redirect(['site/index']);
+        }
+
         $searchModel = new PesertaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

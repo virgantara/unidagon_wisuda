@@ -116,6 +116,12 @@ class SyaratController extends Controller
         $model = new Syarat();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $activity = new \wdmg\activity\models\Activity;
+            $activity->setActivity(
+                Yii::$app->user->identity->username.' added a new Syarat Wisuda', 
+                'syarat_wisuda', 
+                'create', 2
+            );
             Yii::$app->session->setFlash('success', "Data tersimpan");
             return $this->redirect(['index']);
         }
@@ -137,6 +143,12 @@ class SyaratController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $activity = new \wdmg\activity\models\Activity;
+            $activity->setActivity(
+                Yii::$app->user->identity->username.' updated Syarat Wisuda', 
+                'syarat_wisuda', 
+                'update', 2
+            );
             Yii::$app->session->setFlash('success', "Data tersimpan");
             return $this->redirect(['index']);
         }
@@ -155,8 +167,16 @@ class SyaratController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $model = $this->findModel($id);
+        if($model->delete()){
+            $activity = new \wdmg\activity\models\Activity;
+            $activity->setActivity(
+                Yii::$app->user->identity->username.' deleted a Syarat Wisuda', 
+                'syarat_wisuda', 
+                'delete', 2
+            );
+        }
+        Yii::$app->session->setFlash('success','Data successfully deleted');
         return $this->redirect(['index']);
     }
 

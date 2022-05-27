@@ -386,6 +386,8 @@ class SiteController extends Controller
             // $session->set('remainingExp',$remainingExp);
             // print_r($user);exit;
             Yii::$app->user->login($user);
+            $activity = new \wdmg\activity\models\Activity;
+            $activity->setActivity(Yii::$app->user->identity->username.' has successfully login.', 'login', 'info', 2);
             return $this->redirect(['site/index']);
         }
 

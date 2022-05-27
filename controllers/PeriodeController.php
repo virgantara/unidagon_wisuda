@@ -95,9 +95,18 @@ class PeriodeController extends Controller
                 }
             }
 
-            $model->save();
-            Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['view', 'id' => $model->id_periode]);
+            if($model->save()){
+                $activity = new \wdmg\activity\models\Activity;
+                $activity->setActivity(
+                    Yii::$app->user->identity->username.' added a new Periode to '.$model->status_aktivasi, 
+                    'periode', 
+                    'create', 2
+                );
+
+                Yii::$app->session->setFlash('success', "Data tersimpan");
+                return $this->redirect(['view', 'id' => $model->id_periode]);
+            }
+            
         }
 
         return $this->render('create', [
@@ -129,9 +138,17 @@ class PeriodeController extends Controller
                 }
             }
 
-            $model->save();
-            Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['view', 'id' => $model->id_periode]);
+            if($model->save()){
+                $activity = new \wdmg\activity\models\Activity;
+                $activity->setActivity(
+                    Yii::$app->user->identity->username.' updated a Periode to '.$model->status_aktivasi, 
+                    'periode', 
+                    'update', 2
+                );
+
+                Yii::$app->session->setFlash('success', "Data tersimpan");
+                return $this->redirect(['view', 'id' => $model->id_periode]);
+            }
         }
 
         return $this->render('update', [
@@ -148,7 +165,16 @@ class PeriodeController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if($model->delete()){
+            $activity = new \wdmg\activity\models\Activity;
+            $activity->setActivity(
+                Yii::$app->user->identity->username.' deleted a Periode', 
+                'periode', 
+                'delete', 2
+            );
+        }
 
         return $this->redirect(['index']);
     }

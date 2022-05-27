@@ -25,6 +25,16 @@ $config = [
             // 'downloadAction' => 'gridview/export/download',
             // 'i18n' => []
         ],
+        'activity' => [
+            'class' => 'wdmg\activity\Module',
+            'routePrefix' => 'admin',
+            'surfingActivity'=> false, // Log of web-surfing activity
+            'backendSurfing'=> true, // Log of web-surfing activity by backend.
+            'frontendSurfing'=> false, // Log of web-surfing activity by frontend.
+            'ignoringRoutes'=> [], // Ignoring activity by request route
+            'ignoringUsers'=>[], // Ignoring activity by user ID
+            'ignoringIp'=> [] // Ignoring activity by user IP
+        ],
     ],
     'timeZone' => 'Asia/Jakarta',
     'components' => [
