@@ -92,45 +92,7 @@ class SiteController extends Controller
         ];
     }
 
-    public function beforeAction($action)
-    {
-        
-        $session = Yii::$app->session;
-
-        if($session->has('token'))
-        {
-
-            try
-            {
-
-                $token = $session->get('token');
-                $key = Yii::$app->params['jwt_key'];
-                $decoded = \Firebase\JWT\JWT::decode($token, base64_decode(strtr($key, '-_', '+/')), ['HS256']);
-
-            }
-
-            catch(\Exception $e) 
-            {
-                $this->refreshToken($token);
-            }
-            
-            if (!parent::beforeAction($action)) {
-                return false;
-            } 
-        }
-
-        else
-        {
-            
-            return $this->redirect(Yii::$app->params['sso_login']);
-        }
-
-        
-
-        // other custom code here
-
-        return true; // or false to not run the action
-    }
+    
 
     /**
      * Displays homepage.
@@ -285,6 +247,45 @@ class SiteController extends Controller
         
     // }
 
+    public function beforeAction($action)
+    {
+        
+        // $session = Yii::$app->session;
+
+        // if($session->has('token'))
+        // {
+
+        //     try
+        //     {
+
+        //         $token = $session->get('token');
+        //         $key = Yii::$app->params['jwt_key'];
+        //         $decoded = \Firebase\JWT\JWT::decode($token, base64_decode(strtr($key, '-_', '+/')), ['HS256']);
+
+        //     }
+
+        //     catch(\Exception $e) 
+        //     {
+        //         $this->refreshToken($token);
+        //     }
+            
+        //     if (!parent::beforeAction($action)) {
+        //         return false;
+        //     } 
+        // }
+
+        // else
+        // {
+            
+        //     return $this->redirect(Yii::$app->params['sso_login']);
+        // }
+
+        
+
+        // other custom code here
+
+        return true; // or false to not run the action
+    }
 
     public function actionAuthCallback()
     {
