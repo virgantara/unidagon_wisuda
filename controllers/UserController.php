@@ -407,7 +407,16 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $username = $model->username;
+        if($model->delete()){
+            $activity = new \wdmg\activity\models\Activity;
+            $activity->setActivity(
+                Yii::$app->user->identity->username.' has deleted '.$username.' from database', 
+                'user', 
+                'delete', 2
+            );
+        }
 
         return $this->redirect(['index']);
     }
