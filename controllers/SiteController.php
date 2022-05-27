@@ -137,10 +137,11 @@ class SiteController extends Controller
         // $model->nim = '402019611018';
         $setting = Setting::findOne(['kode_setting' => 'MAKLUMAT']);
 
-
+        $periode = Periode::findOne(['status_aktivasi' => 'Y']);
         return $this->render('registrasi',[
             'model' => $model,
-            'setting' => $setting
+            'setting' => $setting,
+            'periode'=>$periode
         ]);  
     }
 
