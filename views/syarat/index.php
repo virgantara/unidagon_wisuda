@@ -9,6 +9,8 @@ use kartik\grid\GridView;
 
 $this->title = 'Syarats';
 $this->params['breadcrumbs'][] = $this->title;
+
+$list_status = ['Y'=>'Aktif','N'=>'Non-Aktif'];
 ?>
 
 <h3><?= Html::encode($this->title) ?></h3>
@@ -42,7 +44,21 @@ $this->params['breadcrumbs'][] = $this->title;
             'inputType' => \kartik\editable\Editable::INPUT_TEXT,
         ],
     ],
-    'is_aktif',
+    [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'is_aktif',
+        'refreshGrid' => true,
+        'filter' => $list_status,
+        'readonly' => !Yii::$app->user->can('admin'),
+        'value' => function($data) use ($list_status){
+            return !empty($list_status[$data->is_aktif]) ? $list_status[$data->is_aktif] : null;
+        },
+        'editableOptions' => [
+            'data' => $list_status,
+            'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+        ],
+    ],
+    // 'is_aktif',
     ['class' => 'yii\grid\ActionColumn']
 ];?>    
 <?= GridView::widget([
