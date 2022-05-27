@@ -39,13 +39,13 @@ use yii\widgets\ActiveForm;
     
 <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?> 
 
-    <?= $form->field($model, 'nama_ayah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'nama_ayah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'pekerjaan_ayah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'pekerjaan_ayah',['options' => ['tag' => false]])->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'nama_ibu',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'nama_ibu',['options' => ['tag' => false]])->textInput(['class'=>'form-control','readonly' => true]) ?>
 
-    <?= $form->field($model, 'pekerjaan_ibu',['options' => ['tag' => false]])->textInput(['class'=>'form-control','maxlength' => true]) ?>
+    <?= $form->field($model, 'pekerjaan_ibu',['options' => ['tag' => false]])->textInput(['class'=>'form-control','readonly' => true]) ?>
 
    
 

@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\UserSearch */
+/* @var $model app\models\UserSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -15,21 +15,25 @@ use yii\widgets\ActiveForm;
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'ID') ?>
+    <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'NIY') ?>
-
-    <?= $form->field($model, 'status_admin') ?>
+    <?= $form->field($model, 'username') ?>
 
     <?= $form->field($model, 'auth_key') ?>
 
     <?= $form->field($model, 'password_hash') ?>
 
-    <?php // echo $form->field($model, 'password_reset_token') ?>
+    <?= $form->field($model, 'password_reset_token') ?>
 
     <?php // echo $form->field($model, 'email') ?>
 
     <?php // echo $form->field($model, 'status') ?>
+
+    <?php // echo $form->field($model, 'uuid') ?>
+
+    <?php // echo $form->field($model, 'access_role') ?>
+
+    <?php // echo $form->field($model, 'nim') ?>
 
     <?php // echo $form->field($model, 'created_at') ?>
 

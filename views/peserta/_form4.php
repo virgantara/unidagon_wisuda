@@ -2,7 +2,7 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
 /* @var $this yii\web\View */
 /* @var $model app\models\Peserta */
 /* @var $form yii\widgets\ActiveForm */
@@ -61,7 +61,7 @@ use yii\widgets\ActiveForm;
         </tr>
         <tr>
             <td>TTL</td>
-            <td><?=$model->tempat_lahir?>, <?=$model->tanggal_lahir?></td>
+            <td><?=$model->tempat_lahir?>, <?=strftime('%d %B %Y',strtotime($model->tanggal_lahir));?></td>
         </tr>
         <tr>
             <td>Jenis Kelamin</td>

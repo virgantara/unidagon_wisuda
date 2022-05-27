@@ -34,9 +34,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
-            'id',
-            'nama',
-            'is_aktif',
+    [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'nama',
+        'readonly' => !Yii::$app->user->can('admin'),
+        'editableOptions' => [
+            'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+        ],
+    ],
+    'is_aktif',
     ['class' => 'yii\grid\ActionColumn']
 ];?>    
 <?= GridView::widget([

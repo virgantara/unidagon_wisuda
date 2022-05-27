@@ -64,7 +64,7 @@ class User extends UserIdentity
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            [['nim'], 'safe'],
+            [['nim','access_role','uuid'], 'safe'],
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'message' => Yii::t('app', 'This email address has already been taken.'),'on'=>'insert'],
 

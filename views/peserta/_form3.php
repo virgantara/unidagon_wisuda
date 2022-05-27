@@ -25,7 +25,7 @@ use devgroup\dropzone\DropZone;
         <a href="<?=Url::to(['peserta/create','step'=>1])?>">Biodata</a>
     </li>
     <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>1])?>" >Data Orang Tua</a>
+        <a href="<?=Url::to(['peserta/create','step'=>2])?>" >Data Orang Tua</a>
     </li>
     <li role="presentation" class="active">
         <a href="#">Bukti Wisuda</a>

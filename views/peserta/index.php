@@ -39,8 +39,7 @@ $tgl_akhir = strftime('%A, %d %B %Y',strtotime($periode->tanggal_tutup));
     ],
             'nim',
             'nama_lengkap',
-            'fakultas',
-            'prodi',
+            
             'tempat_lahir',
             [
                 'attribute' => 'tanggal_lahir',
@@ -53,40 +52,25 @@ $tgl_akhir = strftime('%A, %d %B %Y',strtotime($periode->tanggal_tutup));
                 'filter' => ['L'=>'Laki-laki','P'=>'Perempuan'],
                 // 'value' => function($)
             ],
-            //'status_warga',
-            //'warga_negara',
+            'fakultas',
+            'prodi',
+            'status_warga',
+            'warga_negara',
             'alamat:ntext',
             'no_telp',
-            //'nama_ayah',
-            //'pekerjaan_ayah',
+            'nama_ayah',
+            // 'pekerjaan_ayah',
             'nama_ibu',
-            //'pekerjaan_ibu',
-            //'pas_photo',
-            //'ijazah',
-            //'akta_kelahiran',
-            //'kwitansi_jilid',
-            //'surat_bebas_pinjaman',
-            //'resume_skripsi',
-            //'surat_bebas_tunggakan',
-            //'transkrip',
-            //'skl_tahfidz',
-            //'kwitansi_wisuda',
-            //'tanda_keluar_asrama',
-            //'surat_jalan',
-            //'skripsi',
-            //'abstrak',
-            'kode_pendaftaran',
-            //'kampus',
-            //'status_validasi',
-            //'kmi',
-            //'bukti_revisi_bahasa',
-            //'bukti_layouter',
-            //'bukti_perpus',
+            // 'pekerjaan_ibu',
+            
             'created',
             'status_validasi',
             //'periode_id',
             //'drive_path:ntext',
-    ['class' => 'yii\grid\ActionColumn']
+    [
+        'class' => 'yii\grid\ActionColumn',
+
+    ]
 ];?>    
 <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -99,7 +83,7 @@ $tgl_akhir = strftime('%A, %d %B %Y',strtotime($periode->tanggal_tutup));
         'beforeHeader'=>[
             [
                 'columns'=>[
-                    ['content'=> $this->title, 'options'=>['colspan'=>15, 'class'=>'text-center warning']], //cuma satu 
+                    ['content'=> $this->title, 'options'=>['colspan'=>17, 'class'=>'text-center warning']], //cuma satu 
                 ], 
                 'options'=>['class'=>'skip-export'] 
             ]

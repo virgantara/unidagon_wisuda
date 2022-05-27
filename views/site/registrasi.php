@@ -192,7 +192,6 @@ $(document).on("click","#btn-submit",function(e){
                             success: function(data){
                                 
                                 var res = $.parseJSON(data);
-                                console.log(res)
                                 if(res.code == 200){
                                     Swal.fire({
                                         title: \'Yeay!\',

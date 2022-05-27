@@ -2,26 +2,30 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
-use app\models\Prodi;
-//use backend\models\User;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\UserSearch */
+/* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Users';
 $this->params['breadcrumbs'][] = $this->title;
-?>
-<div class="user-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+$list_status = ['10' => 'Aktif','2'=>'Non-Aktif'];
+?>
+
+<h3><?= Html::encode($this->title) ?></h3>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
+            </div>
+<div class="panel-body ">
 
     <p>
         <?= Html::a('Create User', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
-<?php
+    <?php
     $gridColumns = [
     [
         'class'=>'kartik\grid\SerialColumn',
@@ -32,51 +36,45 @@ $this->params['breadcrumbs'][] = $this->title;
         'header'=>'',
         'headerOptions'=>['class'=>'kartik-sheet-style']
     ],
-        
-        'NIY',
-            [
-               'attribute' => 'nama',
-               'value' => function($data){
-                    return !empty($data->dataDiri) ? $data->dataDiri->nama : '';
-               }
-               
-            ],
+
+            'username',
+            // 'auth_key',
+            // 'password_hash',
+            // 'password_reset_token',
             'email:email',
             [
-               'attribute' => 'id_prod',
-               'value' => 'prodiUser.nama',
-               'filter' => Html::activeDropDownList($searchModel, 'id_prod',$prodi,['class'=>'form-control','prompt' =>''])
-            ],
-            [
-                'attribute' => 'status_admin',
-                'format' => 'raw',
-                'filter' => ['admin' => 'Admin', 'user' => 'User']
-            ],
-//            'auth_key',
-//            'password_hash',
-            // 'password_reset_token',
-//            'status',
-            'uuid',
-            [
+                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'status',
-                'format' => 'raw',
-                'value' => 'status',
-                'filter' => ['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']
+                'filter' => $list_status,
+                'readonly' => !Yii::$app->user->can('theCreator'),
+                'value' => function($data) use ($list_status){
+                    return $list_status[$data->status];
+                },
+                'editableOptions' => [
+                    'data' => $list_status,
+                    'inputType' => \kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                ],
             ],
-            
-    [
-        'class' => 'yii\grid\ActionColumn',
-        'template' => '{view} {update} {delete}',
-        // 'visibleButtons' => [
-        //     'delete' => function ($model, $key, $index) {
-        //         return Yii::$app->user->can('baak');
-        //     },
-        //     'update' => function ($model, $key, $index) {
-        //         return Yii::$app->user->can('baak');
-        //     },
-        // ]
-        
-    ]
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'uuid',
+                'readonly' => !Yii::$app->user->can('theCreator'),
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                ],
+            ],
+            'access_role',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'nim',
+                'readonly' => !Yii::$app->user->can('theCreator'),
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_TEXT,
+                ],
+            ],
+            //'created_at',
+            //'updated_at',
+    ['class' => 'yii\grid\ActionColumn']
 ];?>    
 <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -122,5 +120,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'panel' => [
             'type' => GridView::TYPE_PRIMARY
         ],
-    ]); ?>   
+    ]); ?>
+
 </div>
+        </div>
+    </div>
+
+</div>
+

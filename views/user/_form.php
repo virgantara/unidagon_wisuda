@@ -1,137 +1,302 @@
 <?php
-
+use app\rbac\models\AuthItem;
+use kartik\password\PasswordInput;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use yii\helpers\ArrayHelper;
-use app\models\Prodi;
-use kartik\depdrop\DepDrop;
-use kartik\date\DatePicker;
 
-use \app\models\MJenjangPendidikan;
+use kartik\depdrop\DepDrop;
+use kartik\select2\Select2;
+use yii\jui\AutoComplete;
+use yii\web\JsExpression;
+use yii\helpers\ArrayHelper;
+
 /* @var $this yii\web\View */
-/* @var $model backend\models\User */
+/* @var $user app\models\User */
 /* @var $form yii\widgets\ActiveForm */
 
-$listData = \app\models\MJabatanAkademik::getList();
-$listDataJenjang = \app\models\MJenjangPendidikan::getList();
-$listRoles = \app\rbac\models\AuthItem::find()->where(['<>','name','theCreator'])->all();
+$list_roles = ArrayHelper::map(AuthItem::getRoles(),'name','name');
+
 ?>
+<?php foreach (AuthItem::getRoles() as $item_name): ?>
+            <?php $roles[$item_name->name] = $item_name->name ?>
+        <?php endforeach ?>
+<style>
+.modal-dialog{
+    top: 50%;
+    margin-top: -250px; 
+}
 
-<div class="user-form">
-
-    <?php $form = ActiveForm::begin(); 
-    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
-    }
-    echo $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);
-    echo $form->errorSummary($dataDiri,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);
-    ?>
+</style>
+<div class="panel">
+  <div class="panel-heading">
+    <h3 class="panel-title"><?=$this->title;?></h3>
+  </div>
+  <div class="panel-body">
     <div class="row">
-        <div class="col-md-4">
-        <?= $form->field($dataDiri, 'nama')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($dataDiri, 'nik')->textInput(['maxlength' => true]) ?>
+      <div class="col-md-6">
+
+      <?php $form = ActiveForm::begin(['id' => 'form-user']); ?>
+          <?= $form->errorSummary($user,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>
+          <?= $form->field($user, 'username')->textInput(
+                  ['placeholder' => Yii::t('app', 'Create username'), 'autofocus' => true]) ?>
+
+          <?= $form->field($user, 'uuid')->textInput(
+                  ['placeholder' => Yii::t('app', 'UUID')]) ?>
+          
+          <?= $form->field($user, 'email')->input('email', ['placeholder' => Yii::t('app', 'Enter e-mail')]) ?>
+
+          <?php if ($user->scenario === 'create'): ?>
+
+              <?= $form->field($user, 'password')->widget(PasswordInput::classname(), 
+                  ['options' => ['placeholder' => Yii::t('app', 'Create password')]]) ?>
+
+          <?php else: ?>
+
+              <?= $form->field($user, 'password')->widget(PasswordInput::classname(),
+                       ['options' => ['placeholder' => Yii::t('app', 'Change password ( if you want )')]]) ?> 
+
+          <?php endif ?>
+
+      
+        
+          
+          <?= $form->field($user, 'access_role')->widget(Select2::classname(), [
+              'data' => $roles,
+
+              'options'=>['placeholder'=>Yii::t('app','- Pilih Role -')],
+              'pluginOptions' => [
+                  'allowClear' => true,
+              ],
+          ])?>
+            
+      
+            <?= $form->field($user, 'status')->dropDownList($user->statusList) ?>
+
+          
+            <div class="form-group">
+              <label>NIM (*<small>Isikan NIM jika Mahasiswa</small>)</label>
+          <?= $form->field($user, 'nim',['options' => ['tag' => false]])->input('nim', ['placeholder' => Yii::t('app', 'Enter ID'),'id'=>'nim'])->label(false) ?>
+                  
+              </div>
         
 
-    <?= $form->field($dataDiri, 'tempat_lahir')->textInput(['maxlength' => true]) ?>
+      <div class="form-group">     
+          <?= Html::submitButton($user->isNewRecord ? Yii::t('app', 'Create') 
+              : Yii::t('app', 'Update'), ['class' => $user->isNewRecord 
+              ? 'btn btn-success' : 'btn btn-primary']) ?>
 
-      <?= $form->field($dataDiri, 'tanggal_lahir')->widget(
-        DatePicker::className(),[
-            'name' => 'tanggal', 
-            'value' => date('d-m-Y', strtotime('0 days')),
-            'options' => ['placeholder' => 'Pilih tanggal lahir ...'],
-            'pluginOptions' => [
-                'format' => 'dd-mm-yyyy',
-                'todayHighlight' => true
-            ]
-        ]
-    ) ?>
-    <?= $form->field($dataDiri, 'gender')->radioList([ 'Laki-laki' => 'Laki-laki', 'Perempuan' => 'Perempuan', ], ['prompt' => '']) ?>
-    <?= $form->field($dataDiri, 'agama')->radioList([ 'ISLAM' => 'ISLAM']) ?>
-    
-    <?= $form->field($dataDiri, 'status_kawin')->radioList([ 'Kawin' => 'Kawin', 'Belum Kawin' => 'Belum Kawin', 'Duda/Janda' => 'Duda/Janda', ], ['prompt' => '']) ?>
-    <?= $form->field($dataDiri, 'alamat_rumah')->textInput(['maxlength' => true]) ?>
-     <?= $form->field($dataDiri, 'telp_hp')->textInput(['maxlength' => true]) ?>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-            <label>Kode Unik</label><br>
-            <?= $form->field($dataDiri, 'kode_unik',['options'=>['tag'=>false],'errorOptions' => ['tag' => null]])->textInput(['style' => 'width:120px','class'=>''])->label(false) ?>
-            <?=Html::a('<i class="fa fa-refresh"></i> Generate Kode (Dosen LB)','javascript:void(0)',['class'=>'btn btn-primary','id'=>'btn-generate']);?><br>
-            <small>Kode Unik dosen ini dipakai untuk semua sistem</small>
-            </div>
-            <?= $form->field($model, 'NIY')->textInput(['autofocus' => true]) ?>
-            <?= $form->field($dataDiri, 'NIDN')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($dataDiri, 'jenjang_kode')->dropDownList($listDataJenjang, ['prompt' => '-Pilih Pendidikan Terakhir-']) ?>
-    
-            <?= $form->field($dataDiri, 'kampus')->dropDownList($listKampus, ['prompt' => '-Pilih Kampus-']) ?>
-   
-            <?= $form->field($model, 'id_prod')->dropDownList(
-            ArrayHelper::map(Prodi::find()->all(),'ID','nama'),
-            ['prompt'=>'Pilih Program Studi']
-            ) 
-        ?>
+          <?= Html::a(Yii::t('app', 'Cancel'), ['user/index'], ['class' => 'btn btn-default']) ?>
+      </div>
 
-       <?= $form->field($dataDiri, 'status_dosen')->dropDownList([ '1' => 'Dosen Tetap', '2' => 'Tidak Tetap'], ['prompt' => '- Pilih Status Dosen -']) ?>
-      <?= $form->field($dataDiri, 'jabatan_fungsional')->dropDownList($listData, ['prompt'=>'..Pilih Jabatan Fungsional..','id'=>'jabfung']); ?>
-    <?php
+      <?php ActiveForm::end(); ?>
+    </div>
 
-    $data = !$dataDiri->isNewRecord ? [$dataDiri->pangkat => $dataDiri->pangkat0->nama.' '.$dataDiri->pangkat0->golongan] : [];
-     echo $form->field($dataDiri, 'pangkat')->widget(DepDrop::classname(), [
-        'data' => $data, 
-        'options'=>['id'=>'pangkat'],
-        'pluginOptions'=>[
-            'depends'=>['jabfung'],
-            'placeholder'=>'..Pilih Pangkat..',
-            'url'=>\yii\helpers\Url::to(['/m-jabatan-akademik/get-pangkat'])
-        ]
-    ]);
+
+    <?php 
+    if(Yii::$app->user->can('theCreator'))
+    {
+
+
+    ?>
+     <div class="col-md-6">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Option</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php 
+          foreach($user->authAssignments as $role)
+          {
+          ?>
+          <tr>
+            <td><?=$role->item_name;?></td>
+            <td><?=Html::a('<i class="fa fa-trash"></i> Remove','javascript:void(0)',['class'=>'btn btn-danger btn-remove-role','data-item'=>$role->item_name,'data-user'=>$user->id]);?></td>
+          </tr>
+          <?php 
+          }
+          ?>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">
+              <?=Html::a('<i class="fa fa-plus"></i> Add a Role','javascript:void(0)',['class'=>'btn btn-success','id'=>'btn-add-role']);?>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+     
+     </div>
+     <?php 
+    }
      ?>
+  </div>
 
-    
-    
-             
-        </div>
-        <div class="col-md-4">
-              <?= $form->field($model, 'email') ?>
-            <?= $form->field($model, 'password')->passwordInput() ?>
-            
-        <?= $form->field($model, 'access_role')->dropDownList(ArrayHelper::map($listRoles,'name','name')) ?>
-    
-        <?= $form->field($model, 'status')->dropDownList(['aktif'=>'Aktif','nonaktif'=>'Nonaktif']) ?>
-    
-    <?= $form->field($dataDiri, 'permalink')->textInput(['maxlength' => true]) ?>
-        </div>
-    </div>
-    <div class="row">
-    <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success btn-block' : 'btn btn-primary btn-block']) ?>
-    </div>
-    </div>
-    <?php ActiveForm::end(); ?>
-
+  </div>
 </div>
 
 
-<?php
 
-$this->registerJs(' 
- 
-function makeid(length) {
-   var result           = \'\';
-   var characters       = \'ABCDEFGHIJKLMNOPQRSTUVWXYZ\';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
-}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Data Role</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+       <input type="hidden" id="user_id" value="<?=$user->id;?>">
+        <?=Html::dropDownList('item_name','',$list_roles,['id'=>'item_name','class'=>'form-control']);?>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn-save">Add this role</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<?php 
 
-$(document).on("click","#btn-generate",function(e){
-    e.preventDefault()
+$script = ' 
+$(document).on("click","#btn-add-role",function(e){
+  e.preventDefault()
 
-    $(this).prev().val(makeid(6))
+  $("#exampleModal").modal("show");
+
+  
+
 })
 
-', \yii\web\View::POS_READY);
+$(document).on(\'change\',\'#dosen\',function(e){
+    e.preventDefault();
+    $("#nim").val($(this).val());
+    
+});
+
+$(document).on("click","#btn-save",function(e){
+  e.preventDefault()
+
+  var obj = new Object;
+  obj.user_id = $("#user_id").val();
+  obj.item_name = $("#item_name").val();
+  
+  $.ajax({
+      type: \'POST\',
+      url: "'.Url::to(['user/ajax-add-role']).'",
+      data: {
+          dataPost : obj
+      },
+      async: true,
+      error : function(e){
+        Swal.hideLoading();
+        
+
+      },
+      beforeSend: function(){
+        Swal.showLoading();
+      },
+      success: function (data) {
+        var hasil = $.parseJSON(data)
+        if(hasil.code == 200){
+      
+          Swal.fire({
+            title: \'Yeay!\',
+            icon: \'success\',
+            text: hasil.message
+          }).then((result) => {
+            if (result.value) {
+              location.reload(); 
+            }
+          });
+        }
+
+        else{
+          Swal.fire({
+            title: \'Oops!\',
+            icon: \'error\',
+            text: hasil.message
+          }).then((result) => {
+            if (result.value) {
+              location.reload(); 
+            }
+          });
+        }
+      }
+  })
+})
+
+
+$(document).on("click",".btn-remove-role",function(e){
+  e.preventDefault()
+
+
+
+  var obj = new Object;
+  obj.user_id = $(this).data("user");
+  obj.item_name = $(this).data("item");
+  
+  $.ajax({
+      type: \'POST\',
+      url: "'.Url::to(['user/ajax-delete-role']).'",
+      data: {
+          dataPost : obj
+      },
+      async: true,
+      error : function(e){
+        Swal.hideLoading();
+        
+
+      },
+      beforeSend: function(){
+        Swal.showLoading();
+      },
+      success: function (data) {
+        var hasil = $.parseJSON(data)
+        if(hasil.code == 200){
+      
+          Swal.fire({
+            title: \'Yeay!\',
+            icon: \'success\',
+            text: hasil.message
+          }).then((result) => {
+            if (result.value) {
+              location.reload(); 
+            }
+          });
+        }
+
+        else{
+          Swal.fire({
+            title: \'Oops!\',
+            icon: \'error\',
+            text: hasil.message
+          }).then((result) => {
+            if (result.value) {
+              location.reload(); 
+            }
+          });
+        }
+      }
+  })
+})
+
+';
+if(Yii::$app->user->can('Mahasiswa'))
+{
+$script .= '
+  setTimeout(function(){ 
+    $("#nim").val("'.$user->nim.'");
+  }, 500);
+  
+';
+}
+$this->registerJs($script, \yii\web\View::POS_READY);
 
 ?>

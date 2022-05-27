@@ -29,13 +29,20 @@ class MenuHelper
 		     	'template' => '<a href="{url}">{label}</a>',
 		        'label' => '<i class="lnr lnr-user"></i><span>Wisuda</span>', 
 		        'url' => ['peserta/create'],
-		        'visible' => Yii::$app->user->can('member'),
+		        'visible' => Yii::$app->user->identity->access_role == ('member'),
 		    ];		
 
 			$menuItems[] = [
 		     	'template' => '<a href="{url}">{label}</a>',
-		        'label' => '<i class="lnr lnr-user"></i><span>Peserta</span>', 
+		        'label' => '<i class="lnr lnr-users"></i><span>Calon Wisudawan</span>', 
 		        'url' => ['peserta/index'],
+		        'visible' => Yii::$app->user->can('admin'),
+		    ];
+
+		    $menuItems[] = [
+		     	'template' => '<a href="{url}">{label}</a>',
+		        'label' => '<i class="lnr lnr-history"></i><span>Riwayat Pendaftaran</span>', 
+		        'url' => ['peserta/riwayat'],
 		        'visible' => Yii::$app->user->can('admin'),
 		    ];		    
 
@@ -48,14 +55,18 @@ class MenuHelper
 		        'template' => '<a class="collapsed" data-toggle="collapse" href="#pages_profil">{label}</a>',
 		        'items'=>[
 		           	['label' => 'Periode', 'url' => ['/periode/index']],
-		           	['label' => 'Riwayat Pendaftaran', 'url' => ['/peserta/riwayat']],
 		           	['label' => 'Syarat Wisuda', 'url' => ['/syarat/index']],
 		           	['label' => 'Setting', 'url' => ['/setting/index']],
 	               
 		        ]
 	        ];
 
-
+	        $menuItems[] = [
+		     	'template' => '<a href="{url}">{label}</a>',
+		        'label' => '<i class="lnr lnr-user"></i><span>User</span>', 
+		        'url' => ['user/index'],
+		        'visible' => Yii::$app->user->can('theCreator'),
+		    ];		    
 	          
 		}
 

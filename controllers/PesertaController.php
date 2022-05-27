@@ -63,6 +63,161 @@ class PesertaController extends Controller
         ];
     }
 
+    public function actionAjaxApprove()
+    {
+        $results = [];
+
+        if(Yii::$app->request->isPost && !empty($_POST['dataPost'])){
+            $dataPost = $_POST['dataPost'];
+
+            $nim = $dataPost['nim'];
+            $model = Peserta::findOne(['nim' => $nim]);
+            
+            if (!empty($model)) {
+                
+                $transaction = Yii::$app->db->beginTransaction();
+                
+                try {
+                    $model->status_validasi = 'VALID';
+                    if($model->save()){
+                        $user = User::findOne(['nim' => $nim]);
+                        $emailTemplate = $this->renderPartial('//site/email_approval',[
+                            'model' => $model
+                        ]);
+                    
+                        Yii::$app->mailer->compose()
+                        ->setTo($user->email)
+                        // ->setTo('vinux.edu@gmail.com')
+                        ->setFrom([Yii::$app->params['supportEmail'] => 'Administrator'])
+                        ->setSubject('[Approval] WISUDA UNIDA Gontor')
+                        ->setHtmlBody($emailTemplate)
+                        ->send();
+
+                        $results = [
+                            'code' => 200,
+                            'message' => Yii::t('app', 'An email has been sent to this user')
+                        ];
+
+                        $transaction->commit();
+                    }
+
+                    else{
+                        throw new \Exception(MyHelper::logError($model));
+                        
+                    }
+                } 
+
+                catch (\Exception $e) {
+                    $transaction->rollBack();
+                    $errors = $e->getMessage();
+                    $results = [
+                        'code' => 500,
+                        'message' => Yii::t('app', $errors)
+                    ];
+                }
+            }
+
+            else{
+                $results = [
+                    'code' => 404,
+                    'message' => Yii::t('app', 'Peserta not found')
+                ];
+            }
+            
+        }
+        else{
+            $results = [
+                'code' => 400,
+                'message' => Yii::t('app', 'Bad Request')
+            ];
+        }
+        echo json_encode($results);
+        exit;
+    }
+
+    public function actionAjaxTotalBelumLengkap()
+    {
+        $results = [];
+
+        if(Yii::$app->request->isPost){
+            $query = Peserta::find();
+            $query->joinWith(['periode as p']);
+            $query->where(['p.status_aktivasi' =>'Y']);
+            $list_wisudawan = $query->all();
+
+            $list_syarat = Syarat::find()->where(['is_aktif'=> 'Y'])->all();
+            $total_syarat = count($list_syarat);
+            $total = 0;
+            foreach($list_wisudawan as $model){
+                $counter = 0;
+                $list_bukti_peserta = [];
+                foreach($list_syarat as $syarat){
+                    $ps = PesertaSyarat::findOne([
+                        'peserta_id' => $model->id,
+                        'syarat_id' => $syarat
+                    ]);
+
+                    if(!empty($ps)){
+                        $counter++;
+                    }
+                }    
+
+                $sisa = $total_syarat - $counter;
+                if($sisa > 0) $total++;
+            }
+            
+
+            $results = [
+                'code' => 200,
+                'total' => $total,
+            ];
+        }
+
+        echo json_encode($results);
+        exit;
+    }
+
+
+    public function actionAjaxTotalWisudawan()
+    {
+        $results = [];
+
+        if(Yii::$app->request->isPost){
+            $query = Peserta::find();
+            $query->joinWith(['periode as p']);
+            $query->where(['p.status_aktivasi' =>'Y']);
+            $total_wisudawan = $query->count();
+
+            $query = Peserta::find();
+            $query->joinWith(['periode as p']);
+            $query->where([
+                'p.status_aktivasi' =>'Y',
+                'status_validasi' => 'VALID'
+            ]);
+            $total_valid = $query->count();
+
+            $query = Peserta::find();
+            $query->joinWith(['periode as p']);
+            $query->where([
+                'p.status_aktivasi' =>'Y',                
+            ]);
+
+            $query->andWhere(['<>','status_validasi','VALID']);
+
+            $total_invalid = $query->count();
+
+            $results = [
+                'code' => 200,
+                'total_wisudawan' => $total_wisudawan,
+                'total_invalid' => $total_invalid,
+                'total_valid' => $total_valid
+            ];
+        }
+
+        echo json_encode($results);
+        exit;
+    }
+
     public function actionAjaxProceed()
     {
         $results = [];
@@ -273,18 +428,62 @@ class PesertaController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $results = [];
+        $api_baseurl = Yii::$app->params['api_baseurl'];
+        $client = new Client(['baseUrl' => $api_baseurl]);
+        $client_token = Yii::$app->params['client_token'];
+        $headers = ['x-access-token'=>$client_token];
+
+        $params = [
+            'nim' => $model->nim
+        ];
+        $response = $client->get('/m/profil/nim', $params,$headers)->send();
+        
+        if ($response->isOk) {
+            $tmp = $response->data['values'];
+            if(!empty($tmp)) {
+                $results = [
+                    'code' => 200,
+                    'message' => 'Success',
+                    'items' => $tmp[0]
+                ];
+            }   
+            else {
+
+                $results = [
+                    'code' => 404,
+                    'message' => 'Your data is not found',
+                    'items' => []
+                ];    
+            } 
+               
+        }
+
+        
         $list_syarat = Syarat::find()->where(['is_aktif'=> 'Y'])->all();
         $list_bukti_peserta = [];
+        $counter = 0;
+        $jumlah_syarat = count($list_syarat);
         foreach($list_syarat as $syarat){
             $ps = PesertaSyarat::findOne([
                 'peserta_id' => $model->id,
                 'syarat_id' => $syarat
             ]);
-            $list_bukti_peserta[$syarat->id] = $ps; 
+
+            if(!empty($ps)){
+                $counter++;
+                $list_bukti_peserta[$syarat->id] = $ps; 
+            }
         }
+
+        $sisa = $jumlah_syarat - $counter;
+
+        // print_r($results);exit;
         return $this->render('view_new', [
             'model' => $model,
+            'sisa' => $sisa,
             'list_syarat' => $list_syarat,
+            'results' => $results,
             'list_bukti_peserta' => $list_bukti_peserta
         ]);
     }

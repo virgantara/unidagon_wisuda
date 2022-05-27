@@ -55,6 +55,38 @@ class SyaratController extends Controller
         $searchModel = new SyaratSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        if (Yii::$app->request->post('hasEditable')) 
+        {
+            
+            // instantiate your book model for saving
+            $id = Yii::$app->request->post('editableKey');
+            $model = Syarat::findOne($id);
+
+            // store a default json response as desired by editable
+            $out = json_encode(['output'=>'', 'message'=>'']);
+
+            
+            $posted = current($_POST['Syarat']);
+            $post = ['Syarat' => $posted];
+            if ($model->load($post)) {
+                if($model->save())
+                {
+                    $out = json_encode(['output'=>'', 'message'=>'']);
+                }
+
+                else
+                {
+                    $errors = \app\helpers\MyHelper::logError($model);
+                    $out = json_encode(['output'=>'', 'message'=>$errors]);
+                }
+            }
+
+            echo $out;
+
+            return;
+            
+        }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -85,7 +117,7 @@ class SyaratController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
@@ -106,7 +138,7 @@ class SyaratController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', "Data tersimpan");
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [

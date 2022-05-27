@@ -4,50 +4,51 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\User */
+/* @var $model app\models\User */
 
-$this->title = $model->ID;
+$this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="user-view">
+<div class="block-header">
+    <h2><?= Html::encode($this->title) ?></h2>
+</div>
+<div class="row">
+   <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Are you sure you want to delete this item?',
+                        'method' => 'post',
+                    ],
+                ]) ?>
+            </div>
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php 
-    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-      echo '<div class="alert alert-' . $key . '">' . $message . '<button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button></div>';
-    }
-    ?>
-    <p>
+            <div class="panel-body ">
         
-        <?= Html::a('Edit', ['update', 'id' => $model->ID], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->ID], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-
-        <?= Html::a('Login as '.$model->dataDiri->nama, ['otp', 'id' => $model->ID], ['class' => 'btn btn-success','target'=>'_blank']) ?>
-    </p>
-
-    <?= DetailView::widget([
+<?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            
-            'NIY',
-            'dataDiri.NIDN',
-            'dataDiri.nama',
-            'prodiUser.nama',
-            // 'status_admin',
+            'id',
+            'username',
+            'auth_key',
+            'password_hash',
+            'password_reset_token',
             'email:email',
             'status',
-            'access_role',
             'uuid',
-            // 'created_at',
-            // 'updated_at',
+            'access_role',
+            'nim',
+            'created_at',
+            'updated_at',
         ],
     ]) ?>
 
+            </div>
+        </div>
+
+    </div>
 </div>
