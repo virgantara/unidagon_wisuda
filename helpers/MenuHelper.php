@@ -13,10 +13,9 @@ class MenuHelper
     public static function getMenuItems()
     {
 
-    	// $userRole = Yii::$app->user->identity->access_role;
+
         $menuItems = [];
 
-        // $currentRoute = Yii::$app->controller->id.'/'.Yii::$app->controller->action->id;
 		if(!Yii::$app->user->isGuest)
 		{
 			$menuItems[] = [
@@ -65,6 +64,13 @@ class MenuHelper
 		     	'template' => '<a href="{url}">{label}</a>',
 		        'label' => '<i class="lnr lnr-user"></i><span>User</span>', 
 		        'url' => ['user/index'],
+		        'visible' => Yii::$app->user->can('theCreator'),
+		    ];	
+
+		    $menuItems[] = [
+		     	'template' => '<a href="{url}">{label}</a>',
+		        'label' => '<i class="lnr lnr-user"></i><span>Activity Logs</span>', 
+		        'url' => ['logs/index'],
 		        'visible' => Yii::$app->user->can('theCreator'),
 		    ];		    
 	          
