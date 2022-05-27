@@ -532,7 +532,8 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            
+            $activity = new \wdmg\activity\models\Activity;
+            $activity->setActivity(Yii::$app->user->identity->username.' has successfully login from WISUDA', 'login', 'info', 2);       
             return $this->goBack();
         } else {
             return $this->render('login', [
