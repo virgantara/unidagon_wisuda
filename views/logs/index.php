@@ -22,9 +22,6 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
             </div>
 <div class="panel-body ">
 
-    <p>
-        <?= Html::a('Create Activity', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
     <?php
     $gridColumns = [
     [
@@ -48,7 +45,10 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
             ],
             'action',
             // 'metadata:ntext',
-    ['class' => 'yii\grid\ActionColumn']
+    [
+        'class' => 'yii\grid\ActionColumn',
+        'template' => '{view} {delete}'
+    ]
 ];?>    
 <?= GridView::widget([
         'dataProvider' => $dataProvider,
