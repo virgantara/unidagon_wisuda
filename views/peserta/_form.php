@@ -20,20 +20,7 @@ use yii\widgets\ActiveForm;
     
     
 </form>
-<ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active">
-        <a href="#" aria-controls="one" role="tab" data-toggle="tab">Biodata</a>
-    </li>
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>2])?>" >Data Orang Tua</a>
-    </li>
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>3])?>">Bukti Wisuda</a>
-    </li>
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>4])?>">Konfirmasi</a>
-    </li>
-</ul>
+
 <?php $form = ActiveForm::begin(); ?>
 <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
 <div class="col-lg-6 col-md-12 col-sm-12">

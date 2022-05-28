@@ -19,6 +19,10 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="panel-body ">
 
+<div class="alert alert-info">
+    <h3><i class="fa fa-warning"></i> Perhatian</h3>
+    Jika ada kesalahan pada data Anda, silakan mengupdate data dari SIAKAD.
+</div>
 
 
     <?php 

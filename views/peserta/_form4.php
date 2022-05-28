@@ -22,20 +22,7 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
     
     
 </form>
-<ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>1])?>">Biodata</a>
-    </li>
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>2])?>" >Data Orang Tua</a>
-    </li>
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>3])?>">Bukti Wisuda</a>
-    </li>
-    <li role="presentation" class="active">
-        <a href="#four" aria-controls="four" role="tab" data-toggle="tab">Konfirmasi</a>
-    </li>
-</ul>
+
 <?php $form = ActiveForm::begin(); ?>
 <?= $form->errorSummary($model,['header'=>'<div class="alert alert-danger">','footer'=>'</div>']);?>  
 <div class="col-lg-6 col-md-12 col-sm-12">

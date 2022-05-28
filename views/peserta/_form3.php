@@ -20,20 +20,7 @@ use devgroup\dropzone\DropZone;
     
     
 </form>
-<ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>1])?>">Biodata</a>
-    </li>
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>2])?>" >Data Orang Tua</a>
-    </li>
-    <li role="presentation" class="active">
-        <a href="#">Bukti Wisuda</a>
-    </li>
-    <li role="presentation" class="">
-        <a href="<?=Url::to(['peserta/create','step'=>4])?>">Konfirmasi</a>
-    </li>
-</ul>
+
 <div class="peserta-form">
 
 
