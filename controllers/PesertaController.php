@@ -532,6 +532,34 @@ class PesertaController extends Controller
             
             if ($response->isOk) {
                 $tmp = $response->data['values'];
+
+                if(count($tmp) > 0){
+                    $tmp = $tmp[0];
+                    $model->nim = $tmp['nim_mhs'];
+                    $model->nama_lengkap = $tmp['nama_mahasiswa'];
+                    $model->fakultas = $tmp['nama_fakultas'];
+                    $model->prodi = $tmp['nama_prodi'];    
+                    $model->tempat_lahir = $tmp['tempat_lahir'];
+                    $model->tanggal_lahir = $tmp['tgl_lahir'];
+                    $model->jenis_kelamin = $tmp['jenis_kelamin'];
+                    $model->status_warga = $tmp['sw'];
+                    $model->warga_negara = $tmp['wn'];
+                    $model->alamat = $tmp['alamat'].' RT '.$tmp['rt'].'/RW '.$tmp['rw'].', '.$tmp['dusun'].', '.$tmp['desa'].', '.$tmp['kecamatan'].', '.$tmp['kab'].', '.$tmp['prov'];
+                    $model->no_telp = $tmp['telepon'];
+                }
+                
+            }
+        }
+
+        else{
+            $params = [
+                'nim' => Yii::$app->user->identity->nim
+            ];
+            $response = $client->get('/m/profil/nim', $params,$headers)->send();
+            
+            if ($response->isOk) {
+                $tmp = $response->data['values'];
+                
                 if(count($tmp) > 0){
                     $tmp = $tmp[0];
                     $model->nim = $tmp['nim_mhs'];
