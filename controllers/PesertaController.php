@@ -241,7 +241,7 @@ class PesertaController extends Controller
             $params = [
                 'nim' => $nim
             ];
-            $response = $client->get('/u/mhs/nim', $params,$headers)->send();
+            $response = $client->get('/m/profil/nim', $params,$headers)->send();
             
             if ($response->isOk) {
                 $tmp = $response->data['values'];
