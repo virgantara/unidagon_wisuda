@@ -245,7 +245,7 @@ class PesertaController extends Controller
             
             if ($response->isOk) {
                 $tmp = $response->data['values'];
-                
+                $tmp = $tmp[0];
                 $user = User::findOne(['username'=>$nim]);
                 $auth = Yii::$app->authManager;
                 $transaction = Yii::$app->db->beginTransaction();
