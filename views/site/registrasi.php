@@ -6,7 +6,18 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 
 $this->title = 'Pendaftaran Wisuda';
+ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
 
+$is_open = false;
+if(!empty($periode)){
+    $sd = strtotime($periode->tanggal_buka);
+    $ed = strtotime($periode->tanggal_tutup);
+    $today = strtotime(date('Y-m-d H:i:s'));
+    // print_r($sd);
+    // print_r($today);
+    // exit;
+    $is_open = $today >= $sd && $today <= $ed;
+}
 ?>
 
 <style>
@@ -26,6 +37,11 @@ $this->title = 'Pendaftaran Wisuda';
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8 pr-lg-5">
+                
+                <?php 
+                if($is_open){
+
+                 ?>
                 <h1>Graduation Registration</h1>
                 <p class="lead">Before registration, make sure your data is valid. <br>You can begin your registration by entering your NIM below</p>
                 <div class="cta">
@@ -45,6 +61,16 @@ $this->title = 'Pendaftaran Wisuda';
                               
                         <?php ActiveForm::end(); ?>                   
                 </div>
+                <?php } 
+                else{
+                ?>
+                <h1>Graduation Registration is officially closed</h1>
+                <p class="lead">Oops, the registration is already closed. See you again in the next period.</p>
+                <?php 
+
+
+                }
+                ?>
             </div>
             <div class="col-lg-4 d-lg-block d-none">
                 <img src="https://getstisla.com/landing/undraw_post_online_dkuk.svg" alt="image" class="img-fluid img-flip" width="80%">
@@ -64,8 +90,7 @@ if(empty($periode)){
 <?php }
 else{
 
-    setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
-
+   
 
     $tgl_awal = strftime('%A, %d %B %Y',strtotime($periode->tanggal_buka));
     $tgl_akhir = strftime('%A, %d %B %Y',strtotime($periode->tanggal_tutup));
