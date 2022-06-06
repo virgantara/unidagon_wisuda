@@ -104,9 +104,10 @@ else{
     }
 
     else{
+        $tgl_akhir = strftime('%A, %d %B %Y',strtotime($periode->tanggal_tutup));
         echo "<div class='alert alert-danger'>";
         echo "Periode Pendaftaran ".$periode->nama_periode." sudah ditutup ";
-        
+        echo "pada <b>".$tgl_akhir."</b>";
         echo "</div>";
     }
 }
