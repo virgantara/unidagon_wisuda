@@ -90,15 +90,25 @@ if(empty($periode)){
 <?php }
 else{
 
-   
+    if($is_open){
 
-    $tgl_awal = strftime('%A, %d %B %Y',strtotime($periode->tanggal_buka));
-    $tgl_akhir = strftime('%A, %d %B %Y',strtotime($periode->tanggal_tutup));
-    echo "<h1>Pembukaan Pendaftaran ".$periode->nama_periode."</h1>";
-    echo "<div class='alert alert-info'>";
-    echo "Periode Pendaftaran ".$periode->nama_periode." dibuka pada ";
-    echo "<b>".$tgl_awal.' s/d '.$tgl_akhir."</b>";
-    echo "</div>";
+
+
+        $tgl_awal = strftime('%A, %d %B %Y',strtotime($periode->tanggal_buka));
+        $tgl_akhir = strftime('%A, %d %B %Y',strtotime($periode->tanggal_tutup));
+        echo "<h1>Pembukaan Pendaftaran ".$periode->nama_periode."</h1>";
+        echo "<div class='alert alert-info'>";
+        echo "Periode Pendaftaran ".$periode->nama_periode." dibuka pada ";
+        echo "<b>".$tgl_awal.' s/d '.$tgl_akhir."</b>";
+        echo "</div>";
+    }
+
+    else{
+        echo "<div class='alert alert-danger'>";
+        echo "Periode Pendaftaran ".$periode->nama_periode." sudah ditutup ";
+        
+        echo "</div>";
+    }
 }
  ?>
 </p>
