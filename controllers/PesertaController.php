@@ -700,7 +700,7 @@ class PesertaController extends Controller
 
             $model->delete();
             Yii::$app->session->setFlash('success', "Data successfully deleted");
-            
+            $transaction->commit();
         } catch (\Exception $e) {
             $errors .= $e->getMessage();
             Yii::$app->session->setFlash('danger', $errors);
