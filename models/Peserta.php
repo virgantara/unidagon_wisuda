@@ -141,4 +141,9 @@ class Peserta extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Periode::className(), ['id_periode' => 'periode_id']);
     }
+
+    public function getPesertaSyarats()
+    {
+        return $this->hasMany(PesertaSyarat::className(), ['peserta_id' => 'id']);
+    }
 }

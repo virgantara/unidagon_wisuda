@@ -510,6 +510,22 @@ class PesertaController extends Controller
         if(Yii::$app->user->isGuest){
             return $this->redirect(['site/logout']);
         }
+        $periode = Periode::findOne(['status_aktivasi' => 'Y']);
+        $is_open = false;
+        if(!empty($periode)){
+            $sd = strtotime($periode->tanggal_buka);
+            $ed = strtotime($periode->tanggal_tutup);
+            $today = strtotime(date('Y-m-d H:i:s'));
+            // print_r($sd);
+            // print_r($today);
+            // exit;
+            $is_open = $today >= $sd && $today <= $ed;
+        }
+
+        if(!$is_open){
+            Yii::$app->session->setFlash('danger','Oops, registration has been closed');
+            return $this->redirect(['site/index']);
+        }
 
         $list_syarat = Syarat::find()->where(['is_aktif'=> 'Y'])->all();
         $list_bukti_peserta = [];
@@ -519,7 +535,7 @@ class PesertaController extends Controller
         $headers = ['x-access-token'=>$client_token];
 
         $model = Peserta::findOne(['nim' => Yii::$app->user->identity->nim]);
-        $periode = Periode::findOne(['status_aktivasi' => 'Y']);
+        
 
         if(empty($model)){
             $model = new Peserta();
@@ -673,7 +689,24 @@ class PesertaController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $transaction = \Yii::$app->db->beginTransaction();
+        $errors = '';
+        try 
+        {
+            foreach($model->pesertaSyarats as $syarat){
+                $syarat->delete();
+            }
+
+            $model->delete();
+            Yii::$app->session->setFlash('success', "Data successfully deleted");
+            
+        } catch (\Exception $e) {
+            $errors .= $e->getMessage();
+            Yii::$app->session->setFlash('danger', $errors);
+            $transaction->rollBack();
+               
+        }
 
         return $this->redirect(['index']);
     }
