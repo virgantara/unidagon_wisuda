@@ -46,6 +46,7 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
             ],
             'nim',
             'nama_lengkap',
+            'nik',
             'fakultas',
             'prodi',
             'tempat_lahir',
@@ -64,7 +65,8 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
             //'warga_negara',
             'alamat:ntext',
             'no_telp',
-            //'nama_ayah',
+
+            'nama_ayah',
             //'pekerjaan_ayah',
             'nama_ibu',
             //'pekerjaan_ibu',
