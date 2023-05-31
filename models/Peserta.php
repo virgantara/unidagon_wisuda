@@ -48,6 +48,9 @@ use Yii;
  * @property string|null $updated_at
  * @property int $periode_id
  * @property string|null $drive_path
+ * @property int|null $approved_by 
+ * @property string|null $ukuran_kaos 
+ * @property string|null $jumlah_rombongan 
  *
  * @property Periode $periode
  */
@@ -68,16 +71,19 @@ class Peserta extends \yii\db\ActiveRecord
     {
         return [
             [['nim', 'nama_lengkap', 'fakultas', 'prodi', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_warga', 'warga_negara', 'alamat', 'no_telp','periode_id','nik'], 'required','on'=>'sce_form1'],
-            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required','on'=>'sce_form2'],
-            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required','on'=>'sce_form3'],
-            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required','on'=>'sce_form4'],
+            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required', 'on' => 'sce_form2'],
+            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required', 'on' => 'sce_form3'],
+            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required', 'on' => 'sce_form4'],
+            [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required', 'on' => 'sce_form5'],
             [['alamat', 'drive_path'], 'string'],
             [['created', 'updated_at'], 'safe'],
-            [['periode_id'], 'integer'],
+            [['periode_id', 'approved_by'], 'integer'],
             [['nim', 'kampus'], 'string', 'max' => 50],
             [['nama_lengkap', 'pas_photo', 'ijazah', 'akta_kelahiran', 'kwitansi_jilid', 'surat_bebas_pinjaman', 'resume_skripsi', 'surat_bebas_tunggakan', 'transkrip', 'skl_tahfidz', 'kwitansi_wisuda', 'tanda_keluar_asrama', 'surat_jalan', 'skripsi', 'abstrak', 'bukti_revisi_bahasa', 'bukti_layouter', 'bukti_perpus'], 'string', 'max' => 255],
             [['fakultas', 'prodi', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_warga', 'warga_negara', 'no_telp', 'nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'string', 'max' => 100],
             [['kode_pendaftaran', 'status_validasi', 'kmi'], 'string', 'max' => 20],
+            [['ukuran_kaos', 'jumlah_rombongan'], 'string', 'max' => 3],
+            [['approved_by'], 'exist', 'skipOnError' => true, 'targetClass' => Approver::className(), 'targetAttribute' => ['approved_by' => 'id']],
             [['periode_id'], 'exist', 'skipOnError' => true, 'targetClass' => Periode::className(), 'targetAttribute' => ['periode_id' => 'id_periode']],
         ];
     }
@@ -130,6 +136,10 @@ class Peserta extends \yii\db\ActiveRecord
             'updated_at' => Yii::t('app', 'Updated At'),
             'periode_id' => Yii::t('app', 'Periode ID'),
             'drive_path' => Yii::t('app', 'Drive Path'),
+
+            'approved_by' => Yii::t('app', 'Approved By'),
+            'ukuran_kaos' => Yii::t('app', 'Ukuran Kaos'),
+            'jumlah_rombongan' => Yii::t('app', 'Jumlah Rombongan'),
         ];
     }
 
@@ -146,5 +156,10 @@ class Peserta extends \yii\db\ActiveRecord
     public function getPesertaSyarats()
     {
         return $this->hasMany(PesertaSyarat::className(), ['peserta_id' => 'id']);
+    }
+
+    public function getApprovedBy() 
+    { 
+        return $this->hasOne(Approver::className(), ['id' => 'approved_by']); 
     }
 }
