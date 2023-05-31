@@ -31,11 +31,11 @@ class MenuHelper
 				'visible' => Yii::$app->user->identity->access_role == ('member'),
 			];
 
-			if (Yii::$app->user->identity->access_role == ('member')) {
+			if (Yii::$app->user->identity->access_role == ('member') && MyHelper::getPesertaId(Yii::$app->user->identity->nim)['status']) {
 				$menuItems[] = [
 					'template' => '<a href="{url}">{label}</a>',
 					'label' => '<i class="lnr lnr-file-empty"></i><span>My Data</span>',
-					'url' => ['peserta/view', 'id' => MyHelper::getPesertaId(Yii::$app->user->identity->nim)],
+					'url' => ['peserta/view', 'id' => MyHelper::getPesertaId(Yii::$app->user->identity->nim)['id']],
 				];
 			}
 
