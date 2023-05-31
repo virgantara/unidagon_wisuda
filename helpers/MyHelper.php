@@ -70,7 +70,12 @@ class MyHelper
 		$peserta = Peserta::find()->where([
 			'nim' => $nim
 		])->one();
-		return $peserta->id;
+
+		$result = [
+			'id' =>  $peserta ? $peserta->id : '',
+			'status' => $peserta ? true : false,
+		];
+		return $result;
 	}
 
 	public static function getStatusSyarat($peserta_id, $syarat_id)
