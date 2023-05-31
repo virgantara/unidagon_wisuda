@@ -14,7 +14,8 @@ use yii\widgets\ActiveForm;
         </li>
         <li id="step2" class="active" ><strong>Data Orang Tua</strong></li>
         <li id="step3"><strong>Bukti Wisuda</strong></li>
-        <li id="step4"><strong>Konfirmasi</strong></li>
+        <li id="step4"><strong>Data Wisuda</strong></li>
+        <li id="step5"><strong>Konfirmasi</strong></li>
     </ul>
     
     
