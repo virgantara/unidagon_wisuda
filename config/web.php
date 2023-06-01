@@ -72,7 +72,7 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => Yii::$app->params['mail'],
+        'mailer' => $params['mail'],
         'view' => [
             'theme' => [
                 'pathMap' => [
