@@ -87,7 +87,7 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
                         </tr>
                         <tr>
                             <td>Kampus</td>
-                            <td colspan="2">: <?= MyHelper::getKampus($model->kampus) ?></td>
+                            <td colspan="2">: <?= $model->kampus != null ? MyHelper::getKampus($model->kampus)  : "";?></td>
                         </tr>
                         <tr>
                             <td>Fakultas</td>
