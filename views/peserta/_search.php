@@ -25,6 +25,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'prodi') ?>
 
+    <?= $form->field($model, 'jumlah_rombongan') ?>
+
     <?php // echo $form->field($model, 'tempat_lahir') ?>
 
     <?php // echo $form->field($model, 'tanggal_lahir') ?>

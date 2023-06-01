@@ -51,8 +51,11 @@ use Yii;
  * @property int|null $approved_by 
  * @property string|null $ukuran_kaos 
  * @property string|null $jumlah_rombongan 
+ * @property string|null $approved_at
  *
+ * @property Approver $approvedBy 
  * @property Periode $periode
+ * @property PesertaSyarat[] $pesertaSyarats 
  */
 class Peserta extends \yii\db\ActiveRecord
 {
@@ -76,9 +79,9 @@ class Peserta extends \yii\db\ActiveRecord
             [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required', 'on' => 'sce_form4'],
             [['nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'required', 'on' => 'sce_form5'],
             [['alamat', 'drive_path'], 'string'],
-            [['created', 'updated_at'], 'safe'],
+            [['created', 'updated_at', 'approved_at'], 'safe'],
             [['periode_id', 'approved_by'], 'integer'],
-            [['nim', 'kampus'], 'string', 'max' => 50],
+            [['nim', 'nik', 'kampus'], 'string', 'max' => 50],
             [['nama_lengkap', 'pas_photo', 'ijazah', 'akta_kelahiran', 'kwitansi_jilid', 'surat_bebas_pinjaman', 'resume_skripsi', 'surat_bebas_tunggakan', 'transkrip', 'skl_tahfidz', 'kwitansi_wisuda', 'tanda_keluar_asrama', 'surat_jalan', 'skripsi', 'abstrak', 'bukti_revisi_bahasa', 'bukti_layouter', 'bukti_perpus'], 'string', 'max' => 255],
             [['fakultas', 'prodi', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_warga', 'warga_negara', 'no_telp', 'nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu'], 'string', 'max' => 100],
             [['kode_pendaftaran', 'status_validasi', 'kmi'], 'string', 'max' => 20],

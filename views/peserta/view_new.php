@@ -2,11 +2,10 @@
 
 use app\helpers\MyHelper;
 use app\models\Approver;
+use kartik\select2\Select2;
 use richardfan\widget\JSRegister;
 use wdmg\helpers\ArrayHelper;
-use yii\helpers\Url;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Peserta */
@@ -30,14 +29,15 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
                             $title = $sisa > 0 ? 'Tidak bisa diapprove karena bukti belum lengkap' : 'Approval';
                             $approve_btn = Html::a('<i class="fa fa-check"></i> Approve', 'javascript:void(0)', ['class' => 'btn btn-success', 'id' => 'btn-approve', 'disabled' => $disabled, 'title' => $title]);
 
-
-
-                            $list_approver = Html::dropDownList(
-                                'approved_by',
-                                $model->ukuran_kaos,
-                                ArrayHelper::map(Approver::find()->all(), 'id', 'nama'),
-                                ['class' => 'form-control', 'prompt' => 'please choose a approver']
-                            );
+                            $list_approver = Select2::widget([
+                                'name' => 'approved_by',
+                                'data' => ArrayHelper::map(Approver::find()->all(), 'id', 'nama'),
+                                'value' => $model->ukuran_kaos,
+                                'options' => [
+                                    'class' => 'form-control',
+                                    'prompt' => 'please choose an approver',
+                                ],
+                            ]);
                         ?>
 
                             <div class="col-md-1"><?= $approve_btn ?></div>
@@ -47,8 +47,8 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
                                     <?= Html::hiddenInput('id', $model->id, ['id' => 'peserta_id']); ?>
                                 </form>
                             </div>
-                            
-                            <?php
+
+                        <?php
                         endif;
                         ?>
                         <div class="col-md-1">
@@ -131,12 +131,8 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
                             <td colspan="2">: <?= $model->pekerjaan_ibu ?></td>
                         </tr>
                         <tr>
-                            <td>Alamat</td>
-                            <td colspan="2">: <?= $model->alamat ?></td>
-                        </tr>
-                        <tr>
-                            <td>Email</td>
-                            <td colspan="2">: <?= $model->alamat ?></td>
+                            <td>Alamat Email</td>
+                            <td colspan="2">: <?= MyHelper::getEmailUser($model->nim) ?></td>
                         </tr>
                         <tr>
                             <td>Ukuran Kaos</td>
