@@ -176,7 +176,6 @@ class PesertaController extends Controller
         exit;
     }
 
-
     public function actionAjaxTotalWisudawan()
     {
         $results = [];
@@ -382,7 +381,6 @@ class PesertaController extends Controller
         ]);
     }
 
-
     /**
      * Lists all Peserta models.
      * @return mixed
@@ -464,7 +462,7 @@ class PesertaController extends Controller
         $sisa = $jumlah_syarat - $counter;
 
         // print_r($results);exit;
-        return $this->render('view_new', [
+        return $this->render('view', [
             'model' => $model,
             'sisa' => $sisa,
             'list_syarat' => $list_syarat,
@@ -646,6 +644,7 @@ class PesertaController extends Controller
                 $model = Peserta::findOne($dataPost['id']);
 
                 $model->attributes = $dataPost;
+                $model->approved_at = date('Y-m-d');
 
                 if ($model->save()) {
                     $results    = [
@@ -702,12 +701,26 @@ class PesertaController extends Controller
             $pdf->SetPrintFooter(false);
             $fontpath   = Yii::getAlias('@webroot') . '/klorofil/assets/fonts/pala.ttf';
 
+
             $fontreg    = \TCPDF_FONTS::addTTFfont($fontpath, 'TrueTypeUnicode', '', 86);
-            $pdf->SetFont($fontreg, '', 11);
+            $pdf->SetFont($fontreg, '', 9);
             $pdf->AddPage();
 
+            
+            $style = array(
+                'border' => false,
+                'padding' => 0,
+                'fgcolor' => array(0, 0, 0),
+                'bgcolor' => false, //array(255,255,255)
+            );
+            
+            $imgdata = Yii::getAlias('@webroot') . '/klorofil/assets/img/logo-ori.png';
+            $pdf->Image($imgdata, 60, 8, 12);
+
             $pdf->writeHTML($data);
-            $pdf->Output('persyaratan-wisuda-' . 43 . '.pdf');
+            
+            $peserta->approved_by != null ? $pdf->write2DBarcode($peserta->nim . '#approved_by#' . $peserta->approvedBy->nama , 'QRCODE,Q', 130, 210, 30, 20, $style, 'N') : "";
+            $pdf->Output('persyaratan-wisuda-' . $peserta->nama_lengkap . '.pdf');
         } catch (\Exception $e) {
             echo $e;
             exit;

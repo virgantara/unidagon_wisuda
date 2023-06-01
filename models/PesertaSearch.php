@@ -19,7 +19,7 @@ class PesertaSearch extends Peserta
     {
         return [
             [['id', 'periode_id'], 'integer'],
-            [['nim', 'nama_lengkap', 'fakultas', 'prodi', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_warga', 'warga_negara', 'alamat', 'no_telp', 'nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu', 'pas_photo', 'ijazah', 'akta_kelahiran', 'kwitansi_jilid', 'surat_bebas_pinjaman', 'resume_skripsi', 'surat_bebas_tunggakan', 'transkrip', 'skl_tahfidz', 'kwitansi_wisuda', 'tanda_keluar_asrama', 'surat_jalan', 'skripsi', 'abstrak', 'kode_pendaftaran', 'kampus', 'status_validasi', 'kmi', 'bukti_revisi_bahasa', 'bukti_layouter', 'bukti_perpus', 'created', 'drive_path','nik'], 'safe'],
+            [['nim', 'nama_lengkap', 'fakultas', 'prodi', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_warga', 'warga_negara', 'alamat', 'no_telp', 'nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu', 'pas_photo', 'ijazah', 'akta_kelahiran', 'kwitansi_jilid', 'surat_bebas_pinjaman', 'resume_skripsi', 'surat_bebas_tunggakan', 'transkrip', 'skl_tahfidz', 'kwitansi_wisuda', 'tanda_keluar_asrama', 'surat_jalan', 'skripsi', 'abstrak', 'kode_pendaftaran', 'kampus', 'status_validasi', 'kmi', 'bukti_revisi_bahasa', 'jumlah_rombongan', 'bukti_layouter', 'bukti_perpus', 'created', 'drive_path','nik'], 'safe'],
         ];
     }
 
@@ -106,7 +106,8 @@ class PesertaSearch extends Peserta
             ->andFilterWhere(['like', 'bukti_revisi_bahasa', $this->bukti_revisi_bahasa])
             ->andFilterWhere(['like', 'bukti_layouter', $this->bukti_layouter])
             ->andFilterWhere(['like', 'bukti_perpus', $this->bukti_perpus])
-            ->andFilterWhere(['like', 'drive_path', $this->drive_path]);
+            ->andFilterWhere(['like', 'drive_path', $this->drive_path])
+            ->andFilterWhere(['like', 'jumlah_rombongan', $this->jumlah_rombongan]);
 
         return $dataProvider;
     }
@@ -178,7 +179,8 @@ class PesertaSearch extends Peserta
             ->andFilterWhere(['like', 'bukti_revisi_bahasa', $this->bukti_revisi_bahasa])
             ->andFilterWhere(['like', 'bukti_layouter', $this->bukti_layouter])
             ->andFilterWhere(['like', 'bukti_perpus', $this->bukti_perpus])
-            ->andFilterWhere(['like', 'drive_path', $this->drive_path]);
+            ->andFilterWhere(['like', 'drive_path', $this->drive_path])
+            ->andFilterWhere(['like', 'jumlah_rombongan', $this->jumlah_rombongan]);
 
         return $dataProvider;
     }

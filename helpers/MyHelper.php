@@ -5,6 +5,7 @@ namespace app\helpers;
 use app\models\Peserta;
 use app\models\PesertaSyarat;
 use app\models\Syarat;
+use app\models\User;
 use Yii;
 
 /**
@@ -76,6 +77,16 @@ class MyHelper
 			'status' => $peserta ? true : false,
 		];
 		return $result;
+	}
+
+	public static function getEmailUser($nim)
+	{
+
+		$user = User::find()->where([
+			'nim' => $nim
+		])->one();
+
+		return $user->email;
 	}
 
 	public static function getStatusSyarat($peserta_id, $syarat_id)

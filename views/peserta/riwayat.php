@@ -39,6 +39,7 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
     ],  
             [
                 'attribute' => 'periode_id',
+                'label' => 'Periode',
                 'filter' => ArrayHelper::map($list_periode,'id_periode','nama_periode'),
                 'value' => function($data){
                     return !empty($data->periode) ? $data->periode->nama_periode : null;
