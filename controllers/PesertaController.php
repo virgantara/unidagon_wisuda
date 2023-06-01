@@ -11,13 +11,10 @@ use app\models\Syarat;
 use app\models\PesertaSyarat;
 
 use app\helpers\MyHelper;
-use Google\Service\Analytics\Resource\Data;
-use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use yii\helpers\StringHelper;
 // use \Firebase\JWT\JWT;
 use yii\httpclient\Client;
 
@@ -465,7 +462,7 @@ class PesertaController extends Controller
         $sisa = $jumlah_syarat - $counter;
 
         // print_r($results);exit;
-        return $this->render('view_new', [
+        return $this->render('view', [
             'model' => $model,
             'sisa' => $sisa,
             'list_syarat' => $list_syarat,
