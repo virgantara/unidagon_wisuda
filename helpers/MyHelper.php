@@ -86,7 +86,7 @@ class MyHelper
 			'nim' => $nim
 		])->one();
 
-		return $user->email;
+		return isset($user->email) ? $user->email : "";
 	}
 
 	public static function getStatusSyarat($peserta_id, $syarat_id)
