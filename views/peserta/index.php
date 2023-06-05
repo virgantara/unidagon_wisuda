@@ -41,6 +41,7 @@ $tgl_akhir = strftime('%A, %d %B %Y', strtotime($periode->tanggal_tutup));
                     ],
                     'nim',
                     'nama_lengkap',
+                    'nik',
 
                     'tempat_lahir',
                     [
@@ -72,6 +73,7 @@ $tgl_akhir = strftime('%A, %d %B %Y', strtotime($periode->tanggal_tutup));
                     'nama_ibu',
                     'pekerjaan_ibu',
                     'jumlah_rombongan',
+                    'ukuran_kaos',
                     'created',
                     'status_validasi',
                     // 'periode_id',
