@@ -23,6 +23,8 @@ use yii\httpclient\Client;
  */
 class PesertaController extends Controller
 {
+
+
     /**
      * {@inheritdoc}
      */
@@ -793,4 +795,65 @@ class PesertaController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    public function actionAddCatatan()
+    {
+        $results = [];
+        $dataPost = Yii::$app->request->post('dataPost');
+
+        if ($dataPost === null) {
+            return $this->asJson(['error' => 'No data received.']);
+        }
+
+        $model = Peserta::findOne($dataPost['user_id']);
+
+        if ($model === null) {
+            return $this->asJson(['error' => 'User not found.']);
+        }
+
+        $model->catatan = $dataPost['catatan'];
+        $model->status_validasi = 'TIDAK VALID';
+        $model->is_valid = false;
+        $model->approved_at = null;
+        $model->approved_by = null;
+
+        if ($model->save()) {
+            // Data berhasil diperbarui
+            $results = [
+                'code' => 200,
+                'message' => 'Catatan telah berhasil ditambahkan!',
+                'data' => 'Berhasil'
+            ];
+
+            $user = User::find()->where(['nim' => $model->nim])->one();
+            Yii::$app->mailer->compose()
+            ->setFrom([Yii::$app->params['supportEmail'] => 'Wisuda Unida Gontor'])
+            ->setTo($user->email) // Email Anda untuk uji coba
+            ->setSubject('Catatan Baru')
+            ->setHtmlBody("Catatan baru telah ditambahkan:\n\n" . $model->catatan)
+            ->send();
+
+            // Yii::$app->mailer->compose()
+            // ->setTo($user->email)
+            // // ->setTo('vinux.edu@gmail.com')
+            // ->setFrom([Yii::$app->params['supportEmail'] => 'Administrator'])
+            // ->setSubject('[Approval] WISUDA UNIDA Gontor')
+            // ->setHtmlBody($emailTemplate)
+            // ->send();
+
+        } else {
+            // Tangani error
+            $results = [
+                'code' => 400,
+                'message' => 'Catatan gagal ditambahkan!',
+                'errors' => $model->getErrors(),
+                'data' => 'Gagal'
+            ];
+        }
+
+        
+        echo json_encode($results);
+        exit;
+    }
+
 }

@@ -6,6 +6,9 @@ use kartik\select2\Select2;
 use richardfan\widget\JSRegister;
 use wdmg\helpers\ArrayHelper;
 use yii\helpers\Html;
+use dosamigos\ckeditor\CKEditor;
+use yii\helpers\Url;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Peserta */
@@ -56,9 +59,40 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
                         </div>
                     </div>
                 </div>
+                <br>
+                <br>
+                <div class="col-md-1"><button class="btn btn-danger" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-ban"></i> Reject</button>
+
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Tambahkan Catatan</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <?php $form = ActiveForm::begin(); ?>
+                        <div class="modal-body">
+                            <?= $form->field($model, 'catatan')->widget(CKEditor::classname(),[
+                                'options' => ['rows' => 6],
+                                'preset' => 'advance', 
+                                ]);
+                            ?>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="btn-catatan">Save changes</button>
+                        </div>
+                        <?php ActiveForm::end(); ?>
+    
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <br>
+                <br>
                 <div class="col-lg-6 col-md-12 col-sm-12">
-
-
                     <h2>Data Pribadi Calon Wisudawan</h2>
                     <table class="table table-striped">
                         <tr>
@@ -146,6 +180,11 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
                         <tr>
                             <td>Verifikator</td>
                             <td colspan="2">: <?= $model->approved_by == '' ? 'Tidak ada' : $model->approvedBy->nama ?></td>
+                        </tr>
+
+                        <tr>
+                            <td>Catatan</td>
+                            <td colspan="2">: <?= $model->catatan == '' ? 'Tidak ada' : $model->catatan ?></td>
                         </tr>
                     </table>
 
@@ -278,5 +317,75 @@ setlocale(LC_ALL, 'id_ID', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', '
 
 
     })
+
+    $(document).on("click", "#btn-catatan", function(e) {
+    e.preventDefault();
+
+    // Ambil nilai dari CKEditor
+    var catatanValue = CKEDITOR.instances['peserta-catatan'].getData();
+
+    var obj = {
+        user_id: '<?=$model->id ?>',
+        catatan: catatanValue // Nilai dari CKEditor
+    };
+
+    $.ajax({
+        type: 'POST',
+        data: {
+            dataPost: obj
+        },
+        url: '<?= Url::to(['peserta/add-catatan']) ?>',
+        async: true,
+        beforeSend: function() {
+            Swal.fire({
+                title: "Please wait",
+                html: "Processing your request",
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                title: 'Oops!',
+                icon: 'error',
+                text: xhr.responseText
+            });
+        },
+        success: function(data) {
+            try {
+                var res = $.parseJSON(data);
+                if (res.code == 200) {
+                    Swal.fire({
+                        title: 'Yeay!',
+                        icon: 'success',
+                        text: res.message
+                    }).then((result) => {
+            if (result.value) {
+              location.reload(); 
+            }
+          });;
+                } else {
+                    Swal.fire({
+                        title: 'Oops!',
+                        icon: 'error',
+                        text: res.message
+                    });
+                }
+            } catch (e) {
+                console.error('Error parsing response: ', e);
+                Swal.fire({
+                    title: 'Oops!',
+                    icon: 'error',
+                    text: 'Error parsing server response'
+                });
+            }
+        }
+    });
+});
+
+
 </script>
 <?php JSRegister::end() ?>
