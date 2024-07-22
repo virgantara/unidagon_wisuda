@@ -818,7 +818,7 @@ class PesertaController extends Controller
         $model->approved_by = null;
 
         if ($model->save()) {
-            // Data berhasil diperbarui
+            
             $results = [
                 'code' => 200,
                 'message' => 'Catatan telah berhasil ditambahkan!',
@@ -828,21 +828,15 @@ class PesertaController extends Controller
             $user = User::find()->where(['nim' => $model->nim])->one();
             Yii::$app->mailer->compose()
             ->setFrom([Yii::$app->params['supportEmail'] => 'Wisuda Unida Gontor'])
-            ->setTo($user->email) // Email Anda untuk uji coba
-            ->setSubject('Catatan Baru')
+            ->setTo($user->email) 
+            ->setSubject('[Admisi UNIDA Gontor] Catatan Baru')
             ->setHtmlBody("Catatan baru telah ditambahkan:\n\n" . $model->catatan)
             ->send();
 
-            // Yii::$app->mailer->compose()
-            // ->setTo($user->email)
-            // // ->setTo('vinux.edu@gmail.com')
-            // ->setFrom([Yii::$app->params['supportEmail'] => 'Administrator'])
-            // ->setSubject('[Approval] WISUDA UNIDA Gontor')
-            // ->setHtmlBody($emailTemplate)
-            // ->send();
+
 
         } else {
-            // Tangani error
+            
             $results = [
                 'code' => 400,
                 'message' => 'Catatan gagal ditambahkan!',
