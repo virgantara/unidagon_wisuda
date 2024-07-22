@@ -818,7 +818,7 @@ class PesertaController extends Controller
         $model->approved_by = null;
 
         if ($model->save()) {
-            
+
             $results = [
                 'code' => 200,
                 'message' => 'Catatan telah berhasil ditambahkan!',
@@ -829,7 +829,7 @@ class PesertaController extends Controller
             Yii::$app->mailer->compose()
             ->setFrom([Yii::$app->params['supportEmail'] => 'Wisuda Unida Gontor'])
             ->setTo($user->email) 
-            ->setSubject('[Admisi UNIDA Gontor] Catatan Baru')
+            ->setSubject('[Admisi UNIDA Gontor] Catatan Perbaikan Berkas')
             ->setHtmlBody("Catatan baru telah ditambahkan:\n\n" . $model->catatan)
             ->send();
 
