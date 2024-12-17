@@ -288,50 +288,58 @@ class SiteController extends Controller
         return true; // or false to not run the action
     }
 
+    //------------------------------------------------------------------------------------------------//
+// OAUTH2 CALLBACK
+//------------------------------------------------------------------------------------------------//
     public function actionAuthCallback()
     {
+
+
+        // $input = json_decode(file_get_contents('php://input'),true);
+        // header('Content-type:application/json;charset=utf-8');
+
         $results = [];
-        header('Content-Type: application/json');
+         
+
         try
         {
-            if(!empty($_SERVER['HTTP_X_JWT_TOKEN'])){
+            $session = Yii::$app->session;
+            $access_token = Yii::$app->request->get('access_token');
+            $refresh_token = Yii::$app->request->get('refresh_token');
+
+            $result = Yii::$app->tokenManager->validateTokenFromOtherApps($access_token);
+            
+            $token = $result['token'];
+            // echo '<pre>';
+            // print_r($token);exit;
+            $accessTokenExpiresAt = $token['accessTokenExpiresAt'];
+            $uuid = $token['user']['uuid'];
+            
+
+            $user = \app\models\User::find()->where([
+                'uuid'=>$uuid,
+            ])
+            ->one();
+
+            Yii::$app->session->set('access_token', $access_token);
+            Yii::$app->session->set('refresh_token', $refresh_token ?? null);
+            Yii::$app->session->set('expires_in',$accessTokenExpiresAt);
+
+            if(!empty($user)){
                 
-                $request_method = $_SERVER["REQUEST_METHOD"];
+                Yii::$app->user->login($user);
 
-                switch($request_method)
-                {
-                    case 'POST' :
-                        $token = $_SERVER['HTTP_X_JWT_TOKEN'];
-                        $key = Yii::$app->params['jwt_key'];
-                        $decoded = JWT::decode($token, base64_decode(strtr($key, '-_', '+/')), ['HS256']);
-                        $results = [
-                            'code' => 200,
-                            'message' => 'Valid'
-                        ];   
-                    break;
-                    default:
-                        header("HTTP/1.0 405 Method Not Allowed");
-                        $results = [
-                            'code' => 405,
-                            'message' => $request_method.' Method not allowed '
-                        ];   
+                $hasil = Yii::$app->aplikasi->getAllowedAplikasi($access_token);               
+            
+                $session->set('token',$hasil['token']);
+                $session->set('apps',$hasil['apps']);
 
-                        echo json_encode($results);
-                        exit;
-                    break;
-                }
+                return $this->redirect(['site/index']);
             }
 
             else{
-                header("HTTP/1.0 401 Bad Request");
-
-                $results = [
-                    'code' => 401,
-                    'message' => 'Unauthorized Request '
-                ];   
-
-                echo json_encode($results);
-                exit;
+                throw new \Exception("User with ".$decoded->uuid." not found SIAKAD");
+                
             }
             
         }
@@ -339,16 +347,78 @@ class SiteController extends Controller
         {
 
             $results = [
-                'code' => $e->getCode(),
+                'code' => 500,
                 'message' => $e->getMessage()
             ];
+            print_r($results);
+            exit;
         }
 
-        header('Content-Type: application/json');
         echo json_encode($results);
 
         die();
+        
        
+    }
+
+
+    public function actionCallback()
+    {
+        $session = Yii::$app->session;  
+
+        $receivedJwt = Yii::$app->request->get('state');
+        
+        $secretKey = Yii::$app->params['jwt_key'];
+        $decoded = \Firebase\JWT\JWT::decode($receivedJwt, new \Firebase\JWT\Key($secretKey, 'HS256'));
+
+        if ($decoded->iss !== Yii::$app->params['oauth']['redirectUri']) {
+            throw new BadRequestHttpException('Invalid issuer.');
+        }
+
+        if ($decoded->exp < time()) {
+            throw new BadRequestHttpException('Token has expired.');
+            
+        }
+      
+        try {
+
+            $authCode = Yii::$app->request->get('code');
+            $accessToken = Yii::$app->tokenManager->fetchAccessTokenWithAuthCode($authCode);
+            
+            Yii::$app->session->set('jwt_token', $accessToken);
+
+            $jwtSecretKey = Yii::$app->params['jwt_key'];
+            $decoded = \Firebase\JWT\JWT::decode($accessToken, new \Firebase\JWT\Key($jwtSecretKey, 'HS256'));
+            $uuid = $decoded->uuid;
+            $user = \app\models\User::find()->where([
+                'uuid'=>$uuid,
+            ])
+            ->one();
+
+            Yii::$app->session->set('access_token', $decoded->accessToken);
+            Yii::$app->session->set('refresh_token', $decoded->refreshToken ?? null);
+            Yii::$app->session->set('expires_in',$decoded->accessTokenExpiresAt);
+
+            if(!empty($user)){
+                
+                Yii::$app->user->login($user);
+
+                $hasil = Yii::$app->aplikasi->getAllowedAplikasi($decoded->accessToken);               
+            
+                $session->set('token',$hasil['token']);
+                $session->set('apps',$hasil['apps']);
+
+                return $this->redirect(['site/index']);
+            }
+
+            else{
+                throw new \Exception("User with ".$decoded->uuid." not found SIAKAD");
+                
+            }
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('danger',$e->getMessage());
+            return $this->redirect(['site/index']);
+        }
     }
 
     public function actionLoginSso($token)

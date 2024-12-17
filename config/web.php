@@ -38,6 +38,20 @@ $config = [
     ],
     'timeZone' => 'Asia/Jakarta',
     'components' => [
+        'aplikasi' => [
+            'class' => 'app\components\AplikasiAuth',
+            'baseurl' => $params['oauth']['baseurl'], 
+        ],
+        'tokenManager' => [
+            'class' => 'app\components\TokenManager',
+        ],
+        'oauth2' => [
+            'class' => 'app\components\OAuth2Client',
+            'tokenValidationUrl' => $params['oauth']['baseurl'], // Endpoint for token validation
+            'tokenRefreshUrl' => $params['oauth']['baseurl'],
+            'client_id' => $params['oauth']['client_id'],
+            'client_secret' => $params['oauth']['client_secret'],
+        ],
         'formatter' => [
             'dateFormat' => 'php:d-m-Y',
             'decimalSeparator' => ',',

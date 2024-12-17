@@ -1,7 +1,13 @@
 <?php
 
 return [
-
+     'oauth' => [
+          'baseurl' => 'https://auth.unida.gontor.ac.id:5443',
+          'client_id' => '',
+          'redirectUri' => 'https://wisuda.unida.gontor.ac.id/site/callback',
+          'client_secret' => '',
+          'grant_type' => 'password'
+     ],
    'api_baseurl' => 'http://localhost:1926',
    'sso_url' => 'http://local.sso.com:30101',
    'sister_baseurl' => 'http://sister.unida.gontor.ac.id/ws.php/1.0',
