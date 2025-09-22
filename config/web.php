@@ -38,15 +38,21 @@ $config = [
     ],
     'timeZone' => 'Asia/Jakarta',
     'components' => [
+        'apiManager' => [
+            'class' => 'virgantara\components\ApiManager',
+            'api_baseurl' => $params['api_baseurl'],
+            'client_token' => $params['client_token'],
+            'timeout' => 60
+        ],
         'aplikasi' => [
-            'class' => 'app\components\AplikasiAuth',
+            'class' => 'virgantara\components\AplikasiAuth',
             'baseurl' => $params['oauth']['baseurl'], 
         ],
         'tokenManager' => [
-            'class' => 'app\components\TokenManager',
+            'class' => 'virgantara\components\TokenManager',
         ],
         'oauth2' => [
-            'class' => 'app\components\OAuth2Client',
+            'class' => 'virgantara\components\OAuth2Client',
             'tokenValidationUrl' => $params['oauth']['baseurl'], // Endpoint for token validation
             'tokenRefreshUrl' => $params['oauth']['baseurl'],
             'client_id' => $params['oauth']['client_id'],

@@ -301,8 +301,8 @@ class SiteController extends Controller
         $results = [];
          
 
-        try
-        {
+        // try
+        // {
             $session = Yii::$app->session;
             $access_token = Yii::$app->request->get('access_token');
             $refresh_token = Yii::$app->request->get('refresh_token');
@@ -310,8 +310,7 @@ class SiteController extends Controller
             $result = Yii::$app->tokenManager->validateTokenFromOtherApps($access_token);
             
             $token = $result['token'];
-            // echo '<pre>';
-            // print_r($token);exit;
+            
             $accessTokenExpiresAt = $token['accessTokenExpiresAt'];
             $uuid = $token['user']['uuid'];
             
@@ -329,7 +328,7 @@ class SiteController extends Controller
                 
                 Yii::$app->user->login($user);
 
-                $hasil = Yii::$app->aplikasi->getAllowedAplikasi($access_token);               
+                $hasil = Yii::$app->aplikasi->getAllowedAplikasi($access_token, $refresh_token);             
             
                 $session->set('token',$hasil['token']);
                 $session->set('apps',$hasil['apps']);
@@ -342,17 +341,17 @@ class SiteController extends Controller
                 
             }
             
-        }
-        catch(\Exception $e) 
-        {
+        // }
+        // catch(\Exception $e) 
+        // {
 
-            $results = [
-                'code' => 500,
-                'message' => $e->getMessage()
-            ];
-            print_r($results);
-            exit;
-        }
+        //     $results = [
+        //         'code' => 500,
+        //         'message' => $e->getMessage()
+        //     ];
+        //     print_r($results);
+        //     exit;
+        // }
 
         echo json_encode($results);
 

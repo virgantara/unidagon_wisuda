@@ -14,15 +14,14 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.6.0",
-        "yiisoft/yii2": "~2.0.40",
-        "yiisoft/yii2-bootstrap": "~2.0.0",
-        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+        "php": ">=7.3.0",
+        "yiisoft/yii2": "*",
+        "yiisoft/yii2-bootstrap": "*",
+        "yiisoft/yii2-swiftmailer": "*",
         "yiisoft/yii2-authclient": "*",
         "kartik-v/yii2-widget-datepicker":"@dev",
         "kartik-v/yii2-grid": "dev-master",
         "phpoffice/phpspreadsheet": "^1.10",
-        "fxp/composer-asset-plugin": "^1.4",
         "firebase/php-jwt": "^5.2",
         "aws/aws-sdk-php": "^3.173",
         "2amigos/yii2-ckeditor-widget": "^2.1",
@@ -40,7 +39,8 @@
         "kartik-v/yii2-number": "dev-master",
         "wdmg/yii2-activity": "^1.1",
         "kartik-v/yii2-widget-datetimepicker": "*",
-        "richardfan1126/yii2-js-register": "*"
+        "richardfan1126/yii2-js-register": "*",
+        "virgantara/unida-apps-support": "dev-master"
 
     },
     "require-dev": {
@@ -59,6 +59,9 @@
         "process-timeout": 1800,
         "fxp-asset": {
             "enabled": false
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
         }
     },
     "scripts": {
@@ -90,6 +93,10 @@
         {
             "type": "composer",
             "url": "https://asset-packagist.org"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/virgantara/Unida-Apps-Support"
         }
     ]
 }

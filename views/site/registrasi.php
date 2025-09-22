@@ -72,9 +72,9 @@ if(!empty($periode)){
                 }
                 ?>
             </div>
-            <div class="col-lg-4 d-lg-block d-none">
+            <!-- <div class="col-lg-4 d-lg-block d-none">
                 <img src="https://getstisla.com/landing/undraw_post_online_dkuk.svg" alt="image" class="img-fluid img-flip" width="80%">
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
